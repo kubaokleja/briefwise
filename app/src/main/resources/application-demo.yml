@@ -1,0 +1,6 @@
+# Replay provider + seeded snapshot: runs without any API key.
+briefwise:
+  llm:
+    provider: replay
+    replay:
+      on-miss: fail

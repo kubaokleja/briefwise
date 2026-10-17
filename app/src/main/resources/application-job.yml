@@ -1,0 +1,9 @@
+# Non-web runner for GitHub Actions (`--briefwise.job=<name>`, runs and exits). Combine with `cloud`:
+#   SPRING_PROFILES_ACTIVE=cloud,job
+spring:
+  main:
+    web-application-type: none
+
+briefwise:
+  llm:
+    provider: anthropic

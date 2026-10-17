@@ -1,0 +1,6 @@
+# Tests: Testcontainers provide the database, WireMock provides HTTP APIs, LLM calls are replayed (never live).
+briefwise:
+  llm:
+    provider: replay
+    replay:
+      on-miss: fail

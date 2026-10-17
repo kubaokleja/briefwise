@@ -1,0 +1,48 @@
+# Shared defaults. Profile files (application-{local,cloud,job,demo,test}.yml) override per environment.
+# `local` is the default profile when none is active (Docker Compose stack).
+spring:
+  application:
+    name: briefwise
+  profiles:
+    default: local
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/briefwise}
+    username: ${DB_USER:briefwise}
+    password: ${DB_PASSWORD:${POSTGRES_PASSWORD:briefwise}}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate   # Flyway is the only schema source; never "update"
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+# See DESIGN 13.2. Model names will live here too (never in code) once LLM calls exist.
+briefwise:
+  execution:
+    mode: on-demand          # on-demand | scheduled
+  jobs:
+    news-ingest:
+      enabled: true
+      cron: "0 */15 7-22 * * MON-FRI"
+    news-classify:
+      enabled: true
+    risk-alerts:
+      enabled: true
+    brief:
+      enabled: false         # expensive model; on demand by default
+  llm:
+    replay:
+      on-miss: fail          # fail (CI, demo) | fallback (local)
+  cors:
+    allowed-origins:
+      - http://localhost:5173

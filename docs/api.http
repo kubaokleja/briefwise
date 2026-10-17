@@ -1,0 +1,48 @@
+### Briefwise API: happy path, 404, 400 per context. Run the app (`local` profile) and use IntelliJ / VS Code REST Client.
+### These cases are verified automatically by PortfolioControllerIT and MarketControllerIT.
+@host = http://localhost:8080
+@corePortfolio = b0000000-0000-4000-8000-000000000002
+
+################################################################ portfolio
+
+### List portfolios (3 synthetic) - 200
+GET {{host}}/api/portfolios
+X-Correlation-ID: manual-001
+
+### One portfolio with positions - 200
+GET {{host}}/api/portfolios/{{corePortfolio}}
+
+### Holdings only - 200
+GET {{host}}/api/portfolios/{{corePortfolio}}/holdings
+
+### Unknown portfolio - 404
+GET {{host}}/api/portfolios/00000000-0000-4000-8000-0000000000ff
+
+### Malformed id - 400
+GET {{host}}/api/portfolios/not-a-uuid
+
+################################################################ market
+### Prices are loaded by the ETL (later task); until then these return empty / 404 on a fresh database.
+
+### Price history - 200 (empty list until prices exist)
+GET {{host}}/api/market/instruments/AAPL/prices?from=2026-10-01&to=2026-10-15
+
+### Daily move - 200 once two closes exist, otherwise 404
+GET {{host}}/api/market/instruments/AAPL/daily-move
+
+### Unknown instrument - 404
+GET {{host}}/api/market/instruments/ZZZZ/daily-move
+
+### Invalid ticker - 400
+GET {{host}}/api/market/instruments/123/daily-move
+
+### Missing 'to' - 400
+GET {{host}}/api/market/instruments/AAPL/prices?from=2026-10-01
+
+### 'from' after 'to' - 400
+GET {{host}}/api/market/instruments/AAPL/prices?from=2026-10-15&to=2026-10-01
+
+################################################################ ops
+
+### Health - 200
+GET {{host}}/actuator/health

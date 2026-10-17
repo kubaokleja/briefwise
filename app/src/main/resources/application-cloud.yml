@@ -1,0 +1,10 @@
+# Neon database + Claude API. Secrets come from the environment (GitHub Secrets / .env), never from this file.
+spring:
+  datasource:
+    url: ${NEON_JDBC_URL}
+    username: ${NEON_DB_USER}
+    password: ${NEON_DB_PASSWORD}
+
+briefwise:
+  llm:
+    provider: anthropic

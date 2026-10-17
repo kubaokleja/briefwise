@@ -1,0 +1,54 @@
+# Local stack for the `local` profile: Postgres + pgvector, Kafka (KRaft, single node), Ollama.
+# Copy .env.example to .env first (the real .env is git-ignored). All ports are bound to localhost only.
+#   docker compose up -d
+#   docker compose up -d postgres      # database only is enough for most work
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.7-pg16   # same image as the Testcontainers tests
+    environment:
+      POSTGRES_DB: briefwise
+      POSTGRES_USER: briefwise
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?copy .env.example to .env and set POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U briefwise -d briefwise"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  kafka:
+    image: apache/kafka:4.3.1
+    # Single node, KRaft mode (no ZooKeeper): this node is both broker and controller. Used from M1 (news.raw).
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    ports:
+      - "127.0.0.1:9092:9092"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+
+  ollama:
+    image: ollama/ollama:0.40.5
+    # Local embeddings and dev LLM (zero cost, lower quality: never used for evals). Pull a model with:
+    #   docker compose exec ollama ollama pull nomic-embed-text
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+
+volumes:
+  postgres-data:
+  kafka-data:
+  ollama-data:

@@ -1,0 +1,50 @@
+package com.briefwise.market.infrastructure.persistence;
+
+import com.briefwise.market.domain.model.DailyPrice;
+import com.briefwise.market.domain.model.Instrument;
+import com.briefwise.market.domain.port.InstrumentRepository;
+import com.briefwise.market.domain.port.PriceRepository;
+import com.briefwise.shared.domain.model.Ticker;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+/** Outbound adapter for both market ports. */
+@Component
+@Transactional(readOnly = true)
+class MarketRepositoryAdapter implements InstrumentRepository, PriceRepository {
+
+    private final InstrumentJpaRepository instruments;
+    private final DailyPriceJpaRepository prices;
+    private final MarketEntityMapper mapper;
+
+    MarketRepositoryAdapter(InstrumentJpaRepository instruments, DailyPriceJpaRepository prices,
+                            MarketEntityMapper mapper) {
+        this.instruments = instruments;
+        this.prices = prices;
+        this.mapper = mapper;
+    }
+
+    @Override
+    public Optional<Instrument> findByTicker(Ticker ticker) {
+        return instruments.findByTicker(ticker.symbol()).map(mapper::toDomain);
+    }
+
+    @Override
+    public List<DailyPrice> findBetween(UUID instrumentId, LocalDate from, LocalDate to) {
+        return prices.findByInstrumentIdAndTradeDateBetweenOrderByTradeDateAsc(instrumentId, from, to).stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<DailyPrice> findLatest(UUID instrumentId, int count) {
+        return prices.findByInstrumentIdOrderByTradeDateDesc(instrumentId, PageRequest.of(0, count)).stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+}

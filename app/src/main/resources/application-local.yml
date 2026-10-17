@@ -1,0 +1,6 @@
+# Default for development: Docker Compose (Postgres + pgvector, Kafka, Ollama). Zero LLM cost.
+briefwise:
+  llm:
+    provider: ollama
+    replay:
+      on-miss: fallback
