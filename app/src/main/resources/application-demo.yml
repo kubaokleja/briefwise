@@ -1,5 +1,8 @@
 # Replay provider + seeded snapshot: runs without any API key.
 briefwise:
+  market:
+    price-snapshot:
+      import-on-startup: true
   llm:
     provider: replay
     replay:
