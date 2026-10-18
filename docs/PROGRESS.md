@@ -34,6 +34,45 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 3 — 2026-10-18 — UI delivery planning (docs only)
+
+**Phase:** M0 / planning (no application code)
+**Goal:** Decide when and how each UI screen is built, with CI, tests and serving per profile.
+
+**Done**
+- Audit of DESIGN 15 vs PLANNING: no UI tasks, no login screen, no UI states, undefined AI-marker scope,
+  `EventSource` cannot send auth/correlation headers, no Java/TS contract, no rule against rendering LLM output as
+  HTML, `demo` Compose profile missing although ticked.
+- UI tasks placed under M0-M6 in PLANNING (~54 h total); DESIGN 15, 12.1, 14.1, 14.2 and 16 updated.
+- npm versions verified on the registry (listed in ADR 0007); springdoc 3.1.1 checked on Maven Central (built
+  against Spring Boot 4.1.0).
+
+**Decisions** (link ADRs)
+- [0007](decisions/0007-ui-delivery-strategy.md) thin vertical slices; Spring serves the UI in `demo`; JWT in an
+  httpOnly cookie + CSRF; OpenAPI-generated TS types; hand-rolled `useApi`; SSE progress for briefs; Approve
+  blocked while violations are open; AI marker never removed; TypeScript pinned to 5.9.3; nothing planned to be cut.
+- Dependencies approved for M0 (not installed yet): the M0 npm list in ADR 0007, springdoc-openapi 3.1.1,
+  openapi-typescript 7.13.0.
+
+**AI concepts introduced / explained**
+- SSE token streaming: the LLM answer is sent piece by piece, so the RM reads within ~1 s instead of waiting
+  ≤10 s. Trade-off: citation validation runs only at the end, so text is provisional until the `done` event.
+
+**Domain questions added** (also in PLANNING)
+- Should an RM be able to override open compliance violations with a written justification?
+
+**Open questions / blockers**
+- Milestone durations are not recorded anywhere, so the UI share per milestone cannot be stated as a percentage.
+- Global npm is 9.7.2 (old for Node 24); CI uses the bundled npm.
+
+**Next session**
+- Build the M0 UI skeleton (PLANNING "UI skeleton"), then start M1.
+
+**Proposed commit message**
+> docs: add UI delivery strategy (ADR 0007) and plan UI slices per milestone
+
+---
+
 ## Session 2 — 2026-10-18 — M0 completion: ADRs, remaining contexts, shared kernel, quant/ and price snapshot
 
 **Phase:** M0 / last open items
