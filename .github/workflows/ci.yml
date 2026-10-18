@@ -50,3 +50,30 @@ jobs:
             app/target/failsafe-reports
           if-no-files-found: ignore
           retention-days: 7
+
+  # Python quant batch (DESIGN 14.2). Tests are offline: yfinance is stubbed, the price snapshot is never refreshed here.
+  quant-verify:
+    name: quant-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: quant
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10
+        with:
+          version: '0.13.1'
+          enable-cache: true
+          cache-dependency-glob: quant/uv.lock
+
+      # Python 3.12 comes from quant/.python-version; --locked fails if uv.lock is out of date.
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Test
+        run: uv run pytest
