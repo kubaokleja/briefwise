@@ -482,6 +482,8 @@ Evaluations are the backbone of the project and the main talking point in interv
 - Facades: `@SpringBootTest` + Testcontainers (Postgres with pgvector).
 - Architecture: `ArchitectureTest` (ArchUnit).
 - `docs/api.http` per context: happy path, 404, 400.
+- UI: typecheck + ESLint; Vitest + Testing Library for pure functions and compliance-relevant components; one
+  Playwright smoke against `demo` ([ADR 0007](decisions/0007-ui-delivery-strategy.md)).
 
 **Cross-cutting**
 - Structured logs: human-readable locally, JSON in `cloud` and `job` profiles.
@@ -593,7 +595,7 @@ Not included: the Claude Code subscription used for development.
 | Kafka | Docker Compose (KRaft, single node) | Service container in the workflow | Docker Compose |
 | Quant (Python) | Local `uv run` / notebooks | GitHub Actions step | Precomputed forecasts in the snapshot |
 | Ollama | Local | Not used | Not needed (replay) |
-| UI | Local (Vite dev server) | — | Local |
+| UI | Local (Vite dev server, proxy to the app) | — | Served by the app image (same origin) |
 
 Neon free tier: 100 CU-hours of compute per project per month, 0.5 GB storage per project, pgvector supported, compute suspends after 5 minutes idle. A separate Neon project can be used for MLflow so it doesn't share the 0.5 GB quota.
 
@@ -601,7 +603,7 @@ Neon free tier: 100 CU-hours of compute per project per month, 0.5 GB storage pe
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `ci.yml` | Every PR and push to `main` | Build, unit tests, ArchUnit, Testcontainers (Postgres + Kafka), deterministic evals, Python lint and tests for `quant/` |
+| `ci.yml` | Every PR and push to `main` | Build, unit tests, ArchUnit, Testcontainers (Postgres + Kafka), deterministic evals, Python lint and tests for `quant/`, UI lint, typecheck, API types up to date, unit tests and build for `ui/` |
 | `evals.yml` | `workflow_dispatch` + path filter `prompts/**`, `evals/**` | LLM evals via Batch API; posts the results table as a PR comment; thresholds from section 10 block the merge |
 | `morning-pipeline.yml` | Cron on weekdays (UTC) + `workflow_dispatch`; schedule active only if repo variable `PIPELINE_ENABLED == 'true'` | Quant batch → news ingest + classification → risk alerts, against Neon; Kafka as a service container |
 | `release.yml` | Tag `v*` | Build the app image, publish to GHCR, attach the jar and release notes |
@@ -620,8 +622,12 @@ Rules: secrets only in GitHub Secrets (`ANTHROPIC_API_KEY`, `NEON_DATABASE_URL`,
 
 ### Screens
 
+Each screen ships in the milestone of the backend feature it shows (thin vertical slices); milestones, serving per
+profile, auth and testing are in [ADR 0007](decisions/0007-ui-delivery-strategy.md).
+
 | Screen | Content |
 |---|---|
+| **Login** (M4) | Username + password; JWT in an httpOnly cookie, CSRF token; role-based navigation (Admin only for `ADMIN`) |
 | **Dashboard** | Portfolio tiles (daily performance, alert count, relevant news count), list of briefs awaiting approval, last pipeline run status |
 | **Portfolio** | Positions with a change heatmap, forecast vs realised volatility (chart), alerts |
 | **News** | Feed with classification (sentiment, relevance, event type); LLM rationale expandable under the headline |
@@ -645,6 +651,13 @@ Principles:
 - Numbers always right-aligned, tabular figures, unit and currency next to every amount.
 - Colour is never the only carrier of meaning: sentiment also has an icon or label.
 - Every AI-generated text carries a visible "AI draft" marker and a link to its sources (EU AI Act, Art. 50 — transparency).
+  The marker is never removed: draft states "AI draft, not reviewed"; `Approved` "AI-generated · reviewed and
+  approved by {rm}, {date}"; `Rejected` "AI draft, rejected by {rm}"; `isFallback` "Built from a template (AI
+  unavailable)". It covers news rationale, daily summary, research answers and briefs.
+- Approve is disabled while any compliance violation is open (enforced by the backend; the UI reflects it).
+- LLM output is untrusted and always rendered as text, never as HTML.
+- Every screen has loading, empty and error states (the error shows the correlation ID), plus the domain states it
+  can meet: `UNCLASSIFIED` news, RAG "I don't know", budget exceeded (HTTP 429), suspected injection, fallback brief.
 - UI language: English.
 
 ---
@@ -665,7 +678,7 @@ Principles:
 | LLM | Claude API (Haiku 5.5 for classification, Sonnet 5.5 for commentary), Ollama locally |
 | MCP | Spring AI MCP server (Streamable HTTP) |
 | Quant | Python 3.12+, uv, pandas, arch, scikit-learn, LightGBM, MLflow |
-| Frontend | React + Vite + Tailwind + Recharts + Zustand |
+| Frontend | React + TypeScript + Vite + Tailwind + Recharts + Zustand; types generated from OpenAPI (springdoc + openapi-typescript); Vitest + Testing Library, Playwright smoke ([ADR 0007](decisions/0007-ui-delivery-strategy.md)) |
 | Evals | JUnit (deterministic) + promptfoo (LLM, red-team) |
 | Observability | Micrometer / OpenTelemetry → Langfuse Cloud |
 | CI/CD | GitHub Actions (CI, evals with thresholds, morning pipeline, releases to GHCR), Dependabot |
