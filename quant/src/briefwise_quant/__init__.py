@@ -1,0 +1,1 @@
+"""Briefwise quant batch."""

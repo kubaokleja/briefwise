@@ -12,6 +12,11 @@ updates:
     schedule:
       interval: weekly
 
-  # Added with the code they cover:
-  # - package-ecosystem: npm   (directory: /ui,    when ui/ exists)
-  # - package-ecosystem: uv    (directory: /quant, when quant/ exists)
+  - package-ecosystem: uv
+    directory: /quant
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  # Added with the code it covers:
+  # - package-ecosystem: npm   (directory: /ui, when ui/ exists)
