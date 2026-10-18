@@ -34,6 +34,63 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 2 — 2026-10-18 — M0 completion: ADRs, remaining contexts, shared kernel, quant/ and price snapshot
+
+**Phase:** M0 / last open items
+**Goal:** Close M0: decisions as ADRs, skeletons for the remaining contexts, shared kernel, Python `quant/`,
+market prices with a Java loader, and verification of the logging and Compose items left open in Session 1.
+
+**Done**
+- ADRs 0004-0006 (see below). Environment: TLS workaround replaced by a user-level `JAVA_TOOL_OPTIONS`
+  (`Windows-ROOT` trust store, because Avast scans HTTPS), `UV_SYSTEM_CERTS=1` for uv; uv and Python 3.12 installed.
+- Shared kernel: `SourceType`, `Citation`, `Money`, `TokenCount` (+ unit tests).
+- Skeletons (empty facade + `*FacadeIT`) for news, research, risk, brief, compliance, aiops, access. `jobs` and `mcp`
+  get no facade until their first adapter.
+- `quant/` (uv, Python 3.12, pandas 3.0.6, yfinance 1.7.0, pytest, ruff): `universe.py`, `prices.py`
+  (refresh script), 7 offline tests. `data/prices/`: 36 CSV files, 45,180 rows, 2021-10-18 to 2026-10-16.
+- CI: `quant-verify` job; Dependabot entry for uv. (App job was already green; `quant-verify` not yet run on GitHub.)
+- `market`: V6 (25 more instruments, 36 total), `PriceSnapshotImport` / `PriceSnapshotSource` ports, CSV reader,
+  idempotent batch insert (`ON CONFLICT DO NOTHING`), `MarketFacade.importPriceSnapshot()`, startup import in
+  `local` and `demo` only.
+- `JsonLoggingIT`: JSON line with `correlationId` under the `job` profile.
+- Compose stack started: Postgres healthy, Kafka started, Ollama answers; app in `local` profile starts on it
+  (health UP, 36 instruments / 45,180 prices loaded). Containers stopped afterwards.
+- Bug found only by starting the app for real: `Path`-typed config property with a relative default failed to bind
+  in a web context. Now a `String` + `PriceSnapshotPropertiesTest` (web-context runner) as regression test.
+- Build: `./mvnw verify` green: `ArchitectureTest` included, 37 integration tests.
+
+**Decisions** (link ADRs)
+- [0004](decisions/0004-market-price-source-yfinance-snapshot.md) yfinance refresh script + committed CSV snapshot
+  (`close` = adjusted close; a refresh rewrites history, the import never updates stored closes).
+- [0005](decisions/0005-resilience-spring-retryable.md) Spring core retry first, Resilience4j later.
+- [0006](decisions/0006-facade-views-and-public-surface-conventions.md) facade view records, public-surface rules.
+- Not in an ADR (small): `SourceType` values; snapshot import runs on startup only in `local`/`demo`.
+
+**AI concepts introduced / explained**
+- None new in code (no LLM calls yet). Data side of the RAG/forecast pipeline: prices come from a reproducible
+  snapshot so the quant batch and tests never depend on a live market API.
+
+**Domain questions added** (also in PLANNING)
+- Adjusted close rewrites history on every refresh, but the import never updates: reset or add an upsert mode?
+- Instrument universe is defined twice (`universe.py` and V4/V6): how to keep them in sync?
+
+**Open questions / blockers**
+- `quant-verify` CI job has not run on GitHub yet (push needed, done by you).
+- `demo` profile not verified end to end; Ollama has no model pulled yet.
+- `docs/DESIGN.md` has an uncommitted one-line change (blank line after the title removed) that was not made by
+  this session; check whether you want it.
+- Optional, awaiting approval: Jupyter as an optional dependency group in `quant/`; README note on running behind Avast.
+
+**Next session**
+- Start M1 (news ingestion and classification). First decisions to name: classification approach
+  (workflow vs agent), model choice, structured output, Spring AI 2.0 setup (verify APIs in docs), Kafka topic design.
+- Verify the Spring Framework 7 core retry claim in ADR 0005 when the first adapter is written.
+
+**Proposed commit message**
+> feat: complete M0 with remaining contexts, shared kernel, quant snapshot and price loader
+
+---
+
 ## Session 1 — 2026-10-16 — M0 step 1: Spring Boot skeleton, architecture rules, portfolio + market
 
 **Phase:** M0 / project bootstrap, architecture, data (first slice)
