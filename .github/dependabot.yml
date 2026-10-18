@@ -18,5 +18,24 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
 
-  # Added with the code it covers:
-  # - package-ecosystem: npm   (directory: /ui, when ui/ exists)
+  - package-ecosystem: npm
+    directory: /ui
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    # Packages that are released together are updated in one PR.
+    groups:
+      react:
+        patterns: ["react", "react-dom", "@types/react", "@types/react-dom"]
+      testing:
+        patterns: ["vitest", "jsdom", "@testing-library/*"]
+      lint:
+        patterns: ["eslint", "typescript-eslint", "eslint-plugin-*"]
+      tailwind:
+        patterns: ["tailwindcss", "@tailwindcss/*"]
+      fonts:
+        patterns: ["@fontsource/*"]
+    ignore:
+      # Pinned to 5.x: openapi-typescript needs ^5 and typescript-eslint <6.1 (ADR 0007). Lift when both support 6+.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]

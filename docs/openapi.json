@@ -1,0 +1,244 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Briefwise API",
+    "version" : "v0"
+  },
+  "servers" : [ {
+    "url" : "/"
+  } ],
+  "paths" : {
+    "/api/market/instruments/{ticker}/daily-move" : {
+      "get" : {
+        "operationId" : "dailyMove",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "ticker",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DailyMoveResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "market-controller" ]
+      }
+    },
+    "/api/market/instruments/{ticker}/prices" : {
+      "get" : {
+        "operationId" : "prices",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "ticker",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "from",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        }, {
+          "in" : "query",
+          "name" : "to",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PricePointResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "market-controller" ]
+      }
+    },
+    "/api/portfolios" : {
+      "get" : {
+        "operationId" : "list",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PortfolioResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "portfolio-controller" ]
+      }
+    },
+    "/api/portfolios/{portfolioId}" : {
+      "get" : {
+        "operationId" : "get",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "portfolioId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PortfolioResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "portfolio-controller" ]
+      }
+    },
+    "/api/portfolios/{portfolioId}/holdings" : {
+      "get" : {
+        "operationId" : "holdings",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "portfolioId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PositionResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "portfolio-controller" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "DailyMoveResponse" : {
+        "type" : "object",
+        "properties" : {
+          "change" : {
+            "type" : "number"
+          },
+          "changePercent" : {
+            "type" : "number"
+          },
+          "close" : {
+            "type" : "number"
+          },
+          "date" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "previousClose" : {
+            "type" : "number"
+          },
+          "ticker" : {
+            "type" : "string"
+          }
+        }
+      },
+      "PortfolioResponse" : {
+        "type" : "object",
+        "properties" : {
+          "clientId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "positions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PositionResponse"
+            }
+          },
+          "riskProfile" : {
+            "type" : "string"
+          }
+        }
+      },
+      "PositionResponse" : {
+        "type" : "object",
+        "properties" : {
+          "quantity" : {
+            "type" : "number"
+          },
+          "ticker" : {
+            "type" : "string"
+          },
+          "weight" : {
+            "type" : "number"
+          }
+        }
+      },
+      "PricePointResponse" : {
+        "type" : "object",
+        "properties" : {
+          "close" : {
+            "type" : "number"
+          },
+          "date" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "volume" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      }
+    }
+  }
+}

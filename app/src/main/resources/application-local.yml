@@ -1,4 +1,11 @@
 # Default for development: Docker Compose (Postgres + pgvector, Kafka, Ollama). Zero LLM cost.
+server:
+  address: 127.0.0.1          # not reachable from the LAN: the admin endpoint is open until M4 auth (ADR 0007)
+
+springdoc:
+  api-docs:
+    enabled: true
+
 briefwise:
   market:
     price-snapshot:

@@ -26,6 +26,14 @@ management:
       probes:
         enabled: true
 
+# OpenAPI spec at /v3/api-docs, enabled only in `local` and `test` (ADR 0007). Sorted and pretty-printed so the
+# committed docs/openapi.json diffs cleanly.
+springdoc:
+  api-docs:
+    enabled: false
+  writer-with-default-pretty-printer: true
+  writer-with-order-by-keys: true
+
 # See DESIGN 13.2. Model names will live here too (never in code) once LLM calls exist.
 briefwise:
   execution:

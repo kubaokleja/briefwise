@@ -34,6 +34,59 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 4 — 2026-10-18 — M0 UI skeleton, OpenAPI contract, ui-verify CI
+
+**Phase:** M0 / UI skeleton ([ADR 0007](decisions/0007-ui-delivery-strategy.md))
+**Goal:** A running `ui/` with design tokens, API client and a status page, typed from the backend's OpenAPI spec,
+checked in CI.
+
+**Done**
+- PLANNING: hour estimates removed from the UI lines.
+- Backend: springdoc 3.1.1 (`/v3/api-docs` in `local`/`test` only, sorted + pretty-printed), `OpenApiConfig`
+  (relative server URL so the spec is machine-independent), `OpenApiSpecIT` (rewrites `docs/openapi.json` and fails
+  on a difference), `server.address: 127.0.0.1` in `local`.
+- `ui/`: Vite 8 + React 19 + TypeScript 5.9.3 + Tailwind 4, Node 24 (`.nvmrc`), Vite proxy `/api` + `/actuator`
+  -> `127.0.0.1:8080`. DESIGN 15 tokens in `@theme`, self-hosted Inter / IBM Plex Mono.
+- `api/client.ts` (correlation ID per request, `ProblemDetail` -> `ApiError` with the server-logged ID, status 0 =
+  unreachable), `api/useApi.ts` (derived loading state, abort on unmount), generated `api/schema.d.ts` + `types.ts`.
+- Components `AppShell`, `Amount` / `Percent` (arrow + colour for changes), `Loading` / `Empty` / `ErrorPanel`;
+  `StatusPage` (API health + portfolios with largest position).
+- ESLint (typescript-eslint, react-hooks 7 incl. React Compiler rules, ban on `dangerouslySetInnerHTML`, proven to
+  fire on a throwaway file). Vitest: 11 tests (formatters, client, page success/empty/error).
+- CI `ui-verify` job; Dependabot `npm` with groups and an ignore on TypeScript majors.
+- Build: `./mvnw verify` green (58 unit incl. `ArchitectureTest`, 38 integration incl. `OpenApiSpecIT`); UI
+  typecheck, lint, tests and build green. Real stack checked: through the Vite proxy `/api/portfolios` 200 with the
+  correlation ID echoed, health `UP`, app listening on `127.0.0.1:8080` only. Stack stopped afterwards.
+
+**Decisions** (link ADRs)
+- Everything follows [ADR 0007](decisions/0007-ui-delivery-strategy.md). Small, no ADR: amounts render as
+  `1,234.50 USD` (ISO code after the number); `Percent` takes percent points (weights are fractions, callers x100);
+  OpenAPI generated with `--properties-required-by-default` because springdoc marks no record field as required.
+
+**AI concepts introduced / explained**
+- None (no LLM code). Groundwork for later AI screens: `ErrorPanel` shows the correlation ID that will also tag
+  LLM calls in `ai_generation_log`, and the lint ban on HTML rendering protects against untrusted LLM output.
+
+**Domain questions added** (also in PLANNING)
+- None.
+
+**Open questions / blockers**
+- `ui-verify` has not run on GitHub yet; the lockfile was written by npm 9.7.2 while CI uses npm 11 (regenerate
+  with a newer npm if `npm ci` fails).
+- Local Node 24.14.1 < 24.15 wanted by a jsdom dependency (warning only); update Node, then Node 26 after 2026-10-28.
+- Spec shows `*/*` response content (controllers declare no `produces`) and `riskProfile` as a plain string, not an
+  enum. Decide when M1 controllers are written.
+- `JAVA_HOME` / `JAVA_TOOL_OPTIONS` are user-level variables but were not inherited by this shell; set per command.
+
+**Next session**
+- Push and check `app-verify`, `quant-verify` and `ui-verify` on GitHub.
+- Start M1 (news pipeline) with its decision points; UI slice: News feed, `AiMarker`, router.
+
+**Proposed commit message**
+> feat: add UI skeleton with OpenAPI-generated types and ui-verify CI
+
+---
+
 ## Session 3 — 2026-10-18 — UI delivery planning (docs only)
 
 **Phase:** M0 / planning (no application code)
