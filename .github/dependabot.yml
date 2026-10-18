@@ -1,0 +1,17 @@
+version: 2
+
+updates:
+  - package-ecosystem: maven
+    directory: /app
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  # Added with the code they cover:
+  # - package-ecosystem: npm   (directory: /ui,    when ui/ exists)
+  # - package-ecosystem: uv    (directory: /quant, when quant/ exists)
