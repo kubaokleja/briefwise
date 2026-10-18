@@ -1,0 +1,28 @@
+-- Reference data: the rest of the tracked universe (30 companies + 6 ETFs in total, with V4). Must match
+-- quant/src/briefwise_quant/universe.py; the price snapshot in data/prices/ has one file per ticker.
+INSERT INTO instruments (ticker, name, instrument_type) VALUES
+    ('GOOGL', 'Alphabet Inc. Class A',               'STOCK'),
+    ('META',  'Meta Platforms, Inc.',                'STOCK'),
+    ('TSLA',  'Tesla, Inc.',                         'STOCK'),
+    ('BAC',   'Bank of America Corporation',         'STOCK'),
+    ('GS',    'The Goldman Sachs Group, Inc.',       'STOCK'),
+    ('UNH',   'UnitedHealth Group Incorporated',     'STOCK'),
+    ('LLY',   'Eli Lilly and Company',               'STOCK'),
+    ('MRK',   'Merck & Co., Inc.',                   'STOCK'),
+    ('PFE',   'Pfizer Inc.',                         'STOCK'),
+    ('WMT',   'Walmart Inc.',                        'STOCK'),
+    ('COST',  'Costco Wholesale Corporation',        'STOCK'),
+    ('HD',    'The Home Depot, Inc.',                'STOCK'),
+    ('PEP',   'PepsiCo, Inc.',                       'STOCK'),
+    ('DIS',   'The Walt Disney Company',             'STOCK'),
+    ('CVX',   'Chevron Corporation',                 'STOCK'),
+    ('CAT',   'Caterpillar Inc.',                    'STOCK'),
+    ('BA',    'The Boeing Company',                  'STOCK'),
+    ('CSCO',  'Cisco Systems, Inc.',                 'STOCK'),
+    ('ORCL',  'Oracle Corporation',                  'STOCK'),
+    ('INTC',  'Intel Corporation',                   'STOCK'),
+    ('V',     'Visa Inc.',                           'STOCK'),
+    ('QQQ',   'Invesco QQQ Trust',                   'ETF'),
+    ('IWM',   'iShares Russell 2000 ETF',            'ETF'),
+    ('GLD',   'SPDR Gold Shares',                    'ETF'),
+    ('TLT',   'iShares 20+ Year Treasury Bond ETF',  'ETF');

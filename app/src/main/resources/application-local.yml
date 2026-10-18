@@ -1,5 +1,8 @@
 # Default for development: Docker Compose (Postgres + pgvector, Kafka, Ollama). Zero LLM cost.
 briefwise:
+  market:
+    price-snapshot:
+      import-on-startup: true   # data/prices/ -> daily_prices; idempotent. Directory is relative to app/
   llm:
     provider: ollama
     replay:

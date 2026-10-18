@@ -13,4 +13,11 @@ public interface PriceRepository {
 
     /** The {@code count} most recent closes, newest first. */
     List<DailyPrice> findLatest(UUID instrumentId, int count);
+
+    /**
+     * Stores the closes whose date is not stored yet for the instrument; stored closes are not changed.
+     *
+     * @return how many closes were inserted
+     */
+    int insertMissing(UUID instrumentId, List<DailyPrice> prices);
 }

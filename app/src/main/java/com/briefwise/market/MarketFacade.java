@@ -2,7 +2,9 @@ package com.briefwise.market;
 
 import com.briefwise.market.domain.model.DailyMove;
 import com.briefwise.market.domain.model.DailyPrice;
+import com.briefwise.market.domain.model.ImportSummary;
 import com.briefwise.market.domain.port.MarketQueries;
+import com.briefwise.market.domain.port.PriceSnapshotImport;
 import com.briefwise.shared.domain.model.Ticker;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,9 +19,11 @@ import org.springframework.stereotype.Component;
 public class MarketFacade {
 
     private final MarketQueries queries;
+    private final PriceSnapshotImport snapshotImport;
 
-    MarketFacade(MarketQueries queries) {
+    MarketFacade(MarketQueries queries, PriceSnapshotImport snapshotImport) {
         this.queries = queries;
+        this.snapshotImport = snapshotImport;
     }
 
     /**
@@ -40,6 +44,17 @@ public class MarketFacade {
         return toView(queries.getDailyMove(ticker));
     }
 
+    /**
+     * Loads the committed price snapshot (ADR 0004). Safe to repeat: closes already stored are not touched.
+     *
+     * @throws IllegalStateException if the snapshot directory is missing or a file is malformed
+     */
+    public ImportSummaryView importPriceSnapshot() {
+        ImportSummary summary = snapshotImport.importSnapshot();
+        return new ImportSummaryView(summary.tickersRead(), summary.rowsRead(), summary.rowsInserted(),
+                summary.unknownTickers());
+    }
+
     private static PricePointView toView(DailyPrice price) {
         return new PricePointView(price.date(), price.close(), price.volume());
     }
@@ -48,6 +63,8 @@ public class MarketFacade {
         return new DailyMoveView(move.ticker(), move.date(), move.close(), move.previousClose(), move.change(),
                 move.changePercent());
     }
+
+    public record ImportSummaryView(int tickersRead, int rowsRead, int rowsInserted, List<Ticker> unknownTickers) {}
 
     public record PricePointView(LocalDate date, BigDecimal close, long volume) {}
 
