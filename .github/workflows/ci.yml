@@ -77,3 +77,42 @@ jobs:
 
       - name: Test
         run: uv run pytest
+
+  # React UI (ADR 0007). Unit tests only; no backend is started here.
+  ui-verify:
+    name: ui-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ui/.nvmrc
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+
+      # npm ci installs exactly what package-lock.json says and fails if it is out of sync with package.json.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # docs/openapi.json is kept current by OpenApiSpecIT (app-verify); the generated types must match it.
+      - name: API types up to date
+        run: |
+          npm run gen:api
+          git diff --exit-code -- src/api/schema.d.ts
+
+      - name: Test
+        run: npm test -- --run
+
+      - name: Build
+        run: npm run build

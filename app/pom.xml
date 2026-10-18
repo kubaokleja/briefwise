@@ -24,6 +24,8 @@
         <archunit.version>1.5.1</archunit.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
+        <!-- Verified on Maven Central 2026-10-18; 3.1.1 is built against Spring Boot 4.1.0 -->
+        <springdoc.version>3.1.1</springdoc.version>
     </properties>
 
     <dependencies>
@@ -39,6 +41,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- OpenAPI spec from the controllers; the UI generates its TypeScript types from it (ADR 0007). No Swagger UI. -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
 
         <!-- Persistence: Flyway is the only schema source -->

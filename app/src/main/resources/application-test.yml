@@ -1,4 +1,8 @@
 # Tests: Testcontainers provide the database, WireMock provides HTTP APIs, LLM calls are replayed (never live).
+springdoc:
+  api-docs:
+    enabled: true             # OpenApiSpecIT compares the spec with docs/openapi.json
+
 briefwise:
   llm:
     provider: replay
