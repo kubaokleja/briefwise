@@ -51,6 +51,20 @@ Goal: bounded contexts, synthetic portfolios, market data, CI from the first com
 - [ ] **M4 (F5)** Morning brief, approval workflow, MCP server, trajectory eval
 - [ ] **M5 (F6)** Red-team, guardrails, MODEL_CARD / AI_RISK_ASSESSMENT / SECURITY
 - [ ] **M6 (F7)** Hardened pipeline, eval gating in CI, observability, demo video
+- [ ] **Production-readiness review (after M6, before calling the project done)** Briefwise is a one-person learning
+  and portfolio project (GitHub Actions + Neon, <= 5 CHF/month, synthetic data). Write a full analysis (an ADR plus
+  a doc, e.g. `docs/PRODUCTION_GAP.md`) of what would change for real use in a bank, comparing "today" vs
+  "production" for each area:
+  - Deployment and runtime: always-on services, containers/Kubernetes, environments (dev/test/prod), blue-green, IaC.
+  - Scaling and availability: stateless app, DB replicas, Kafka cluster (multi-broker), SLOs, DR/backups.
+  - Data: real market data licences (Yahoo is not allowed for commercial use), adjusted-close handling and
+    corrections, lineage, retention, client data (real portfolios, PII), data residency (e.g. Swiss/EU).
+  - Security and compliance: identity (SSO/OIDC, RBAC for RMs), secrets management, audit trail, encryption,
+    pen-test, FINMA / GDPR / model-risk rules, vendor risk for LLM providers (data leaves the bank?).
+  - AI specifics: private/self-hosted or enterprise LLM contract, eval gating, drift monitoring, human-approval audit.
+  - Tools and technologies: re-check each choice (Postgres+pgvector vs dedicated vector DB, Resilience4j, MLflow,
+    observability stack, CI/CD, Spring Boot upgrade policy) and cost at real volume.
+  - Output: a table of decisions to revisit, risks and an estimated effort; do not change DESIGN without asking.
 
 ## Domain Questions Log
 
