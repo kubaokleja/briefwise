@@ -39,9 +39,9 @@ Goal: bounded contexts, synthetic portfolios, market data, CI from the first com
 
 ### Infrastructure and CI
 - [x] `docker-compose.yml`: Postgres + pgvector, Kafka (KRaft), Ollama; `demo` profile (stack started 2026-10-18: Postgres healthy, Kafka broker started, Ollama 0.40.5 answers; app in `local` profile starts on it, health UP, snapshot loaded 45,180 rows)
-- [x] `.github/workflows/ci.yml`: build, unit tests, ArchUnit, Testcontainers (Postgres + Kafka) (app job green on GitHub; Kafka IT comes with M1; `quant-verify` job added, first run pending)
+- [x] `.github/workflows/ci.yml`: build, unit tests, ArchUnit, Testcontainers (Postgres + Kafka) (`app-verify`, `quant-verify`, `ui-verify` green on GitHub, PR #2; Kafka IT comes with M1)
 - [x] Dependabot (Maven, GitHub Actions, uv done; npm entry added with `ui/`)
-- [x] Python `quant/` with uv + ruff + pytest and a `quant-verify` CI job (7 offline tests; CI job not yet run on GitHub)
+- [x] Python `quant/` with uv + ruff + pytest and a `quant-verify` CI job (7 offline tests; green on GitHub)
 - [x] UI delivery strategy -> [ADR 0007](decisions/0007-ui-delivery-strategy.md)
 - [x] `server.address=127.0.0.1` in `local` (admin endpoint is open until M4 auth)
 - [ ] `docker-compose.yml` `demo` profile does not exist yet (the line above was ticked too early); app image + UI come in M6
@@ -54,15 +54,94 @@ Goal: bounded contexts, synthetic portfolios, market data, CI from the first com
 - [x] Status page: health + portfolio list
 - [x] OpenAPI: springdoc 3.1.1 (`local`/`test` only), `OpenApiSpecIT` vs committed `docs/openapi.json`, openapi-typescript -> `ui/src/api/schema.d.ts`
 - [x] ESLint (typescript-eslint, react-hooks, ban `dangerouslySetInnerHTML`); Vitest tests for API client and formatters
-- [x] CI `ui-verify` (npm ci, lint, typecheck, API types up to date, test, build); Dependabot `npm` for `/ui` (grouped) (first run on GitHub pending)
+- [x] CI `ui-verify` (npm ci, lint, typecheck, API types up to date, test, build); Dependabot `npm` for `/ui` (grouped) (green on GitHub)
+
+## M1 (F2) — News pipeline
+
+Goal: ingest news via outbox + Kafka, deduplicate, classify with an LLM (structured output, generation log, budget,
+replay), daily portfolio summary, daily scheduled pipeline, classification eval ([DESIGN 5](DESIGN.md#5-features-and-milestones),
+[7.1](DESIGN.md#71-news-pipeline-m1)). Branch `feat/m1-news-pipeline`. One slice per session, in this order; each ends
+with `./mvnw verify` green. Decision points are settled at the start of the slice that first needs them (ADR via `adr`).
+
+### Slice 1 — aiops foundation (no LLM)
+- [ ] Decide K1 outbox relay vs Debezium ([DESIGN 18](DESIGN.md#18-open-questions)), K2 Kafka key for multi-ticker news, K3 idempotency store (processed-messages table vs status check), D1 dedup threshold + window -> ADRs
+- [ ] Flyway: `ai_generation_log` (prompt, response, model, `prompt_version`, tokens, cost, latency, correlation ID), daily token usage per feature
+- [ ] Model pricing in `application.yml`; cost per call
+- [ ] `AiopsFacade.recordGeneration`, `checkAndRecordUsage` (daily budget per feature, B1), `getCostSummary`
+- [ ] `UsageLimitExceededException` -> HTTP 429 ProblemDetail (job step marked skipped)
+- [ ] Unit tests + facade `*IT`; `docs/api.http` for aiops (if it gets an endpoint)
+
+### Slice 2 — News domain, Finnhub ingest, dedup
+- [ ] Check current Finnhub free-tier limits and licence; `FINNHUB_API_KEY` in `.env` / GitHub Secrets
+- [ ] Domain: `NewsItem`, `NewsStatus`, `NewsClassification`, `Sentiment`, `Relevance`, `EventType` ([6.3](DESIGN.md#63-domain-model-sketch))
+- [ ] Flyway: `news_items` (URL hash unique, pg_trgm index on headline)
+- [ ] Finnhub adapter (`RestClient`) for held tickers only; WireMock tests (dependency: WireMock)
+- [ ] Dedup: URL hash + pg_trgm headline similarity (D1)
+- [ ] `NewsFacade.ingest`; facade `*IT`
+- [ ] Export ~200 headlines for hand labelling (golden set 150 + separate few-shot pool), labelled before seeing model output
+
+### Slice 3 — Outbox and Kafka
+- [ ] Dependencies: spring-kafka, testcontainers-kafka (verify versions)
+- [ ] Flyway: `outbox` table; news item + outbox row in one transaction
+- [ ] Polling relay -> `news.raw` (key per K2); re-publishes pending rows on the next run
+- [ ] Idempotent consumer by `newsId` (K3); retries -> `news.raw.DLT`
+- [ ] Testcontainers Kafka IT: happy path, duplicate delivery, poison message -> DLT
+- [ ] Skill `kafka-consumer` (pattern now implemented once)
+
+### Slice 4 — Classification: first LLM adapter by hand
+- [ ] Decide L1 structured output mechanism (`BeanOutputConverter` vs native structured output vs forced tool call), L2 model (start Haiku 5.5; Ollama dev model), L3 few-shot, L4 temperature + `maxTokens`, L5 prompt caching (verify current minimum cacheable prefix and TTL), L6 M1 injection screening scope, R1 circuit breaker / time limiter gap vs [ADR 0005](decisions/0005-resilience-spring-retryable.md) -> ADRs
+- [ ] Dependencies: Spring AI 2.0.x Anthropic + Ollama starters (verify APIs in Spring AI 2.0 docs); model names in `application.yml` only
+- [ ] Prompt in `prompts/news-classification/` with `PROMPT_VERSION`; stable prefix first, news in a delimited data block
+- [ ] `ComplianceFacade.screenUntrustedContent` (M1 scope per L6)
+- [ ] Code gate: ticker held, not duplicate, budget left
+- [ ] Classification -> `NewsClassification`; invalid structure -> retry -> `UNCLASSIFIED`; generation log + `checkAndRecordUsage`; `NewsClassified` event
+- [ ] `NewsFacade.classifyPending`; Kafka consumer calls it
+- [ ] WireMock tests with recorded responses: valid, malformed, timeout
+
+### Slice 5 — Replay provider
+- [ ] Decide L7 normalisation of the replay key `hash(model, prompt_version, normalized input)`
+- [ ] `ChatModel` decorator; `AiopsFacade.findReplay`; `on-miss: fail | fallback`
+- [ ] Export replay fixtures to `evals/replay/`; `test` and `demo` use `replay`
+- [ ] Skill `llm-adapter` (pattern now implemented once)
+
+### Slice 6 — Inbound adapters and daily pipeline
+- [ ] `jobs` context: `POST /api/admin/jobs/{job}/run`; `docs/api.http` (happy path, 404 unknown job, 400)
+- [ ] Scheduler only when `briefwise.execution.mode=scheduled`, guarded by `jobs.<name>.enabled`
+- [ ] Job runner (`job` profile, `--briefwise.job=news-ingest`): exits when consumer lag is 0 or after `max-duration`
+- [ ] Neon project + `NEON_DATABASE_URL` secret (you); run the `job` and `cloud` profiles for the first time
+- [ ] `.github/workflows/morning-pipeline.yml`: news ingest + classification, Kafka service container, gated by `PIPELINE_ENABLED`
+
+### Slice 7 — Daily portfolio summary
+- [ ] Decide S1 model, trigger (pipeline vs on demand), M1 `compliance.checkText` scope -> ADR
+- [ ] `NewsFacade.getRelevantNews`, `summarizeForPortfolio`; regenerate only when new HIGH-relevance news exists
+- [ ] Compliance rules (no recommendations, no forecasts, citations, disclaimer); AI marker; `isFallback`
+- [ ] WireMock + replay tests; facade `*IT`
+
+### Slice 8 — Classification eval
+- [ ] Decide E1 metric scope (sentiment only vs + relevance / event type), E2 harness (promptfoo vs Java runner vs Python + Anthropic SDK; Batch API support)
+- [ ] `evals/sentiment_golden.csv` (150 hand-labelled); few-shot examples never from the golden set
+- [ ] Runner via Message Batches API; macro F1, confusion matrix, cost per 1,000 items; optional Alpha Vantage baseline
+- [ ] `.github/workflows/evals.yml` (`workflow_dispatch` + `prompts/**`, `evals/**`); results table as PR comment
+- [ ] ADR: classification model choice from the eval (L2)
+- [ ] Skill `new-eval-case`
+
+### Slice 9 — UI: News
+- [ ] react-router 8.4.0 (ADR 0007); router + nav in `AppShell`
+- [ ] `AiMarker` component (+ Vitest)
+- [ ] News feed: sentiment icon + label, relevance, event type, expandable rationale, `UNCLASSIFIED`, headline + link only; loading / empty / error
+- [ ] "Run news now" button -> admin endpoint; 429 state
+
+### Slice 10 — UI: Portfolio v0 and Dashboard v0
+- [ ] Portfolio v0: positions, daily move, daily AI summary with AI marker
+- [ ] Dashboard v0: portfolio tiles (daily performance, relevant news count)
+- [ ] OpenAPI spec + generated types updated; `ui-verify` green
 
 ## Backlog (one line each)
 
 UI slices per milestone follow [ADR 0007](decisions/0007-ui-delivery-strategy.md). Every AI text carries the AI marker;
 every screen has loading, empty and error states. Contingency cut order (nothing planned to be cut) is in the ADR.
 
-- [ ] **M1 (F2)** News pipeline: Kafka ingest, outbox, dedup, LLM classification, generation log, replay, classification eval
-  - [ ] UI: News feed (sentiment icon + label, expandable rationale, `UNCLASSIFIED`, headline + link only), `AiMarker`, Portfolio v0 (positions, daily move, daily AI summary), Dashboard v0 tiles, router, "run news now" button
+- [ ] **M1 (F2)** News pipeline: see the [M1 section](#m1-f2--news-pipeline) above
 - [ ] **M2 (F3)** RAG over SEC filings: pgvector + HNSW, hybrid search, citations, SSE, RAG eval
   - [ ] UI: Research chat over `fetch` streaming (own SSE parser, Stop), citation side panel with highlighted excerpt, "I don't know" / confidence / 429 states; parser unit tests
 - [ ] **M3 (F4)** Volatility/VaR forecast, risk alerts, backtest, MLflow
@@ -101,6 +180,8 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-10-18 | Snapshot `close` is the adjusted close, so a refresh rewrites history, but `importSnapshot` is `DO NOTHING`. Add an upsert mode, or always reset `daily_prices` before re-import? | Open (decide with the first refresh after M0 / M3) |
 | 2026-10-18 | The instrument universe lives in `quant/universe.py` and in Flyway V4/V6. Single source, or a test that compares them (today only the snapshot-to-DB direction is tested)? | Open |
 | 2026-10-18 | Approve is blocked while compliance violations are open (ADR 0007). Should an RM be able to override with a written justification (common in banks; needs its own audit trail)? | Open (decide at M4) |
+| 2026-10-19 | What is `Relevance` relative to: the ticker's materiality in general, or a specific portfolio (weight, mandate)? Decides whether classification is per item or per portfolio | Open (decide at M1 slice 4) |
+| 2026-10-19 | ETFs (6 of 36 instruments) likely have no company news on Finnhub. Do held ETFs get news (e.g. via top holdings or macro news), or none? | Open (decide at M1 slice 2) |
 
 ## Open questions from DESIGN
 
