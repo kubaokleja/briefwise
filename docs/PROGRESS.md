@@ -34,6 +34,42 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 5 — 2026-10-19 — Close M0: first CI run of all three jobs
+
+**Phase:** M0 / loose ends (no feature code)
+**Goal:** Get `app-verify`, `quant-verify` and `ui-verify` green on GitHub before M1.
+
+**Done**
+- Locally with npm 11.21.1 (CI's npm): `npm ci`, lint, typecheck, API types, 11 tests, build green; the lockfile
+  written by npm 9 needed no regeneration (it already holds the Linux native bindings). `./mvnw verify` green.
+- PR #2 (`feat/m0-completion` -> `master`): CI had not started because the PR conflicted with `master` (the CI setup
+  was squash-merged as `8ca8c13`, the branch still had the original commit). Rebased onto `master`, so the duplicate
+  was dropped and the history is linear (no merge commits).
+- `quant-verify` failed: `astral-sh/setup-uv@v10` does not exist (setup-uv has no floating major tags after v7).
+  Pinned `@v10.3.0`. All three jobs green on the PR (58 unit + 38 IT, 7 pytest, 11 Vitest).
+- Environment: `gh` 2.102.0 installed (winget, `--source winget`), git `http.sslBackend=schannel` (Avast TLS).
+
+**Decisions** (link ADRs)
+- No ADR. Git workflow: linear history, rebase instead of merge; merge PRs with "Rebase and merge".
+
+**AI concepts introduced / explained**
+- None.
+
+**Domain questions added** (also in PLANNING)
+- None.
+
+**Open questions / blockers**
+- Add `quant-verify` and `ui-verify` as required checks in the `master` ruleset; consider "Require linear history".
+- Local Node 24.14.1 < 24.15 (jsdom engine warning); stray `metrics-registry` npm config.
+
+**Next session**
+- Merge PR #2, then start M1 (news pipeline) with its decision points; UI slice: News feed, `AiMarker`, router.
+
+**Proposed commit message**
+> docs: record first green CI run of all three jobs
+
+---
+
 ## Session 4 — 2026-10-18 — M0 UI skeleton, OpenAPI contract, ui-verify CI
 
 **Phase:** M0 / UI skeleton ([ADR 0007](decisions/0007-ui-delivery-strategy.md))
