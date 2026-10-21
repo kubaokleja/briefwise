@@ -64,14 +64,15 @@ replay), daily portfolio summary, daily scheduled pipeline, classification eval 
 with `./mvnw verify` green. Decision points are settled at the start of the slice that first needs them (ADR via `adr`).
 
 ### Slice 1 — aiops foundation (no LLM)
-- [ ] Decide K1 outbox relay vs Debezium ([DESIGN 18](DESIGN.md#18-open-questions)), K2 Kafka key for multi-ticker news, K3 idempotency store (processed-messages table vs status check), D1 dedup threshold + window -> ADRs
-- [ ] Flyway: `ai_generation_log` (prompt, response, model, `prompt_version`, tokens, cost, latency, correlation ID), daily token usage per feature
-- [ ] Model pricing in `application.yml`; cost per call
-- [ ] `AiopsFacade.recordGeneration`, `checkAndRecordUsage` (daily budget per feature, B1), `getCostSummary`
-- [ ] `UsageLimitExceededException` -> HTTP 429 ProblemDetail (job step marked skipped)
-- [ ] Unit tests + facade `*IT`; `docs/api.http` for aiops (if it gets an endpoint)
+- [x] Decide B1 budget unit, gate shape, day boundary -> [ADR 0008](decisions/0008-llm-daily-budget-gate.md) (USD per feature per UTC day, pre-check + post-record, fail closed)
+- [x] Flyway: `ai_generation_log` (prompt, response, model, `prompt_version`, tokens, cost, latency, correlation ID) (V7), daily usage per feature (V8 `ai_daily_usage`)
+- [x] Model pricing in `application.yml` (`briefwise.aiops.pricing`, Haiku 5.5 + Sonnet 5.5); cost per call (`ModelPrice`)
+- [x] `AiopsFacade.recordGeneration`, `ensureBudgetAvailable` (added, ADR 0008), `checkAndRecordUsage` (daily budget per feature, B1), `getCostSummary`
+- [x] `UsageLimitExceededException` -> HTTP 429 ProblemDetail (job step marked skipped: slice 6)
+- [x] Unit tests + facade `*IT`; no aiops endpoint until the M6 Admin UI, so no `api.http`
 
 ### Slice 2 — News domain, Finnhub ingest, dedup
+- [ ] Decide D1 dedup threshold + window -> ADR
 - [ ] Check current Finnhub free-tier limits and licence; `FINNHUB_API_KEY` in `.env` / GitHub Secrets
 - [ ] Domain: `NewsItem`, `NewsStatus`, `NewsClassification`, `Sentiment`, `Relevance`, `EventType` ([6.3](DESIGN.md#63-domain-model-sketch))
 - [ ] Flyway: `news_items` (URL hash unique, pg_trgm index on headline)
@@ -81,6 +82,7 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [ ] Export ~200 headlines for hand labelling (golden set 150 + separate few-shot pool), labelled before seeing model output
 
 ### Slice 3 — Outbox and Kafka
+- [ ] Decide K1 outbox relay vs Debezium ([DESIGN 18](DESIGN.md#18-open-questions)), K2 Kafka key for multi-ticker news, K3 idempotency store (processed-messages table vs status check) -> ADRs
 - [ ] Dependencies: spring-kafka, testcontainers-kafka (verify versions)
 - [ ] Flyway: `outbox` table; news item + outbox row in one transaction
 - [ ] Polling relay -> `news.raw` (key per K2); re-publishes pending rows on the next run
@@ -154,6 +156,7 @@ every screen has loading, empty and error states. Contingency cut order (nothing
 - [ ] **M5 (F6)** Red-team, guardrails, MODEL_CARD / AI_RISK_ASSESSMENT / SECURITY
   - [ ] UI: "suspected injection, content withheld" state + test; UI section in `SECURITY.md` (XSS rule, cookie auth)
 - [ ] **M6 (F7)** Hardened pipeline, eval gating in CI, observability, demo video
+  - [ ] `ai_generation_log` retention ([DESIGN 13.6](DESIGN.md#136-storage-retention)): full text 30 days, then hash + metrics only
   - [ ] UI: Admin (run now per job, token usage vs budget, cost summary + chart), last pipeline run on Dashboard, multi-stage Dockerfile serving the UI from Spring + `demo` Compose profile, Playwright in CI against `demo`, light mode, Evals screen
 - [ ] **Production-readiness review (after M6, before calling the project done)** Briefwise is a one-person learning
   and portfolio project (GitHub Actions + Neon, <= 5 CHF/month, synthetic data). Write a full analysis (an ADR plus
@@ -185,6 +188,7 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-10-18 | Approve is blocked while compliance violations are open (ADR 0007). Should an RM be able to override with a written justification (common in banks; needs its own audit trail)? | Open (decide at M4) |
 | 2026-10-19 | What is `Relevance` relative to: the ticker's materiality in general, or a specific portfolio (weight, mandate)? Decides whether classification is per item or per portfolio | Open (decide at M1 slice 4) |
 | 2026-10-19 | ETFs (6 of 36 instruments) likely have no company news on Finnhub. Do held ETFs get news (e.g. via top holdings or macro news), or none? | Open (decide at M1 slice 2) |
+| 2026-10-21 | Should `ai_generation_log` reference the business object it was generated for (e.g. `newsId`, `briefId`)? Today only feature + correlation ID link a call to its input; an audit ("which call produced this classification?") may need a direct reference | Open (decide at M1 slice 4) |
 
 ## Open questions from DESIGN
 

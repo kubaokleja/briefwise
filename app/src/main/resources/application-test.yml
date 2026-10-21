@@ -8,3 +8,8 @@ briefwise:
     provider: replay
     replay:
       on-miss: fail
+  aiops:
+    pricing:
+      test-model: { input: 1.00, output: 2.00 }   # round numbers: 1M input tokens = 1 USD
+    daily-budget-usd:
+      it-feature: 0.01

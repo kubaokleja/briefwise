@@ -34,7 +34,7 @@ springdoc:
   writer-with-default-pretty-printer: true
   writer-with-order-by-keys: true
 
-# See DESIGN 13.2. Model names will live here too (never in code) once LLM calls exist.
+# See DESIGN 13.2. Model names live here only, never in code.
 briefwise:
   execution:
     mode: on-demand          # on-demand | scheduled
@@ -51,6 +51,15 @@ briefwise:
   llm:
     replay:
       on-miss: fail          # fail (CI, demo) | fallback (local)
+  aiops:
+    # USD per 1M tokens, Anthropic first-party rates (checked 2026-10-21; re-check before relying on them).
+    # Haiku 5.5 rates apply to prompts up to 100K tokens. Every model the app calls needs an entry (ADR 0008).
+    pricing:
+      claude-haiku-5-5: { input: 0.10, output: 0.50 }
+      claude-sonnet-5-5: { input: 2.00, output: 10.00 }
+    # USD per feature per UTC day (ADR 0008). A feature without an entry cannot call an LLM.
+    daily-budget-usd:
+      news-classification: 0.10
   cors:
     allowed-origins:
       - http://localhost:5173
