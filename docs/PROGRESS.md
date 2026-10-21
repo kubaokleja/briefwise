@@ -34,6 +34,55 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 6 — 2026-10-21 — M1 slice 1: aiops foundation (generation log, budget gate, cost summary)
+
+**Phase:** M1 / slice 1 (no LLM calls)
+**Goal:** Give every future LLM call a log entry, a cost and a daily USD budget gate.
+
+**Done**
+- Convention: every milestone is split into slices before its first session (CLAUDE.md "Planning", commit
+  `9b844a4`). Following it, K1–K3 moved to slice 3 and D1 to slice 2.
+- Flyway V7 `ai_generation_log`, V8 `ai_daily_usage` (UTC day x feature, unique key).
+- `aiops` layers: domain (`ModelPrice`, `PriceList`, `DailyBudgets`, `BudgetStatus`, `DailyUsage`, `CostSummary`,
+  `NewGeneration`), ports, package-private services, `AiopsRepositoryAdapter` (JPA insert for the log; atomic
+  `INSERT ... ON CONFLICT DO UPDATE ... RETURNING` for daily totals), `AiopsProperties` + `AiopsConfig`.
+- `AiopsFacade`: `recordGeneration`, `ensureBudgetAvailable`, `checkAndRecordUsage`, `getCostSummary`.
+- `UsageLimitExceededException` (in `shared`) -> HTTP 429 `ProblemDetail` with `feature`.
+- Pricing in `application.yml` (Haiku 5.5 0.10/0.50, Sonnet 5.5 2/10 USD per 1M tokens, via the claude-api skill);
+  budget `news-classification: 0.10` USD/day. Shared `ClockConfig` (UTC clock bean).
+- Tests: domain, service (Mockito, incl. UTC-vs-Zurich date), `ApiExceptionHandlerTest` (429),
+  `AiopsFacadeIT` (6 cases). `FlywayBaselineIT` expects 8 migrations. `./mvnw verify`: 81 unit + 43 IT green.
+
+**Decisions** (link ADRs)
+- [ADR 0008](decisions/0008-llm-daily-budget-gate.md): USD per feature per UTC day; pre-check + post-record;
+  unknown feature/model fails closed.
+- Daily totals stay on JDBC (upsert needs SQL; reads kept on the same row mapper). Accepted trade-off:
+  `ai_daily_usage` is not covered by `ddl-auto: validate`, only by `AiopsFacadeIT`.
+- No aiops HTTP endpoint until the M6 Admin UI.
+
+**AI concepts introduced / explained**
+- Tokens and per-token pricing (input vs output priced separately; output 5x on Haiku).
+- Generation log as audit trail, later replay cache and eval data.
+- Budget gate as a hard cap in code, before the provider's Console limit; overshoot of one in-flight call.
+- Prompt-cache tokens priced differently: deferred to L5 (slice 4).
+
+**Domain questions added** (also in PLANNING)
+- Should `ai_generation_log` reference the business object it was generated for (news item, brief)?
+
+**Open questions / blockers**
+- L4 (slice 4): Haiku 5.5 rejects non-default `temperature` (HTTP 400), so DESIGN's "temperature 0" for
+  classification is not possible as written.
+- Prices are hand-copied (checked 2026-10-21); re-check when models change.
+
+**Next session**
+- M1 slice 2: decide D1 (dedup threshold + window) and the ETF news question, check Finnhub free tier, news domain,
+  `news_items`, Finnhub adapter with WireMock (new dependency: ask first).
+
+**Proposed commit message**
+> feat(aiops): add generation log, daily USD budget gate and cost summary
+
+---
+
 ## Session 5 — 2026-10-19 — Close M0: first CI run of all three jobs
 
 **Phase:** M0 / loose ends (no feature code)
