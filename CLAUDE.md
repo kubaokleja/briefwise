@@ -94,6 +94,15 @@ Details: [6.2 Bounded contexts](docs/DESIGN.md#62-bounded-contexts).
    for factual claims, fixed disclaimer, nothing leaves the system unless `Approved`
    ([11](docs/DESIGN.md#11-security-and-compliance)).
 
+## Planning (milestones in slices)
+
+Every milestone is split into numbered slices in `docs/PLANNING.md` before its first session (M1 is the reference).
+- One slice per session, done in order; each ends with `./mvnw verify` green (UI slices: `ui-verify`).
+- A slice is small and concrete: checkbox tasks naming the tables, facade methods, adapters and tests it adds.
+- Decision points (DESIGN 8/18 IDs) are listed and settled at the start of the slice that first needs them -> ADR.
+- New dependencies are named in the slice that introduces them; skills go in the slice after the pattern exists.
+- UI slices come last in the milestone. Backlog milestones stay one line until they are split.
+
 ## Session start checklist
 
 1. Read `docs/PROGRESS.md` (latest entry) and `docs/PLANNING.md`.
