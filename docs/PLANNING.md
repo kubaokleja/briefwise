@@ -138,6 +138,9 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 
 ## Backlog (one line each)
 
+Each milestone is split into numbered slices (like [M1](#m1-f2--news-pipeline)) before its first session; see the
+Planning section in `CLAUDE.md`.
+
 UI slices per milestone follow [ADR 0007](decisions/0007-ui-delivery-strategy.md). Every AI text carries the AI marker;
 every screen has loading, empty and error states. Contingency cut order (nothing planned to be cut) is in the ADR.
 
