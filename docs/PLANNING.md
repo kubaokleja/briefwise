@@ -79,7 +79,7 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] Finnhub adapter (`RestClient`, key in header, `RetryTemplate` on 429/5xx/timeout per ADR 0005) for held companies only; WireMock tests (wiremock-standalone 3.13.2)
 - [x] Dedup: URL hash + pg_trgm headline similarity (D1); `NewsRepositoryAdapterIT` pins the example pairs
 - [x] `NewsFacade.ingest` (+ `MarketFacade.getInstrument` for the ETF check); facade `*IT`
-- [ ] Export ~200 headlines for hand labelling (golden set 150 + separate few-shot pool), labelled before seeing model output (script + instructions in `evals/labelling/` done and tested on synthetic rows; needs your Finnhub key, a 30-day ingest and the labelling itself)
+- [x] Export headlines for labelling (golden set + separate few-shot pool), labelled before any model output: 344 rows (200 random + 144 stratified company sample; 258 golden / 86 few-shot), drafted by Claude and spot-checked (provenance in `evals/labelling/README.md`)
 
 ### Slice 3 — Outbox and Kafka
 - [ ] Decide K1 outbox relay vs Debezium ([DESIGN 18](DESIGN.md#18-open-questions)), K2 Kafka key for multi-ticker news, K3 idempotency store (processed-messages table vs status check) -> ADRs
@@ -121,7 +121,7 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 
 ### Slice 8 — Classification eval
 - [ ] Decide E1 metric scope (sentiment only vs + relevance / event type), E2 harness (promptfoo vs Java runner vs Python + Anthropic SDK; Batch API support)
-- [ ] `evals/sentiment_golden.csv` (150 hand-labelled); few-shot examples never from the golden set
+- [ ] `evals/sentiment_golden.csv` from the 258 golden rows in `evals/labelling/`; few-shot examples never from the golden set; report per class and on `sample=random` rows alone; event types: accuracy + per-class counts or a longer ingest for rare classes (E1)
 - [ ] Runner via Message Batches API; macro F1, confusion matrix, cost per 1,000 items; optional Alpha Vantage baseline
 - [ ] `.github/workflows/evals.yml` (`workflow_dispatch` + `prompts/**`, `evals/**`); results table as PR comment
 - [ ] ADR: classification model choice from the eval (L2)
@@ -190,6 +190,9 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-10-19 | ETFs (6 of 36 instruments) likely have no company news on Finnhub. Do held ETFs get news (e.g. via top holdings or macro news), or none? | None for now ([ADR 0009](decisions/0009-news-dedup-and-etf-news.md)); strategy (general news as `MACRO` first) to decide at M4 |
 | 2026-10-21 | Finnhub licence forbids redistributing data "or derived results". May the hand-labelled golden set (real headlines) be committed once the repo is public, or only IDs/hashes plus labels, or synthetic headlines? Exports are git-ignored until then | Open (decide before slice 8 / before the repo goes public) |
 | 2026-10-21 | A near-duplicate is linked to one ticker's original. If its URL is later fetched for a second ticker it stays `SKIPPED` even though the original may not concern that ticker. Acceptable? | Open (check on the labelled sample) |
+| 2026-10-23 | Same-event duplicates (e.g. "KFC switches from Pepsi to Coke" vs "KFC plans a massive soda change") score 0.09–0.49 on headline trigram similarity, far below 0.6. Trigram dedup only catches re-syndication. Do we need semantic (embedding) dedup, and where: ingest or classification? | Open (revisit D1 after the eval; 7 labelled pairs in `evals/labelling/`) |
+| 2026-10-23 | `EventType` has no value for analyst rating / price-target changes (~20 labelled rows) or customer contracts (KFC/Coke). Add `ANALYST` and `CONTRACT`, or keep them in `OTHER`? | Open (decide at M1 slice 4 with the prompt) |
+| 2026-10-23 | Relevance is labelled per ticker ("would an RM whose client holds it want to see it?"), multi-ticker items once for the most affected ticker. Does the classifier output per ticker or per item? | Labelling convention agreed; classifier output shape open (slice 4) |
 | 2026-10-21 | Should `ai_generation_log` reference the business object it was generated for (e.g. `newsId`, `briefId`)? Today only feature + correlation ID link a call to its input; an audit ("which call produced this classification?") may need a direct reference | Open (decide at M1 slice 4) |
 
 ## Open questions from DESIGN
