@@ -26,7 +26,7 @@ class FlywayBaselineIT extends AbstractIntegrationTest {
         assertThat(environment.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("validate");
         Integer applied = jdbc.queryForObject(
                 "SELECT count(*) FROM flyway_schema_history WHERE success", Integer.class);
-        assertThat(applied).isEqualTo(8);
+        assertThat(applied).isEqualTo(9);
     }
 
     @Test
