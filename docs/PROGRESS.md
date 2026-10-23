@@ -50,7 +50,7 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
   (`random` / `company`). Total 344 rows: 258 golden, 86 few-shot. Golden: 18 `HIGH`, 58 `MEDIUM`, 19 `NEGATIVE`,
   38 `POSITIVE`; rare event types still thin (`GUIDANCE` 4, `REGULATORY` 3, `LITIGATION` 3, `M_AND_A` 2,
   `MANAGEMENT` 0).
-- Labels drafted by Claude using the agreed definitions, spot-checked by the maintainer (no disagreements). The
+- Labels drafted by Claude using the agreed definitions, spot-checked by the maintainer (about 40 rows, no disagreements). The
   provenance is recorded in `evals/labelling/README.md`, because an LLM-drafted golden set can share the
   classifier's biases.
 - Label definitions written into `evals/labelling/README.md`. Fixed one stray `split` value with leading spaces.

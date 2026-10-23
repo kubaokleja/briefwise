@@ -64,4 +64,4 @@ any classification prompt existed. Because the classifier under evaluation is al
 its biases: eval scores against them measure agreement with Claude, not ground truth. Before slice 8 treats them as
 the golden set, a human reviews them (at least a random sample of golden rows) and records the agreement rate here.
 
-- 2026-10-23: maintainer spot-checked a sample of rows; no disagreements reported (sample size not recorded).
+- 2026-10-23: maintainer spot-checked about 40 rows; no disagreements (agreement ~100% on that sample).

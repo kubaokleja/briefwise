@@ -396,7 +396,7 @@ Evaluations are the backbone of the project and the main talking point in interv
 
 | Area | Dataset | Metrics | CI threshold (start) |
 |---|---|---|---|
-| News classification | `evals/sentiment_golden.csv` (150 hand-labelled) | Macro F1, confusion matrix, cost per 1,000 | F1 drops by no more than 3 pp |
+| News classification | `evals/sentiment_golden.csv` (258 golden rows: random + stratified company sample, see [ADR 0010](decisions/0010-golden-set-labelling.md)) | Macro F1, confusion matrix, cost per 1,000 | F1 drops by no more than 3 pp |
 | RAG | `evals/rag_golden.json` (40–50 questions + expected sources) | recall@5, faithfulness, citation correctness | recall@5 ≥ agreed baseline |
 | Brief | `evals/brief_cases/` (15–20 scenarios) | Task success, coverage of relevant events, compliance violations, **number grounding** | 0 ungrounded numbers |
 | Agent | Same scenarios | Trajectory correctness (right tools), step count, cost, latency | Trajectory ≥ 90% |
