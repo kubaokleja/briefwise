@@ -34,6 +34,59 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 8 — 2026-10-23 — M1 slice 2: real ingest and labelled headline set
+
+**Phase:** M1 / slice 2 (last task; no application code changed, no LLM calls from the app)
+**Goal:** Run a 30-day Finnhub ingest, export headlines and label them for the golden set and few-shot pool.
+
+**Done**
+- Finnhub key in the git-ignored `.env` (the full 40-character key; each 20-character half returns 401).
+- 30-day ingest against the local Compose Postgres: 1,908 new, 53 near-duplicates (`SKIPPED`), 255 already known,
+  no failed tickers. Only the 9 companies held by the synthetic portfolios appear.
+- Random export: 200 rows (150 golden / 50 few-shot). It was 84% `NEUTRAL`, 77% `LOW` and had only 5 `HIGH` golden
+  rows, because Finnhub tags tickers loosely (most items are passing mentions or unrelated).
+- Stratified company sample: `export_company_headlines.sql` (headlines naming the held company) and
+  `append_company_sample.py` (stdlib; skips labelled rows, 16 per ticker, 3:1 golden/few-shot). New `sample` column
+  (`random` / `company`). Total 344 rows: 258 golden, 86 few-shot. Golden: 18 `HIGH`, 58 `MEDIUM`, 19 `NEGATIVE`,
+  38 `POSITIVE`; rare event types still thin (`GUIDANCE` 4, `REGULATORY` 3, `LITIGATION` 3, `M_AND_A` 2,
+  `MANAGEMENT` 0).
+- Labels drafted by Claude using the agreed definitions, spot-checked by the maintainer (no disagreements). The
+  provenance is recorded in `evals/labelling/README.md`, because an LLM-drafted golden set can share the
+  classifier's biases.
+- Label definitions written into `evals/labelling/README.md`. Fixed one stray `split` value with leading spaces.
+- Checked the 7 labelled same-event pairs against pg_trgm: headline similarity 0.09–0.49, all below the 0.6 threshold.
+
+**Decisions** ([ADR 0010](decisions/0010-golden-set-labelling.md))
+- Relevance is judged relative to the single ticker ("would an RM whose client holds it want to see it this morning?").
+- Multi-ticker items: one label from the view of the most affected ticker, named in `notes`.
+- Sentiment = likely price effect for a shareholder, not tone; opinion/prediction pieces with no new facts are `NEUTRAL`.
+- Golden set = random + stratified company sample; metrics reported per class and on `random` rows alone.
+
+**AI concepts introduced / explained**
+- Golden set independence: if the same kind of model labels the data and is evaluated on it, the eval measures
+  agreement rather than correctness, so label provenance must be recorded and a human must review.
+- Class imbalance vs macro F1: macro F1 averages per-class scores, so a class with 5 examples makes the metric noise.
+  Stratified sampling fills rare classes; the `random` subset keeps the real distribution measurable.
+- Lexical vs semantic dedup: trigram similarity catches re-syndicated headlines, not the same event in other words.
+
+**Domain questions added** (also in PLANNING)
+- Same-event duplicates are invisible to trigram dedup (0.09–0.49 on real pairs). Semantic dedup later?
+- `EventType` has no home for analyst rating changes or customer contracts (both common). Add `ANALYST` / `CONTRACT`?
+
+**Open questions / blockers**
+- Event-type metric in slice 8 (E1): too few rare-class rows for macro F1; accuracy + per-class counts, or a longer
+  ingest (free tier: 1 year) to collect rare events.
+- The Finnhub key was pasted in chat; consider regenerating it.
+- Publishing the golden set (licence) still open.
+
+**Next session**
+- M1 slice 3: decide K1 (outbox relay vs Debezium), K2 (Kafka key for multi-ticker news), K3 (idempotency store).
+
+**Proposed commit message**
+> chore(evals): add stratified company sample and label definitions for headline labelling
+
+---
+
 ## Session 7 — 2026-10-21 — M1 slice 2: news domain, Finnhub ingest, dedup
 
 **Phase:** M1 / slice 2 (no LLM calls)
