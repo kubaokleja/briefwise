@@ -2,12 +2,16 @@ package com.briefwise.market.domain.port;
 
 import com.briefwise.market.domain.model.DailyMove;
 import com.briefwise.market.domain.model.DailyPrice;
+import com.briefwise.market.domain.model.Instrument;
 import com.briefwise.shared.domain.model.Ticker;
 import java.time.LocalDate;
 import java.util.List;
 
 /** Inbound port: market data reads. Implemented by a package-private application service. */
 public interface MarketQueries {
+
+    /** @throws com.briefwise.market.domain.model.InstrumentNotFoundException if the ticker is unknown */
+    Instrument getInstrument(Ticker ticker);
 
     /**
      * Closes from {@code from} to {@code to} inclusive, oldest first.

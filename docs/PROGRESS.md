@@ -34,6 +34,66 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 7 — 2026-10-21 — M1 slice 2: news domain, Finnhub ingest, dedup
+
+**Phase:** M1 / slice 2 (no LLM calls)
+**Goal:** Fetch company news for held tickers from Finnhub, drop exact and near-duplicates, store the rest as `RECEIVED`.
+
+**Done**
+- Finnhub checked: `company-news` is for North American companies, the free tier has 1 year of history, about
+  60 calls/min (secondary sources) and a 30/s hard cap; the licence is personal use, no redistribution, and data
+  must be deleted when the subscription ends.
+- `news` domain: DESIGN 6.3 types plus `FetchedNews`, `UrlHash` (SHA-256 of the normalised URL), `DedupPolicy`,
+  `IngestPolicy`, `HeldInstrument`, `IngestSummary`, `NewsSourceUnavailableException`. Ports `NewsIngest`,
+  `NewsSource`, `NewsRepository`, `HeldInstruments`.
+- `NewsIngestService`: held companies only (ETFs skipped), UTC lookback window (2 days), oldest first, per-ticker
+  failures reported without stopping the run, misconfiguration (no key / 401) stops it.
+- Flyway V9: `news_items` (unique `url_hash`, `duplicate_of_id` + CHECK that duplicates are `SKIPPED`) and
+  `news_item_tickers` (one article, several tickers).
+- `FinnhubNewsSource`: `RestClient` with socket timeouts, key in the `X-Finnhub-Token` header, Spring core
+  `RetryTemplate` on 429/5xx/I/O (first use of ADR 0005; API checked in the Spring Framework 7 docs).
+- `FacadeHeldInstruments` over `PortfolioFacade` + new `MarketFacade.getInstrument` (ETF check).
+- `NewsFacade.ingest`; `NewsStartupIngest` (`briefwise.news.ingest.on-startup`, off by default) as a stopgap trigger.
+- Tests: domain, service (Mockito, incl. UTC vs Zurich date), `FinnhubNewsSourceTest` (WireMock: OK, malformed
+  items, 429 retry, 503, timeout, malformed body, 401, no key), `NewsRepositoryAdapterIT` (real pg_trgm, the D1
+  example pairs), `NewsFacadeIT` (seeded portfolios end to end, rerun is idempotent). One shared WireMock server in
+  `AbstractIntegrationTest` keeps a single Spring context. `./mvnw verify`: 118 unit + 51 IT green.
+- `evals/labelling/`: export SQL (150 golden / 50 few-shot, fixed seed, round-robin over tickers) and instructions;
+  tested on a throwaway container with synthetic rows. CSV exports are git-ignored.
+
+**Decisions** (link ADRs)
+- [ADR 0009](decisions/0009-news-dedup-and-etf-news.md): D1 = 0.6 within 48 h, same ticker; near-duplicates stored
+  `SKIPPED` with `duplicate_of_id`; ETFs get no news for now (general news as `MACRO` is the first option for M4);
+  no trigram index on the headline (the query is narrowed by ticker + window first).
+- New test dependency: `org.wiremock:wiremock-standalone` 3.13.2 (latest stable; 4.0 is beta; shaded, no Jetty clash).
+- `SimpleClientHttpRequestFactory` instead of the JDK client factory: the JDK factory's read timeout covers the
+  whole body read and showed up as a non-retried "Stream closed" error.
+
+**AI concepts introduced / explained**
+- Trigram similarity (pg_trgm) as a free, deterministic near-duplicate detector, with a table of real scores; why
+  the error direction matters (a wrong merge hides news, a missed duplicate costs a fraction of a cent);
+  paraphrases need embeddings, deferred until the eval shows a need.
+- Eval leakage: golden and few-shot rows split once with a fixed seed and never mixed; labels before model output.
+
+**Domain questions added** (also in PLANNING)
+- Can the golden set (real Finnhub headlines) be committed once the repo is public?
+- A `SKIPPED` near-duplicate later fetched for a second ticker stays skipped for that ticker too.
+
+**Open questions / blockers**
+- You: get a Finnhub key, run the 30-day ingest and the export (`evals/labelling/README.md`), then label. Slice 4
+  few-shot and slice 8 eval depend on it.
+- The ingest has not run against live Finnhub yet; only WireMock with Finnhub's documented response shape.
+- `FINNHUB_API_KEY` GitHub Secret: add it with the pipeline workflow (slice 6).
+
+**Next session**
+- M1 slice 3: decide K1 (outbox relay vs Debezium), K2 (Kafka key for multi-ticker news; note one item now has
+  several tickers), K3 (idempotency store); spring-kafka + testcontainers-kafka (ask first); outbox table.
+
+**Proposed commit message**
+> feat(news): ingest Finnhub company news with URL and headline deduplication
+
+---
+
 ## Session 6 — 2026-10-21 — M1 slice 1: aiops foundation (generation log, budget gate, cost summary)
 
 **Phase:** M1 / slice 1 (no LLM calls)
