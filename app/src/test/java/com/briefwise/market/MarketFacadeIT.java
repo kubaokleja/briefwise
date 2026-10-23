@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.briefwise.AbstractIntegrationTest;
 import com.briefwise.market.MarketFacade.DailyMoveView;
+import com.briefwise.market.MarketFacade.InstrumentTypeView;
 import com.briefwise.market.MarketFacade.PricePointView;
 import com.briefwise.shared.domain.exception.ResourceNotFoundException;
 import com.briefwise.shared.domain.model.Ticker;
@@ -33,6 +34,14 @@ class MarketFacadeIT extends AbstractIntegrationTest {
                 INSERT INTO daily_prices (instrument_id, trade_date, close, volume)
                 SELECT id, ?::date, ?::numeric, 1000 FROM instruments WHERE ticker = ?
                 """, date, close, ticker);
+    }
+
+    @Test
+    void instrument_reports_its_type() {
+        assertThat(facade.getInstrument(AAPL).type()).isEqualTo(InstrumentTypeView.STOCK);
+        assertThat(facade.getInstrument(new Ticker("SPY")).type()).isEqualTo(InstrumentTypeView.ETF);
+        assertThatThrownBy(() -> facade.getInstrument(new Ticker("NOPE")))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.briefwise.market;
 import com.briefwise.market.domain.model.DailyMove;
 import com.briefwise.market.domain.model.DailyPrice;
 import com.briefwise.market.domain.model.ImportSummary;
+import com.briefwise.market.domain.model.Instrument;
 import com.briefwise.market.domain.port.MarketQueries;
 import com.briefwise.market.domain.port.PriceSnapshotImport;
 import com.briefwise.shared.domain.model.Ticker;
@@ -24,6 +25,13 @@ public class MarketFacade {
     MarketFacade(MarketQueries queries, PriceSnapshotImport snapshotImport) {
         this.queries = queries;
         this.snapshotImport = snapshotImport;
+    }
+
+    /** @throws com.briefwise.shared.domain.exception.ResourceNotFoundException if the ticker is unknown */
+    public InstrumentView getInstrument(Ticker ticker) {
+        Instrument instrument = queries.getInstrument(ticker);
+        return new InstrumentView(instrument.ticker(), instrument.name(),
+                InstrumentTypeView.valueOf(instrument.type().name()), instrument.currency());
     }
 
     /**
@@ -63,6 +71,10 @@ public class MarketFacade {
         return new DailyMoveView(move.ticker(), move.date(), move.close(), move.previousClose(), move.change(),
                 move.changePercent());
     }
+
+    public enum InstrumentTypeView { STOCK, ETF }
+
+    public record InstrumentView(Ticker ticker, String name, InstrumentTypeView type, String currency) {}
 
     public record ImportSummaryView(int tickersRead, int rowsRead, int rowsInserted, List<Ticker> unknownTickers) {}
 

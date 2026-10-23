@@ -26,6 +26,8 @@
         <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
         <!-- Verified on Maven Central 2026-10-18; 3.1.1 is built against Spring Boot 4.1.0 -->
         <springdoc.version>3.1.1</springdoc.version>
+        <!-- Verified on Maven Central 2026-10-21; latest stable (4.0 is still beta). Shaded jar: no Jetty clash -->
+        <wiremock.version>3.13.2</wiremock.version>
     </properties>
 
     <dependencies>
@@ -113,6 +115,13 @@
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit-junit5</artifactId>
             <version>${archunit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <!-- HTTP stubs for outbound adapters (Finnhub now, Anthropic in M1 slice 4) -->
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>${wiremock.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

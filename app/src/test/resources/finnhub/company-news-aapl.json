@@ -1,0 +1,57 @@
+[
+  {
+    "category": "company",
+    "datetime": 1792836000,
+    "headline": "Apple beats Q3 estimates as iPhone sales rise",
+    "id": 9000001,
+    "image": "https://example.com/img/1.jpg",
+    "related": "AAPL",
+    "source": "Synthetic Wire",
+    "summary": "Synthetic fixture in the shape of Finnhub /company-news. Not a real article.",
+    "url": "https://news.example.com/apple-q3-beat"
+  },
+  {
+    "category": "company",
+    "datetime": 1792832400,
+    "headline": "Apple supplier expands capacity in India",
+    "id": 9000002,
+    "image": "",
+    "related": "AAPL",
+    "source": "Synthetic Daily",
+    "summary": "",
+    "url": "https://news.example.com/apple-supplier-india"
+  },
+  {
+    "category": "company",
+    "datetime": 1792828800,
+    "headline": "",
+    "id": 9000003,
+    "image": "",
+    "related": "AAPL",
+    "source": "Synthetic Daily",
+    "summary": "Blank headline: must be dropped.",
+    "url": "https://news.example.com/blank"
+  },
+  {
+    "category": "company",
+    "datetime": 0,
+    "headline": "Missing timestamp: must be dropped",
+    "id": 9000004,
+    "image": "",
+    "related": "AAPL",
+    "source": "Synthetic Daily",
+    "summary": "",
+    "url": "https://news.example.com/no-time"
+  },
+  {
+    "category": "company",
+    "datetime": 1792825200,
+    "headline": "Relative URL: must be dropped",
+    "id": 9000005,
+    "image": "",
+    "related": "AAPL",
+    "source": "Synthetic Daily",
+    "summary": "",
+    "url": "/relative"
+  }
+]

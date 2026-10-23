@@ -72,14 +72,14 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] Unit tests + facade `*IT`; no aiops endpoint until the M6 Admin UI, so no `api.http`
 
 ### Slice 2 — News domain, Finnhub ingest, dedup
-- [ ] Decide D1 dedup threshold + window -> ADR
-- [ ] Check current Finnhub free-tier limits and licence; `FINNHUB_API_KEY` in `.env` / GitHub Secrets
-- [ ] Domain: `NewsItem`, `NewsStatus`, `NewsClassification`, `Sentiment`, `Relevance`, `EventType` ([6.3](DESIGN.md#63-domain-model-sketch))
-- [ ] Flyway: `news_items` (URL hash unique, pg_trgm index on headline)
-- [ ] Finnhub adapter (`RestClient`) for held tickers only; WireMock tests (dependency: WireMock)
-- [ ] Dedup: URL hash + pg_trgm headline similarity (D1)
-- [ ] `NewsFacade.ingest`; facade `*IT`
-- [ ] Export ~200 headlines for hand labelling (golden set 150 + separate few-shot pool), labelled before seeing model output
+- [x] Decide D1 dedup threshold + window -> [ADR 0009](decisions/0009-news-dedup-and-etf-news.md) (0.6 within 48 h, same ticker; near-duplicates stored `SKIPPED`; ETFs skipped for now)
+- [x] Check current Finnhub free-tier limits and licence (~60 calls/min, 30/s cap, NA companies, 1 year history; personal use, no redistribution); `FINNHUB_API_KEY` in `.env.example` (GitHub Secret: slice 6, with the workflow)
+- [x] Domain: `NewsItem`, `NewsStatus`, `NewsClassification`, `Sentiment`, `Relevance`, `EventType` ([6.3](DESIGN.md#63-domain-model-sketch)); plus `FetchedNews`, `UrlHash`, `DedupPolicy`, `IngestPolicy`, `HeldInstrument`, `IngestSummary`
+- [x] Flyway V9: `news_items` (URL hash unique) + `news_item_tickers`; no trigram index on headline (not used by the dedup query, ADR 0009)
+- [x] Finnhub adapter (`RestClient`, key in header, `RetryTemplate` on 429/5xx/timeout per ADR 0005) for held companies only; WireMock tests (wiremock-standalone 3.13.2)
+- [x] Dedup: URL hash + pg_trgm headline similarity (D1); `NewsRepositoryAdapterIT` pins the example pairs
+- [x] `NewsFacade.ingest` (+ `MarketFacade.getInstrument` for the ETF check); facade `*IT`
+- [ ] Export ~200 headlines for hand labelling (golden set 150 + separate few-shot pool), labelled before seeing model output (script + instructions in `evals/labelling/` done and tested on synthetic rows; needs your Finnhub key, a 30-day ingest and the labelling itself)
 
 ### Slice 3 — Outbox and Kafka
 - [ ] Decide K1 outbox relay vs Debezium ([DESIGN 18](DESIGN.md#18-open-questions)), K2 Kafka key for multi-ticker news, K3 idempotency store (processed-messages table vs status check) -> ADRs
@@ -187,7 +187,9 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-10-18 | The instrument universe lives in `quant/universe.py` and in Flyway V4/V6. Single source, or a test that compares them (today only the snapshot-to-DB direction is tested)? | Open |
 | 2026-10-18 | Approve is blocked while compliance violations are open (ADR 0007). Should an RM be able to override with a written justification (common in banks; needs its own audit trail)? | Open (decide at M4) |
 | 2026-10-19 | What is `Relevance` relative to: the ticker's materiality in general, or a specific portfolio (weight, mandate)? Decides whether classification is per item or per portfolio | Open (decide at M1 slice 4) |
-| 2026-10-19 | ETFs (6 of 36 instruments) likely have no company news on Finnhub. Do held ETFs get news (e.g. via top holdings or macro news), or none? | Open (decide at M1 slice 2) |
+| 2026-10-19 | ETFs (6 of 36 instruments) likely have no company news on Finnhub. Do held ETFs get news (e.g. via top holdings or macro news), or none? | None for now ([ADR 0009](decisions/0009-news-dedup-and-etf-news.md)); strategy (general news as `MACRO` first) to decide at M4 |
+| 2026-10-21 | Finnhub licence forbids redistributing data "or derived results". May the hand-labelled golden set (real headlines) be committed once the repo is public, or only IDs/hashes plus labels, or synthetic headlines? Exports are git-ignored until then | Open (decide before slice 8 / before the repo goes public) |
+| 2026-10-21 | A near-duplicate is linked to one ticker's original. If its URL is later fetched for a second ticker it stays `SKIPPED` even though the original may not concern that ticker. Acceptable? | Open (check on the labelled sample) |
 | 2026-10-21 | Should `ai_generation_log` reference the business object it was generated for (e.g. `newsId`, `briefId`)? Today only feature + correlation ID link a call to its input; an audit ("which call produced this classification?") may need a direct reference | Open (decide at M1 slice 4) |
 
 ## Open questions from DESIGN

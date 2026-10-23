@@ -61,6 +61,14 @@ class MarketQueryServiceTest {
         assertThatThrownBy(() -> service.getPriceHistory(ticker, d1, d2))
                 .isInstanceOf(InstrumentNotFoundException.class);
         assertThatThrownBy(() -> service.getDailyMove(ticker)).isInstanceOf(InstrumentNotFoundException.class);
+        assertThatThrownBy(() -> service.getInstrument(ticker)).isInstanceOf(InstrumentNotFoundException.class);
+    }
+
+    @Test
+    void instrument_is_looked_up_by_ticker() {
+        when(instruments.findByTicker(ticker)).thenReturn(Optional.of(instrument));
+
+        assertThat(service.getInstrument(ticker)).isEqualTo(instrument);
     }
 
     @Test

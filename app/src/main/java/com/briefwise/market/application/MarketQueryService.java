@@ -25,6 +25,11 @@ class MarketQueryService implements MarketQueries {
     }
 
     @Override
+    public Instrument getInstrument(Ticker ticker) {
+        return requireInstrument(ticker);
+    }
+
+    @Override
     public List<DailyPrice> getPriceHistory(Ticker ticker, LocalDate from, LocalDate to) {
         if (from.isAfter(to)) {
             throw new IllegalArgumentException("'from' (" + from + ") must not be after 'to' (" + to + ")");
