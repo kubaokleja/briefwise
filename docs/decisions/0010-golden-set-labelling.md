@@ -53,7 +53,7 @@ split 3:1, rows never move between splits. Golden distribution: 18 `HIGH`, 58 `M
 38 `POSITIVE`.
 
 **Labelling:** option 2. Claude (Opus 5.5) drafted all labels before any classification prompt existed; the
-maintainer spot-checked a sample on 2026-10-23 with no disagreements (sample size not recorded). Provenance is in
+maintainer spot-checked about 40 rows on 2026-10-23 with no disagreements. Provenance is in
 the labelling README.
 
 ## Consequences
