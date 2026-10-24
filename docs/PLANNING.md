@@ -82,13 +82,13 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] Export headlines for labelling (golden set + separate few-shot pool), labelled before any model output: 344 rows (200 random + 144 stratified company sample; 258 golden / 86 few-shot), drafted by Claude and spot-checked (provenance in `evals/labelling/README.md`)
 
 ### Slice 3 — Outbox and Kafka
-- [ ] Decide K1 outbox relay vs Debezium ([DESIGN 18](DESIGN.md#18-open-questions)), K2 Kafka key for multi-ticker news, K3 idempotency store (processed-messages table vs status check) -> ADRs
-- [ ] Dependencies: spring-kafka, testcontainers-kafka (verify versions)
-- [ ] Flyway: `outbox` table; news item + outbox row in one transaction
-- [ ] Polling relay -> `news.raw` (key per K2); re-publishes pending rows on the next run
-- [ ] Idempotent consumer by `newsId` (K3); retries -> `news.raw.DLT`
-- [ ] Testcontainers Kafka IT: happy path, duplicate delivery, poison message -> DLT
-- [ ] Skill `kafka-consumer` (pattern now implemented once)
+- [x] Decide K1 outbox relay vs Debezium ([DESIGN 18](DESIGN.md#18-open-questions)), K2 Kafka key for multi-ticker news, K3 idempotency store (processed-messages table vs status check) -> [ADR 0011](decisions/0011-news-outbox-relay-key-and-idempotency.md) (polling relay; one message per item keyed by first-fetched ticker, ids only; status check + conditional write)
+- [x] Dependencies: `spring-boot-starter-kafka` (Spring Kafka 4.1.1, kafka-clients 4.2.1) and `testcontainers-kafka` 2.0.5, both Boot-managed
+- [x] Flyway V10 `news_outbox` (context-prefixed name); news item + outbox row in one transaction, only for `RECEIVED` items
+- [x] Polling relay -> `news.raw` (key per K2, `SKIP LOCKED`, mark after ack, stops at first failed send); `NewsFacade.publishPending`, scheduler behind `briefwise.news.outbox.relay-enabled`
+- [x] Idempotent consumer by `newsId` (K3, `NewsFacade.processIngested`); 3 attempts 1 s apart -> `news.raw.DLT`, malformed / unknown item straight to the DLT; placeholder `NewsClassifier` until slice 4
+- [x] Testcontainers Kafka IT: happy path, duplicate delivery, retries -> DLT, malformed and unknown -> DLT (`NewsKafkaIT`); outbox adapter IT (`SKIP LOCKED`)
+- [x] Skill `kafka-consumer` (pattern now implemented once)
 
 ### Slice 4 — Classification: first LLM adapter by hand
 - [ ] Decide L1 structured output mechanism (`BeanOutputConverter` vs native structured output vs forced tool call), L2 model (start Haiku 5.5; Ollama dev model), L3 few-shot, L4 temperature + `maxTokens`, L5 prompt caching (verify current minimum cacheable prefix and TTL), L6 M1 injection screening scope, R1 circuit breaker / time limiter gap vs [ADR 0005](decisions/0005-resilience-spring-retryable.md) -> ADRs
@@ -112,6 +112,7 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [ ] Job runner (`job` profile, `--briefwise.job=news-ingest`): exits when consumer lag is 0 or after `max-duration`
 - [ ] Neon project + `NEON_DATABASE_URL` secret (you); run the `job` and `cloud` profiles for the first time
 - [ ] `.github/workflows/morning-pipeline.yml`: news ingest + classification, Kafka service container, gated by `PIPELINE_ENABLED`
+- [ ] Sweep of old `RECEIVED` items (e.g. DLT'd or never delivered): decide age threshold, trigger (job step vs `classifyPending`), retry cap so a poison item is not swept forever; facade method + IT
 
 ### Slice 7 — Daily portfolio summary
 - [ ] Decide S1 model, trigger (pipeline vs on demand), M1 `compliance.checkText` scope -> ADR
@@ -193,6 +194,8 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-10-23 | Same-event duplicates (e.g. "KFC switches from Pepsi to Coke" vs "KFC plans a massive soda change") score 0.09–0.49 on headline trigram similarity, far below 0.6. Trigram dedup only catches re-syndication. Do we need semantic (embedding) dedup, and where: ingest or classification? | Open (revisit D1 after the eval; 7 labelled pairs in `evals/labelling/`) |
 | 2026-10-23 | `EventType` has no value for analyst rating / price-target changes (~20 labelled rows) or customer contracts (KFC/Coke). Add `ANALYST` and `CONTRACT`, or keep them in `OTHER`? | Open (decide at M1 slice 4 with the prompt) |
 | 2026-10-23 | Relevance is labelled per ticker ("would an RM whose client holds it want to see it?"), multi-ticker items once for the most affected ticker. Does the classifier output per ticker or per item? | Labelling convention agreed; classifier output shape open (slice 4) |
+| 2026-10-24 | An item whose message ends in `news.raw.DLT` stays `RECEIVED` with its outbox row published, so nothing re-sends it. Who picks it up: a sweep of old `RECEIVED` items (e.g. in `classifyPending` or the job runner), a DLT replay tool, or both? | Sweep (2026-10-24, DESIGN 7.1); age threshold, trigger and retry cap decided in slice 6 |
+| 2026-10-24 | `NewsIngested` carries the first-fetched `ticker` (Kafka key, K2); DESIGN 6.4 sketches `NewsIngested(newsId, occurredAt)`. Update the DESIGN sketch? | Done: DESIGN 6.4 updated (2026-10-24) |
 | 2026-10-21 | Should `ai_generation_log` reference the business object it was generated for (e.g. `newsId`, `briefId`)? Today only feature + correlation ID link a call to its input; an audit ("which call produced this classification?") may need a direct reference | Open (decide at M1 slice 4) |
 
 ## Open questions from DESIGN

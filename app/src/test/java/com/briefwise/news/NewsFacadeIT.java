@@ -38,6 +38,7 @@ class NewsFacadeIT extends AbstractIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        jdbc.update("DELETE FROM news_outbox");
         jdbc.update("DELETE FROM news_items");
         WIREMOCK.resetAll();
         WIREMOCK.stubFor(get(urlPathEqualTo(PATH)).atPriority(10).willReturn(okJson("[]")));
@@ -90,6 +91,12 @@ class NewsFacadeIT extends AbstractIntegrationTest {
                 WHERE d.url = 'https://news.example.com/apple-2'""");
         assertThat(skipped).containsEntry("status", "SKIPPED")
                 .containsEntry("original_url", "https://news.example.com/apple-1");
+
+        // One pending outbox row per RECEIVED item, keyed by the ticker it was first fetched for (ADR 0011).
+        assertThat(jdbc.queryForList("""
+                SELECT n.url || ' ' || o.message_key FROM news_outbox o JOIN news_items n ON n.id = o.aggregate_id
+                WHERE o.published_at IS NULL ORDER BY n.url""", String.class))
+                .containsExactly("https://news.example.com/apple-1 AAPL", "https://news.example.com/shared AAPL");
     }
 
     @Test
@@ -103,5 +110,6 @@ class NewsFacadeIT extends AbstractIntegrationTest {
         assertThat(second.alreadyKnown()).isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT count(*) FROM news_items", Integer.class)).isEqualTo(1);
         assertThat(jdbc.queryForList("SELECT status FROM news_items", String.class)).isEqualTo(List.of("RECEIVED"));
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM news_outbox", Integer.class)).isEqualTo(1);
     }
 }

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.briefwise.news.domain.event.NewsIngested;
 import com.briefwise.news.domain.model.DedupPolicy;
 import com.briefwise.news.domain.model.FetchedNews;
 import com.briefwise.news.domain.model.HeldInstrument;
@@ -21,6 +22,7 @@ import com.briefwise.news.domain.model.NewsSourceUnavailableException;
 import com.briefwise.news.domain.model.NewsStatus;
 import com.briefwise.news.domain.model.UrlHash;
 import com.briefwise.news.domain.port.HeldInstruments;
+import com.briefwise.news.domain.port.NewsOutbox;
 import com.briefwise.news.domain.port.NewsRepository;
 import com.briefwise.news.domain.port.NewsSource;
 import com.briefwise.shared.domain.model.Ticker;
@@ -35,6 +37,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.transaction.support.TransactionOperations;
 
 class NewsIngestServiceTest {
 
@@ -49,8 +52,9 @@ class NewsIngestServiceTest {
     private final HeldInstruments held = mock(HeldInstruments.class);
     private final NewsSource source = mock(NewsSource.class);
     private final NewsRepository repository = mock(NewsRepository.class);
-    private final NewsIngestService service =
-            new NewsIngestService(held, source, repository, new IngestPolicy(2, DEDUP), CLOCK);
+    private final NewsOutbox outbox = mock(NewsOutbox.class);
+    private final NewsIngestService service = new NewsIngestService(held, source, repository, outbox,
+            TransactionOperations.withoutTransaction(), new IngestPolicy(2, DEDUP), CLOCK);
 
     private static FetchedNews article(Ticker ticker, String headline, String url, String publishedAt) {
         return new FetchedNews(ticker, headline, "", url, Instant.parse(publishedAt), "Reuters");
@@ -92,6 +96,19 @@ class NewsIngestServiceTest {
     }
 
     @Test
+    void received_item_gets_an_outbox_event_keyed_by_the_fetched_ticker() {
+        when(held.list()).thenReturn(List.of(new HeldInstrument(AAPL, Kind.COMPANY)));
+        when(source.fetch(any(), any(), any())).thenReturn(
+                List.of(article(AAPL, "Apple beats estimates", "https://example.com/1", "2026-10-20T10:00:00Z")));
+
+        service.ingest();
+
+        ArgumentCaptor<NewsItem> stored = ArgumentCaptor.forClass(NewsItem.class);
+        verify(repository).insert(stored.capture(), any());
+        verify(outbox).append(new NewsIngested(stored.getValue().id(), AAPL, CLOCK.instant()));
+    }
+
+    @Test
     void known_url_only_gets_the_ticker_added() {
         UUID existing = UUID.randomUUID();
         when(held.list()).thenReturn(List.of(new HeldInstrument(MSFT, Kind.COMPANY)));
@@ -103,6 +120,7 @@ class NewsIngestServiceTest {
 
         verify(repository).addTicker(existing, MSFT);
         verify(repository, never()).insert(any(), any());
+        verify(outbox, never()).append(any()); // already sent when it was first stored
         assertThat(summary.alreadyKnown()).isEqualTo(1);
     }
 
@@ -120,6 +138,7 @@ class NewsIngestServiceTest {
         verify(repository).insert(stored.capture(), any());
         assertThat(stored.getValue().status()).isEqualTo(NewsStatus.SKIPPED);
         assertThat(stored.getValue().duplicateOf()).contains(original);
+        verify(outbox, never()).append(any()); // near-duplicates are never sent
         assertThat(summary.nearDuplicates()).isEqualTo(1);
         assertThat(summary.inserted()).isZero();
     }
