@@ -15,6 +15,16 @@ spring:
       ddl-auto: validate   # Flyway is the only schema source; never "update"
   flyway:
     enabled: true
+  kafka:                       # news.raw via the transactional outbox (ADR 0011); String keys and JSON-text values
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      acks: all                # the relay marks a row published only after every in-sync replica has it
+      properties:              # fail fast when the broker is gone; all below briefwise.news.kafka.send-timeout
+        max.block.ms: 5000
+        request.timeout.ms: 5000
+        delivery.timeout.ms: 10000
+    consumer:
+      auto-offset-reset: earliest   # a new consumer group starts at the oldest message, not the newest
 
 management:
   endpoints:
@@ -58,6 +68,16 @@ briefwise:
     dedup:                   # near-duplicate headline (D1, ADR 0009): same ticker, within window, similarity >=
       headline-similarity: 0.6
       window: 48h
+    outbox:                  # polling relay to news.raw (K1, ADR 0011)
+      relay-enabled: true
+      poll-interval: 5s
+      batch-size: 100
+    kafka:                   # news.raw consumer: max-attempts deliveries retry-backoff apart, then news.raw.DLT
+      partitions: 3
+      max-attempts: 3
+      retry-backoff: 1s
+      send-timeout: 15s      # relay wait for one broker ack
+      consumer-enabled: true
     finnhub:                 # free tier: personal use only, about 60 calls/min, 30/s hard cap (checked 2026-10-21)
       base-url: https://finnhub.io/api/v1
       api-key: ${FINNHUB_API_KEY:}

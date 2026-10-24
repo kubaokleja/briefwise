@@ -17,3 +17,7 @@ briefwise:
     finnhub:                  # base-url points at WireMock (set by AbstractIntegrationTest)
       api-key: test-key
       retry-delay: 10ms
+    outbox:
+      relay-enabled: false    # tests call NewsFacade.publishPending() themselves
+    kafka:
+      retry-backoff: 10ms

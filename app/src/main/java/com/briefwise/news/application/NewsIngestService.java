@@ -1,14 +1,17 @@
 package com.briefwise.news.application;
 
+import com.briefwise.news.domain.event.NewsIngested;
 import com.briefwise.news.domain.model.FetchedNews;
 import com.briefwise.news.domain.model.HeldInstrument;
 import com.briefwise.news.domain.model.IngestPolicy;
 import com.briefwise.news.domain.model.IngestSummary;
 import com.briefwise.news.domain.model.NewsItem;
 import com.briefwise.news.domain.model.NewsSourceUnavailableException;
+import com.briefwise.news.domain.model.NewsStatus;
 import com.briefwise.news.domain.model.UrlHash;
 import com.briefwise.news.domain.port.HeldInstruments;
 import com.briefwise.news.domain.port.NewsIngest;
+import com.briefwise.news.domain.port.NewsOutbox;
 import com.briefwise.news.domain.port.NewsRepository;
 import com.briefwise.news.domain.port.NewsSource;
 import com.briefwise.shared.domain.model.Ticker;
@@ -23,11 +26,12 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionOperations;
 
 /**
  * Fetch, deduplicate, store (DESIGN 7.1, first three steps). Not one transaction: each item is stored on its own,
  * so a failure halfway keeps what was stored and the next run picks up the rest (URL hash makes it idempotent).
- * Outbox row and Kafka publish come in M1 slice 3.
+ * A {@code RECEIVED} item and its outbox row are stored in one transaction (ADR 0011); the relay sends the row.
  */
 @Service
 class NewsIngestService implements NewsIngest {
@@ -39,14 +43,18 @@ class NewsIngestService implements NewsIngest {
     private final HeldInstruments held;
     private final NewsSource source;
     private final NewsRepository repository;
+    private final NewsOutbox outbox;
+    private final TransactionOperations transactions;
     private final IngestPolicy policy;
     private final Clock clock;
 
-    NewsIngestService(HeldInstruments held, NewsSource source, NewsRepository repository, IngestPolicy policy,
-                      Clock clock) {
+    NewsIngestService(HeldInstruments held, NewsSource source, NewsRepository repository, NewsOutbox outbox,
+                      TransactionOperations transactions, IngestPolicy policy, Clock clock) {
         this.held = held;
         this.source = source;
         this.repository = repository;
+        this.outbox = outbox;
+        this.transactions = transactions;
         this.policy = policy;
         this.clock = clock;
     }
@@ -103,7 +111,13 @@ class NewsIngestService implements NewsIngest {
         }
         Optional<UUID> original = repository.findNearDuplicate(article.ticker(), article.headline(),
                 article.publishedAt(), policy.dedup());
-        repository.insert(NewsItem.fetched(UUID.randomUUID(), article, original), urlHash);
+        NewsItem item = NewsItem.fetched(UUID.randomUUID(), article, original);
+        transactions.executeWithoutResult(status -> {
+            repository.insert(item, urlHash);
+            if (item.status() == NewsStatus.RECEIVED) { // near-duplicates are never classified, so never sent
+                outbox.append(new NewsIngested(item.id(), article.ticker(), clock.instant()));
+            }
+        });
         return original.isPresent() ? Outcome.NEAR_DUPLICATE : Outcome.INSERTED;
     }
 }
