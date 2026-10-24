@@ -1,0 +1,29 @@
+# Line endings: LF in the repository and in the working tree on every OS, independent of core.autocrlf.
+# Java, Maven, Python, Node, Postgres and the Linux CI runners all expect LF.
+* text=auto eol=lf
+
+# Windows scripts need CRLF to run reliably in cmd.exe / PowerShell.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Unix scripts must stay LF (a CRLF shebang line fails on Linux).
+mvnw  text eol=lf
+*.sh  text eol=lf
+
+# Binary: never convert, never diff as text.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.webp  binary
+*.pdf   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.jar   binary
+*.zip   binary
+*.gz    binary
+*.parquet binary
