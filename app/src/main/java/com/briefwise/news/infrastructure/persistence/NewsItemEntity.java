@@ -13,8 +13,8 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Write-only for now: items are inserted here and read back by the classification consumer (M1 slice 4), which
- * adds the domain mapping. Tickers added to an existing item go through a native insert (see the repository).
+ * Read back by the {@code news.raw} consumer through {@link NewsEntityMapper}. Tickers added to an existing item and
+ * status transitions go through native statements (see {@link NewsItemJpaRepository}).
  */
 @Entity
 @Table(name = "news_items")
@@ -71,5 +71,37 @@ class NewsItemEntity {
 
     public UUID getId() {
         return id;
+    }
+
+    public String getHeadline() {
+        return headline;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public Instant getPublishedAt() {
+        return publishedAt;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public UUID getDuplicateOfId() {
+        return duplicateOfId;
+    }
+
+    public Set<String> getTickers() {
+        return tickers;
     }
 }

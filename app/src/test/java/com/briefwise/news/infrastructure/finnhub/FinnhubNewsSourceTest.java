@@ -58,7 +58,7 @@ class FinnhubNewsSourceTest {
 
     private FinnhubNewsSource sourceWithKey(String apiKey) {
         return new FinnhubNewsSource(new FinnhubProperties(server.baseUrl(), apiKey, Duration.ofSeconds(1),
-                Duration.ofMillis(300), 2, Duration.ofMillis(5)));
+                Duration.ofSeconds(1), 2, Duration.ofMillis(5))); // read timeout with margin for a cold WireMock
     }
 
     private static String fixture(String name) throws IOException {
@@ -119,7 +119,7 @@ class FinnhubNewsSourceTest {
 
     @Test
     void timeout_is_retried_then_unavailable() {
-        server.stubFor(get(urlPathEqualTo(PATH)).willReturn(okJson("[]").withFixedDelay(1000)));
+        server.stubFor(get(urlPathEqualTo(PATH)).willReturn(okJson("[]").withFixedDelay(2000)));
 
         assertThatThrownBy(() -> source.fetch(AAPL, FROM, TO))
                 .isInstanceOf(NewsSourceUnavailableException.class)

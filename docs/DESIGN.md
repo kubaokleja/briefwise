@@ -238,7 +238,7 @@ public record Violation(RuleId rule, String offendingText, String explanation) {
 ### 6.4 Domain events and Kafka topics
 
 ```java
-public record NewsIngested(UUID newsId, Instant occurredAt) {}
+public record NewsIngested(UUID newsId, Ticker ticker, Instant occurredAt) {} // ticker = Kafka key (ADR 0011)
 public record NewsClassified(UUID newsId, Relevance relevance, Instant occurredAt) {}
 public record RiskForecastsPublished(LocalDate asOf, String modelVersion, Instant occurredAt) {}
 public record RiskAlertRaised(Ticker ticker, AlertType type, Instant occurredAt) {}
@@ -281,7 +281,7 @@ Trigger: admin "run now" endpoint | in-app scheduler | job runner (GitHub Action
   → HIGH relevance → input to the morning brief
 ```
 
-**Why the outbox:** in GitHub Actions Kafka lives only for the duration of the workflow run. Postgres is the source of truth: anything not yet consumed stays `RECEIVED` and the relay re-publishes pending outbox rows on the next run. Nothing is lost when the broker disappears.
+**Why the outbox:** in GitHub Actions Kafka lives only for the duration of the workflow run. Postgres is the source of truth: anything not yet consumed stays `RECEIVED` and the relay re-publishes pending outbox rows on the next run. Nothing is lost when the broker disappears. An item whose message ends in `news.raw.DLT` also stays `RECEIVED`; a sweep of old `RECEIVED` items picks it up again (shape decided in M1 slice 6). Relay, key and idempotency: [ADR 0011](decisions/0011-news-outbox-relay-key-and-idempotency.md).
 
 **Job completion:** in job mode the runner publishes, consumes, and exits when consumer lag reaches 0 or after `max-duration`.
 
@@ -743,7 +743,7 @@ A skill is written only after the pattern has been implemented once by hand. A s
 
 | Question | When to decide |
 |---|---|
-| Kafka producer: outbox polling relay vs Debezium? (starting proposal: polling relay) | M1 |
+| Kafka producer: outbox polling relay vs Debezium? (starting proposal: polling relay) | Decided: polling relay ([ADR 0011](decisions/0011-news-outbox-relay-key-and-idempotency.md)) |
 | Add European/Swiss (SMI) companies? News and filings are harder to get for free | F3 |
 | Forecast horizon: 1 day vs 5 days? | Start of F4 |
 | MLflow storage for the daily pipeline | F4, week 6 |

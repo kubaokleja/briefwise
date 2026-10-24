@@ -2,6 +2,7 @@ package com.briefwise.news.infrastructure.persistence;
 
 import com.briefwise.news.domain.model.DedupPolicy;
 import com.briefwise.news.domain.model.NewsItem;
+import com.briefwise.news.domain.model.NewsStatus;
 import com.briefwise.news.domain.model.UrlHash;
 import com.briefwise.news.domain.port.NewsRepository;
 import com.briefwise.shared.domain.model.Ticker;
@@ -18,9 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 class NewsRepositoryAdapter implements NewsRepository {
 
     private final NewsItemJpaRepository items;
+    private final NewsEntityMapper mapper;
 
-    NewsRepositoryAdapter(NewsItemJpaRepository items) {
+    NewsRepositoryAdapter(NewsItemJpaRepository items, NewsEntityMapper mapper) {
         this.items = items;
+        this.mapper = mapper;
     }
 
     @Override
@@ -46,5 +49,16 @@ class NewsRepositoryAdapter implements NewsRepository {
         items.save(new NewsItemEntity(item.id(), item.headline(), item.summary(), item.url(), urlHash.value(),
                 item.source(), item.publishedAt(), item.status().name(), item.duplicateOf().orElse(null),
                 item.tickers().stream().map(Ticker::symbol).collect(Collectors.toSet())));
+    }
+
+    @Override
+    public Optional<NewsItem> findById(UUID newsId) {
+        return items.findById(newsId).map(mapper::toDomain);
+    }
+
+    @Override
+    @Transactional
+    public boolean transitionFromReceived(UUID newsId, NewsStatus to) {
+        return items.transitionFromReceived(newsId, to.name()) == 1;
     }
 }

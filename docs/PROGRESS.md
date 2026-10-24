@@ -34,6 +34,63 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 9 — 2026-10-24 — M1 slice 3: outbox and Kafka
+
+**Phase:** M1 / slice 3 (no LLM calls)
+**Goal:** Send stored news to Kafka `news.raw` through a transactional outbox and consume it idempotently, with
+retries and a dead-letter topic.
+
+**Done**
+- Dependencies (approved): `spring-boot-starter-kafka` (Spring Kafka 4.1.1, kafka-clients 4.2.1) and
+  `testcontainers-kafka` 2.0.5, versions managed by Boot 4.1.1 (checked in the Boot BOM). Awaitility 4.3.0 was
+  already on the test classpath through `spring-boot-starter-test`.
+- Flyway V10 `news_outbox` (id = message id, key, JSONB payload, correlation ID, attempts, last error,
+  `published_at`, partial index on pending rows).
+- `NewsIngestService` stores a `RECEIVED` item and its `NewsIngested` outbox row in one transaction; near-duplicates
+  get no row. `NewsOutboxAdapter` (JDBC) enforces the caller's transaction (`MANDATORY`).
+- `OutboxRelayService`: batches of 100 per transaction, `FOR UPDATE SKIP LOCKED`, mark published after the
+  broker ack, stop at the first failed send. `NewsFacade.publishPending()`; `OutboxRelayScheduler` every 5 s
+  (`briefwise.news.outbox.relay-enabled`, off in `test`). Producer `acks=all` and fail-fast timeouts
+  (`max.block.ms` 5 s, delivery 10 s).
+- `NewsRawListener` -> `NewsFacade.processIngested` -> `NewsProcessingService` (status gate + conditional
+  `UPDATE ... WHERE status = 'RECEIVED'`). Own listener container factory with `DefaultErrorHandler`: 3 attempts
+  1 s apart, then `news.raw.DLT` (same partition); malformed messages and unknown items go there without retries.
+  Correlation ID travels as the `X-Correlation-ID` header into the consumer's MDC.
+- `PlaceholderNewsClassifier` (never classifies, items stay `RECEIVED`) until slice 4; `NewsRepository.findById`
+  with a MapStruct mapper.
+- Tests: `OutboxRelayServiceTest`, `NewsProcessingServiceTest`, `NewsRawMessagesTest`, `NewsOutboxAdapterIT`
+  (transaction required, order, `SKIP LOCKED`), `NewsKafkaIT` (relay -> consumed, duplicate -> one classification,
+  failing -> 3 attempts -> DLT, malformed / unknown -> DLT), repository and facade ITs extended. Kafka container
+  in `TestcontainersConfig`; `RecordingNewsClassifier` keeps one shared Spring context. `./mvnw verify`: 131 unit +
+  63 IT green.
+- Flaky `FinnhubNewsSourceTest` (300 ms read timeout vs cold WireMock, failed 1 in 3 runs): timeout 1 s, delay stub 2 s.
+- Skill `kafka-consumer`.
+
+**Decisions** ([ADR 0011](decisions/0011-news-outbox-relay-key-and-idempotency.md))
+- K1 polling relay (not Debezium); K2 one message per item, key = first-fetched ticker, payload ids only; K3 status
+  check with conditional write. Outbox rows only for `RECEIVED`; published rows kept until M6 retention.
+
+**AI concepts introduced / explained**
+- None new (no LLM in this slice). Engineering concepts: transactional outbox, at-least-once delivery, idempotent
+  consumer, partition key and ordering, dead-letter topic, `SKIP LOCKED` for concurrent relays.
+
+**Domain questions added** (also in PLANNING)
+- An item whose message reaches the DLT stays `RECEIVED` and is never re-sent: sweep, DLT replay, or both?
+- `NewsIngested` carries `ticker` (Kafka key); DESIGN 6.4 sketch lacks it. Update DESIGN?
+
+**Open questions / blockers**
+- Settled at session end: `local` keeps relay and consumer on (connection warnings without Kafka accepted);
+  DESIGN 6.4, 7.1 and 18 updated for ADR 0011; DLT'd items will be picked up by a sweep of old `RECEIVED` items
+  (task added to slice 6).
+
+**Next session**
+- M1 slice 4: decide L1–L6 and R1, then the first LLM adapter by hand (replaces `PlaceholderNewsClassifier`).
+
+**Proposed commit message**
+> feat(news): send ingested news to Kafka via transactional outbox with idempotent consumer and DLT
+
+---
+
 ## Session 8 — 2026-10-23 — M1 slice 2: real ingest and labelled headline set
 
 **Phase:** M1 / slice 2 (last task; no application code changed, no LLM calls from the app)

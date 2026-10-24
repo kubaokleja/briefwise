@@ -6,6 +6,7 @@ import com.briefwise.AbstractIntegrationTest;
 import com.briefwise.news.domain.model.DedupPolicy;
 import com.briefwise.news.domain.model.FetchedNews;
 import com.briefwise.news.domain.model.NewsItem;
+import com.briefwise.news.domain.model.NewsStatus;
 import com.briefwise.news.domain.model.UrlHash;
 import com.briefwise.news.domain.port.NewsRepository;
 import com.briefwise.shared.domain.model.Ticker;
@@ -106,5 +107,30 @@ class NewsRepositoryAdapterIT extends AbstractIntegrationTest {
         List<String> tickers = jdbc.queryForList(
                 "SELECT ticker FROM news_item_tickers WHERE news_item_id = ? ORDER BY ticker", String.class, item.id());
         assertThat(tickers).containsExactly("AAPL", "MSFT");
+    }
+
+    @Test
+    void stored_item_reads_back_with_its_current_tickers() {
+        UUID original = store(AAPL, "Apple beats Q3 estimates as iPhone sales rise", T0, Optional.empty());
+        UUID duplicate = store(AAPL, "Apple beats Q3 estimates as iPhone sales rise, shares up 3%", T0,
+                Optional.of(original));
+        repository.addTicker(original, MSFT);
+
+        NewsItem read = repository.findById(original).orElseThrow();
+
+        assertThat(read.tickers()).containsExactlyInAnyOrder(AAPL, MSFT);
+        assertThat(read.status()).isEqualTo(NewsStatus.RECEIVED);
+        assertThat(read.duplicateOf()).isEmpty();
+        assertThat(repository.findById(duplicate).orElseThrow().duplicateOf()).contains(original);
+        assertThat(repository.findById(UUID.randomUUID())).isEmpty();
+    }
+
+    @Test
+    void only_the_first_transition_from_received_succeeds() {
+        UUID id = store(AAPL, "Apple opens new campus", T0, Optional.empty());
+
+        assertThat(repository.transitionFromReceived(id, NewsStatus.CLASSIFIED)).isTrue();
+        assertThat(repository.transitionFromReceived(id, NewsStatus.UNCLASSIFIED)).isFalse();
+        assertThat(repository.findById(id).orElseThrow().status()).isEqualTo(NewsStatus.CLASSIFIED);
     }
 }

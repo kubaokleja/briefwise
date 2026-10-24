@@ -20,6 +20,13 @@ interface NewsItemJpaRepository extends JpaRepository<NewsItemEntity, UUID> {
             """)
     int addTicker(@Param("newsId") UUID newsId, @Param("ticker") String ticker);
 
+    /** Conditional on the current status, so of two concurrent writers only the first changes the row (K3). */
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            UPDATE news_items SET status = :to, updated_at = now() WHERE id = :newsId AND status = 'RECEIVED'
+            """)
+    int transitionFromReceived(@Param("newsId") UUID newsId, @Param("to") String to);
+
     /**
      * pg_trgm {@code similarity()} is computed per candidate; the candidates are already narrowed to one ticker and
      * the time window, so a trigram index on the headline would not help this query (ADR 0009).
