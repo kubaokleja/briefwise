@@ -39,7 +39,8 @@ public class AiopsFacade {
      */
     public UUID recordGeneration(GenerationEntry entry) {
         return generationLog.record(new NewGeneration(entry.feature(), entry.model(), entry.promptVersion(),
-                entry.prompt(), entry.response(), entry.tokens(), entry.latency(), entry.fallback()));
+                entry.prompt(), entry.response(), entry.tokens(), entry.latency(), entry.fallback(),
+                entry.subjectId()));
     }
 
     /**
@@ -83,10 +84,13 @@ public class AiopsFacade {
                 status.remainingUsd(), status.exhausted());
     }
 
-    /** One LLM call. {@code response} is empty when the call failed; {@code fallback} when its fallback was used. */
+    /**
+     * One LLM call. {@code response} is empty when the call failed; {@code fallback} when its fallback was used;
+     * {@code subjectId} is the object the call was made for (e.g. the news item id).
+     */
     public record GenerationEntry(String feature, String model, String promptVersion, String prompt,
                                   Optional<String> response, TokenCount tokens, Duration latency,
-                                  boolean fallback) {}
+                                  boolean fallback, Optional<UUID> subjectId) {}
 
     public record BudgetView(String feature, LocalDate date, BigDecimal spentUsd, BigDecimal limitUsd,
                              BigDecimal remainingUsd, boolean exhausted) {}

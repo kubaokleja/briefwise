@@ -6,7 +6,15 @@ springdoc:
   api-docs:
     enabled: true
 
+spring:
+  ai:
+    model:
+      chat: ollama              # zero cost; needs `ollama pull llama3.1:8b` in the compose container
+
 briefwise:
+  aiops:
+    pricing:
+      "[llama3.1:8b]": { input: 0, output: 0 }
   market:
     price-snapshot:
       import-on-startup: true   # data/prices/ -> daily_prices; idempotent. Directory is relative to app/

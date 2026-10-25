@@ -54,9 +54,10 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
     void generation_is_logged_with_cost_and_correlation_id() {
         MDC.put(CorrelationIdFilter.MDC_KEY, "it-corr-1");
 
+        UUID subject = UUID.randomUUID();
         UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "Classify: ...",
                 Optional.of("{\"sentiment\":\"NEUTRAL\"}"), new TokenCount(1_000, 500), Duration.ofMillis(420),
-                false));
+                false, Optional.of(subject)));
 
         Map<String, Object> row = jdbc.queryForMap("SELECT * FROM ai_generation_log WHERE id = ?", id);
         assertThat(row).containsEntry("feature", FEATURE)
@@ -66,7 +67,8 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
                 .containsEntry("completion_tokens", 500)
                 .containsEntry("latency_ms", 420L)
                 .containsEntry("correlation_id", "it-corr-1")
-                .containsEntry("is_fallback", false);
+                .containsEntry("is_fallback", false)
+                .containsEntry("subject_id", subject);
         // 1,000 x 1 / 1M + 500 x 2 / 1M
         assertThat((BigDecimal) row.get("cost_usd")).isEqualByComparingTo("0.002");
     }
@@ -74,11 +76,24 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
     @Test
     void failed_call_is_logged_without_response_and_flagged_as_fallback() {
         UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "Classify: ...",
-                Optional.empty(), new TokenCount(0, 0), Duration.ofSeconds(30), true));
+                Optional.empty(), new TokenCount(0, 0), Duration.ofSeconds(30), true, Optional.empty()));
 
         Map<String, Object> row = jdbc.queryForMap("SELECT * FROM ai_generation_log WHERE id = ?", id);
         assertThat(row.get("response")).isNull();
-        assertThat(row).containsEntry("is_fallback", true).containsEntry("correlation_id", null);
+        assertThat(row).containsEntry("is_fallback", true).containsEntry("correlation_id", null)
+                .containsEntry("subject_id", null);
+    }
+
+    @Test
+    void cached_prefix_tokens_are_logged_and_priced_with_the_standard_cache_multipliers() {
+        UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "Classify: ...",
+                Optional.of("{}"), new TokenCount(100, 50, 0, 1_000), Duration.ofMillis(300), false,
+                Optional.empty()));
+
+        Map<String, Object> row = jdbc.queryForMap("SELECT * FROM ai_generation_log WHERE id = ?", id);
+        assertThat(row).containsEntry("cache_write_tokens", 0).containsEntry("cache_read_tokens", 1_000);
+        // test-model has no cache prices: read = 0.1 x input. 100 x 1 + 50 x 2 + 1,000 x 0.1 = 300 / 1M
+        assertThat((BigDecimal) row.get("cost_usd")).isEqualByComparingTo("0.0003");
     }
 
     @Test

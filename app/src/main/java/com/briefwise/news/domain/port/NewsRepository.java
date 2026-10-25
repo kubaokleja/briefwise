@@ -1,8 +1,9 @@
 package com.briefwise.news.domain.port;
 
 import com.briefwise.news.domain.model.DedupPolicy;
+import com.briefwise.news.domain.model.NewsClassification;
 import com.briefwise.news.domain.model.NewsItem;
-import com.briefwise.news.domain.model.NewsStatus;
+import com.briefwise.news.domain.model.UnclassifiedReason;
 import com.briefwise.news.domain.model.UrlHash;
 import com.briefwise.shared.domain.model.Ticker;
 import java.time.Instant;
@@ -28,9 +29,24 @@ public interface NewsRepository {
     Optional<NewsItem> findById(UUID newsId);
 
     /**
-     * Sets the status only if the item is still {@code RECEIVED} (the first writer wins, K3 in ADR 0011).
+     * Sets {@code SKIPPED} only if the item is still {@code RECEIVED} (the first writer wins, K3 in ADR 0011).
      *
      * @return false if the item was no longer {@code RECEIVED} (or does not exist)
      */
-    boolean transitionFromReceived(UUID newsId, NewsStatus to);
+    boolean skipFromReceived(UUID newsId);
+
+    /**
+     * Stores the labels, marks the affected tickers and sets {@code CLASSIFIED}, only if the item is still
+     * {@code RECEIVED} (first writer wins).
+     *
+     * @return false if the item was no longer {@code RECEIVED}
+     */
+    boolean classifyFromReceived(UUID newsId, NewsClassification classification, Instant classifiedAt);
+
+    /**
+     * Sets {@code UNCLASSIFIED} with the reason, only if the item is still {@code RECEIVED}.
+     *
+     * @return false if the item was no longer {@code RECEIVED}
+     */
+    boolean markUnclassifiedFromReceived(UUID newsId, UnclassifiedReason reason, Instant classifiedAt);
 }

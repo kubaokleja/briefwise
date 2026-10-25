@@ -1,8 +1,9 @@
 package com.briefwise.news.infrastructure.persistence;
 
 import com.briefwise.news.domain.model.DedupPolicy;
+import com.briefwise.news.domain.model.NewsClassification;
 import com.briefwise.news.domain.model.NewsItem;
-import com.briefwise.news.domain.model.NewsStatus;
+import com.briefwise.news.domain.model.UnclassifiedReason;
 import com.briefwise.news.domain.model.UrlHash;
 import com.briefwise.news.domain.port.NewsRepository;
 import com.briefwise.shared.domain.model.Ticker;
@@ -58,7 +59,25 @@ class NewsRepositoryAdapter implements NewsRepository {
 
     @Override
     @Transactional
-    public boolean transitionFromReceived(UUID newsId, NewsStatus to) {
-        return items.transitionFromReceived(newsId, to.name()) == 1;
+    public boolean skipFromReceived(UUID newsId) {
+        return items.skipFromReceived(newsId) == 1;
+    }
+
+    @Override
+    @Transactional
+    public boolean classifyFromReceived(UUID newsId, NewsClassification c, Instant classifiedAt) {
+        int updated = items.classifyFromReceived(newsId, c.sentiment().name(), c.relevance().name(),
+                c.eventType().name(), c.rationale(), c.promptVersion(), classifiedAt);
+        if (updated == 0) {
+            return false;
+        }
+        items.markAffected(newsId, c.tickers().stream().map(Ticker::symbol).toList());
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean markUnclassifiedFromReceived(UUID newsId, UnclassifiedReason reason, Instant classifiedAt) {
+        return items.markUnclassifiedFromReceived(newsId, reason.name(), classifiedAt) == 1;
     }
 }

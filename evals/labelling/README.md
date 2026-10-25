@@ -50,7 +50,7 @@ Agreed 2026-10-23 for labelling; the classification prompt (M1 slice 4) must use
 |---|---|---|
 | `sentiment` | `NEGATIVE`, `NEUTRAL`, `POSITIVE` | Likely effect on the ticker's price from a shareholder's view, not the article's tone |
 | `relevance` | `LOW`, `MEDIUM`, `HIGH` | Relative to the single ticker: would an RM whose client holds it want to see it this morning? `HIGH` = company-specific and likely price-moving (earnings, downgrade, lawsuit, deal); `MEDIUM` = company-specific but minor; `LOW` = clickbait, generic market talk, passing mention |
-| `event_type` | `EARNINGS`, `GUIDANCE`, `M_AND_A`, `REGULATORY`, `LITIGATION`, `MANAGEMENT`, `MACRO`, `PRODUCT`, `OTHER` | Main event; analyst rating changes are `OTHER` with a note (candidate for an `ANALYST` value) |
+| `event_type` | `EARNINGS`, `GUIDANCE`, `M_AND_A`, `REGULATORY`, `LITIGATION`, `MANAGEMENT`, `MACRO`, `PRODUCT`, `ANALYST`, `OTHER` | Main event; `ANALYST` = sell-side rating or price-target changes and reiterations (added 2026-10-24, [ADR 0014](../../docs/decisions/0014-classification-output-shape.md)); contributor opinion pieces stay `OTHER`; customer contracts and partnerships are `PRODUCT` |
 | `duplicate_of_id` | an earlier row's `id` | Same event as that row; empty otherwise |
 | `notes` | free text | Doubts, the chosen ticker for multi-ticker rows |
 
@@ -65,3 +65,6 @@ its biases: eval scores against them measure agreement with Claude, not ground t
 the golden set, a human reviews them (at least a random sample of golden rows) and records the agreement rate here.
 
 - 2026-10-23: maintainer spot-checked about 40 rows; no disagreements (agreement ~100% on that sample).
+- 2026-10-24: 22 rows relabelled `OTHER` -> `ANALYST` (notes named a sell-side downgrade, upgrade, target change or
+  reiteration; 14 golden, 8 few-shot). Left `OTHER`: 4 contributor ratings, 1 opinion on an analyst call, 1
+  partnership with a target raise, 1 target vs export-ban mix. Needs a human spot-check before slice 8.

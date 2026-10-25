@@ -40,8 +40,8 @@ class AiopsRepositoryAdapter implements GenerationRepository, DailyUsageReposito
     public UUID save(NewGeneration g, BigDecimal costUsd, Optional<String> correlationId) {
         GenerationLogEntity entity = new GenerationLogEntity(UUID.randomUUID(), g.feature(), g.model(),
                 g.promptVersion(), g.prompt(), g.response().orElse(null), g.tokens().promptTokens(),
-                g.tokens().completionTokens(), costUsd, g.latency().toMillis(), correlationId.orElse(null),
-                g.fallback());
+                g.tokens().completionTokens(), g.tokens().cacheWriteTokens(), g.tokens().cacheReadTokens(), costUsd,
+                g.latency().toMillis(), correlationId.orElse(null), g.fallback(), g.subjectId().orElse(null));
         return generations.save(entity).getId();
     }
 

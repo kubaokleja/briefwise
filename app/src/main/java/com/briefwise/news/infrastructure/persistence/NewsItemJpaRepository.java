@@ -1,6 +1,7 @@
 package com.briefwise.news.infrastructure.persistence;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,9 +24,37 @@ interface NewsItemJpaRepository extends JpaRepository<NewsItemEntity, UUID> {
     /** Conditional on the current status, so of two concurrent writers only the first changes the row (K3). */
     @Modifying
     @Query(nativeQuery = true, value = """
-            UPDATE news_items SET status = :to, updated_at = now() WHERE id = :newsId AND status = 'RECEIVED'
+            UPDATE news_items SET status = 'SKIPPED', updated_at = now() WHERE id = :newsId AND status = 'RECEIVED'
             """)
-    int transitionFromReceived(@Param("newsId") UUID newsId, @Param("to") String to);
+    int skipFromReceived(@Param("newsId") UUID newsId);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            UPDATE news_items
+            SET status = 'CLASSIFIED', sentiment = :sentiment, relevance = :relevance, event_type = :eventType,
+                rationale = :rationale, prompt_version = :promptVersion, classified_at = :at, updated_at = now()
+            WHERE id = :newsId AND status = 'RECEIVED'
+            """)
+    int classifyFromReceived(@Param("newsId") UUID newsId, @Param("sentiment") String sentiment,
+                             @Param("relevance") String relevance, @Param("eventType") String eventType,
+                             @Param("rationale") String rationale, @Param("promptVersion") String promptVersion,
+                             @Param("at") Instant at);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            UPDATE news_item_tickers SET affected = true, updated_at = now()
+            WHERE news_item_id = :newsId AND ticker IN (:tickers)
+            """)
+    int markAffected(@Param("newsId") UUID newsId, @Param("tickers") Collection<String> tickers);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            UPDATE news_items
+            SET status = 'UNCLASSIFIED', unclassified_reason = :reason, classified_at = :at, updated_at = now()
+            WHERE id = :newsId AND status = 'RECEIVED'
+            """)
+    int markUnclassifiedFromReceived(@Param("newsId") UUID newsId, @Param("reason") String reason,
+                                     @Param("at") Instant at);
 
     /**
      * pg_trgm {@code similarity()} is computed per candidate; the candidates are already narrowed to one ticker and
