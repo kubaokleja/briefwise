@@ -16,8 +16,14 @@ class AiopsConfig {
     PriceList priceList(AiopsProperties properties) {
         Map<String, ModelPrice> prices = properties.pricing().entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey,
-                        e -> new ModelPrice(e.getValue().input(), e.getValue().output())));
+                        e -> toModelPrice(e.getValue())));
         return new PriceList(prices);
+    }
+
+    private static ModelPrice toModelPrice(AiopsProperties.Price p) {
+        return new ModelPrice(p.input(), p.output(),
+                p.cacheWrite() != null ? p.cacheWrite() : ModelPrice.standardCacheWrite(p.input()),
+                p.cacheRead() != null ? p.cacheRead() : ModelPrice.standardCacheRead(p.input()));
     }
 
     @Bean

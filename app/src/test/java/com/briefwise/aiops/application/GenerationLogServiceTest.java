@@ -32,7 +32,7 @@ class GenerationLogServiceTest {
 
     private static NewGeneration generation(String model) {
         return new NewGeneration("news-classification", model, "v1", "prompt", Optional.of("{}"),
-                new TokenCount(1_200, 200), Duration.ofMillis(850), false);
+                new TokenCount(1_200, 200), Duration.ofMillis(850), false, Optional.empty());
     }
 
     @AfterEach

@@ -1,4 +1,13 @@
 # Tests: Testcontainers provide the database, WireMock provides HTTP APIs, LLM calls are replayed (never live).
+spring:
+  ai:
+    model:
+      chat: anthropic         # pointed at WireMock by AbstractIntegrationTest; replay replaces it in slice 5
+    anthropic:
+      api-key: test-key
+      max-retries: 0          # WireMock stubs decide each answer
+      timeout: 2s
+
 springdoc:
   api-docs:
     enabled: true             # OpenApiSpecIT compares the spec with docs/openapi.json

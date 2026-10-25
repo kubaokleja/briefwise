@@ -3,6 +3,9 @@
 spring:
   main:
     web-application-type: none
+  ai:
+    model:
+      chat: anthropic         # key from ANTHROPIC_API_KEY
 
 briefwise:
   llm:

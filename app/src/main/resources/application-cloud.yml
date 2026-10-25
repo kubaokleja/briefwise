@@ -4,6 +4,9 @@ spring:
     url: ${NEON_JDBC_URL}
     username: ${NEON_DB_USER}
     password: ${NEON_DB_PASSWORD}
+  ai:
+    model:
+      chat: anthropic         # key from ANTHROPIC_API_KEY
 
 briefwise:
   llm:

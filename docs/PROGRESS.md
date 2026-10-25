@@ -34,6 +34,78 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 10 — 2026-10-24 — M1 slice 4: classification, first LLM adapter by hand
+
+**Phase:** M1 / slice 4
+**Goal:** Replace the placeholder classifier with a real LLM adapter: code gate, injection screening, native
+structured output, generation log with cache tokens, budget, fallback; tested only against WireMock.
+
+**Done**
+- Verified in docs and sources (2026-10-24): Spring AI 2.0.2 is the latest GA (on the official `anthropic-java`
+  SDK 2.72.0); Haiku 5.5 supports structured outputs, takes no `temperature`, uses adaptive thinking with `effort`;
+  512-token minimum cacheable prefix, 5 min / 1 h TTL.
+- Dependencies (approved): `spring-ai-bom` 2.0.2, `spring-ai-starter-model-anthropic`, `spring-ai-starter-model-ollama`.
+  One chat model per profile via `spring.ai.model.chat` (local `ollama`, cloud/job `anthropic`, test `anthropic` on
+  WireMock, demo `none`).
+- `prompts/news-classification/`: `system.md` (instructions, label definitions, 4 synthetic few-shot examples),
+  `user.md` (`<news_item>` data block), `prompt.properties` (`version=v1` + SHA-256; a test fails on an unbumped
+  change). On the classpath via a pom resource.
+- `LlmNewsClassifier`: budget gate per attempt, native structured output (schema from `BeanOutputConverter` passed
+  through the `ChatClient` context, response parsed by us), case-insensitive enums, one re-ask on invalid output,
+  provider error -> fallback at once, every attempt to `ai_generation_log` + `checkAndRecordUsage`. Effort `low`,
+  `maxTokens` 1024, SDK timeout 20 s / 1 retry, `SYSTEM_ONLY` caching. `NoChatModelNewsClassifier` defers when no
+  model is configured.
+- `NewsProcessingService`: gate (still `RECEIVED`, a ticker still held, else `SKIPPED`), screening ->
+  `UNCLASSIFIED` `INJECTION_SUSPECTED`, classifier -> `CLASSIFIED` / `UNCLASSIFIED` (reason) / stays `RECEIVED`
+  (deferred); conditional writes; in-process `NewsClassified` event. `EventType.ANALYST`.
+- `compliance`: `screenUntrustedContent` with an M1 pattern list (`InjectionRules`), `InjectionSuspected` event.
+- `aiops`: `TokenCount` with cache-write/read tokens, `ModelPrice` cache prices (configured or 1.25x / 0.1x),
+  `GenerationEntry.subjectId`.
+- Flyway V11 (`ai_generation_log` cache tokens + `subject_id` index), V12 (`news_items` label columns + reason,
+  CHECKs; `news_item_tickers.affected`). `transitionFromReceived(to)` narrowed to `skipFromReceived`.
+- Local CSV: 22 rows relabelled `OTHER` -> `ANALYST` (14 golden, 8 few-shot), listed in `evals/labelling/README.md`.
+- Tests: `InjectionRulesTest`, `ContentScreeningServiceTest`, `NewsProcessingServiceTest` (rewritten),
+  `NewsClassificationPromptTest`, `ClassificationAnswerTest` (incl. schema), `LlmNewsClassifierIT` (request shape,
+  valid, malformed -> re-ask, malformed twice, unknown ticker, timeout, 529, budget); repository, facade and aiops
+  ITs extended. `./mvnw verify`: 167 unit + 76 IT green.
+
+**Decisions** ([ADR 0012](decisions/0012-news-classification-llm-call.md),
+[0013](decisions/0013-untrusted-content-screening-m1.md), [0014](decisions/0014-classification-output-shape.md))
+- L1 native structured output, own parsing; L2 Haiku 5.5 / `llama3.1:8b`; L3 4 synthetic examples in the system
+  prompt; L4 effort `low` + `maxTokens` 1024 (no temperature); L5 `SYSTEM_ONLY` 5 min; L6 pattern list, no LLM call
+  on a match; R1 keep ADR 0005, no circuit breaker.
+- Relevance per holder of the ticker, output per item, `ANALYST` added (contracts -> `PRODUCT`), `subject_id` on the
+  generation log.
+- Deviation from PLANNING (approved): the consumer keeps calling `processIngested`; `classifyPending` moves to slice 6.
+
+**AI concepts introduced / explained**
+- Structured output: schema in the prompt vs native (constrained decoding: the API only lets the model produce
+  tokens that fit the schema) vs forced tool call; why we parse ourselves (malformed attempts are logged and billed).
+- Adaptive thinking and `effort` instead of temperature; thinking tokens count toward `max_tokens` and are billed as
+  output.
+- Prompt caching: stable prefix first, minimum length, TTL, write premium vs read discount, verified via
+  `cache_read_input_tokens`.
+- Few-shot examples and eval leakage (never from the golden set); synthetic examples because of the data licence.
+- Indirect prompt injection: delimited data blocks, pattern screening, small blast radius without tools.
+- Prompt versioning: version + content hash so results of different prompts never mix.
+
+**Domain questions added** (also in PLANNING)
+- A provider outage turns items `UNCLASSIFIED` (`PROVIDER_ERROR`) for good: should the slice 6 sweep retry them?
+
+**Open questions / blockers**
+- WireMock fixtures are hand-written to the documented format; no live call has been made. A one-off smoke call
+  (about 0.0002 USD, needs `ANTHROPIC_API_KEY`) would confirm caching and the real response; your call.
+- DESIGN updated (approved): 7.1 and 8 effort instead of "temperature 0", 6.3 `EventType` +`ANALYST`, 6.4 `InjectionSuspected` +`rules`.
+- Ollama dev path untested (`llama3.1:8b` must be pulled; native structured output is model-specific).
+
+**Next session**
+- M1 slice 5: decide L7 (replay key normalisation), replay `ChatModel` decorator, `AiopsFacade.findReplay`, fixtures.
+
+**Proposed commit message**
+> feat(news): classify news with Claude Haiku via native structured output, injection screening and generation log
+
+---
+
 ## Session 9 — 2026-10-24 — M1 slice 3: outbox and Kafka
 
 **Phase:** M1 / slice 3 (no LLM calls)

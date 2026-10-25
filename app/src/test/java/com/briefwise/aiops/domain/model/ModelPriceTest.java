@@ -24,6 +24,23 @@ class ModelPriceTest {
     }
 
     @Test
+    void cached_prefix_tokens_use_the_cache_prices() {
+        ModelPrice explicit = new ModelPrice(new BigDecimal("0.10"), new BigDecimal("0.50"),
+                new BigDecimal("0.125"), new BigDecimal("0.01"));
+
+        // 100 x 0.10 + 50 x 0.50 + 800 x 0.125 + 0 = 10 + 25 + 100 -> 135 / 1M
+        assertThat(explicit.costOf(new TokenCount(100, 50, 800, 0))).isEqualByComparingTo("0.000135");
+        // 100 x 0.10 + 50 x 0.50 + 800 x 0.01 = 10 + 25 + 8 -> 43 / 1M
+        assertThat(explicit.costOf(new TokenCount(100, 50, 0, 800))).isEqualByComparingTo("0.000043");
+    }
+
+    @Test
+    void without_explicit_cache_prices_the_standard_multipliers_apply() {
+        assertThat(haiku.cacheWriteUsdPerMTok()).isEqualByComparingTo("0.125");
+        assertThat(haiku.cacheReadUsdPerMTok()).isEqualByComparingTo("0.01");
+    }
+
+    @Test
     void zero_tokens_cost_nothing() {
         assertThat(haiku.costOf(new TokenCount(0, 0))).isEqualByComparingTo("0");
     }

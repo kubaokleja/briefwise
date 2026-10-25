@@ -11,7 +11,8 @@ import org.springframework.validation.annotation.Validated;
 /**
  * Model prices (USD per million tokens, keyed by model name) and daily budgets (USD, keyed by feature).
  * Model names live here and nowhere in code. A model name containing dots or colons (Ollama tags such as
- * {@code llama3.2:3b}) needs the bracket form in YAML: {@code "[llama3.2:3b]"}.
+ * {@code llama3.2:3b}) needs the bracket form in YAML: {@code "[llama3.2:3b]"}. {@code cache-write} and
+ * {@code cache-read} are optional; without them the standard multipliers on the input price apply (ADR 0012).
  */
 @Validated
 @ConfigurationProperties("briefwise.aiops")
@@ -22,5 +23,6 @@ record AiopsProperties(Map<String, @Valid Price> pricing, Map<String, @NotNull @
         dailyBudgetUsd = dailyBudgetUsd == null ? Map.of() : Map.copyOf(dailyBudgetUsd);
     }
 
-    record Price(@NotNull @PositiveOrZero BigDecimal input, @NotNull @PositiveOrZero BigDecimal output) {}
+    record Price(@NotNull @PositiveOrZero BigDecimal input, @NotNull @PositiveOrZero BigDecimal output,
+                 @PositiveOrZero BigDecimal cacheWrite, @PositiveOrZero BigDecimal cacheRead) {}
 }
