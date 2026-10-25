@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Briefwise quant batch: market data refresh, volatility/VaR forecasts (talks to Java only through the database)."
 requires-python = ">=3.12"
 dependencies = [
-    "pandas==3.0.6",
+    "pandas==3.1.0",
     "yfinance==1.7.0",
 ]
 
