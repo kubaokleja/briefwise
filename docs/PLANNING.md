@@ -63,7 +63,7 @@ replay), daily portfolio summary, daily scheduled pipeline, classification eval 
 [7.1](DESIGN.md#71-news-pipeline-m1)). Branch `feat/m1-news-pipeline`. One slice per session, in this order; each ends
 with `./mvnw verify` green. Decision points are settled at the start of the slice that first needs them (ADR via `adr`).
 
-### Slice 1 — aiops foundation (no LLM)
+### Slice 1 — aiops foundation (no   LLM)
 - [x] Decide B1 budget unit, gate shape, day boundary -> [ADR 0008](decisions/0008-llm-daily-budget-gate.md) (USD per feature per UTC day, pre-check + post-record, fail closed)
 - [x] Flyway: `ai_generation_log` (prompt, response, model, `prompt_version`, tokens, cost, latency, correlation ID) (V7), daily usage per feature (V8 `ai_daily_usage`)
 - [x] Model pricing in `application.yml` (`briefwise.aiops.pricing`, Haiku 5.5 + Sonnet 5.5); cost per call (`ModelPrice`)
@@ -91,19 +91,20 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] Skill `kafka-consumer` (pattern now implemented once)
 
 ### Slice 4 — Classification: first LLM adapter by hand
-- [ ] Decide L1 structured output mechanism (`BeanOutputConverter` vs native structured output vs forced tool call), L2 model (start Haiku 5.5; Ollama dev model), L3 few-shot, L4 temperature + `maxTokens`, L5 prompt caching (verify current minimum cacheable prefix and TTL), L6 M1 injection screening scope, R1 circuit breaker / time limiter gap vs [ADR 0005](decisions/0005-resilience-spring-retryable.md) -> ADRs
-- [ ] Dependencies: Spring AI 2.0.x Anthropic + Ollama starters (verify APIs in Spring AI 2.0 docs); model names in `application.yml` only
-- [ ] Prompt in `prompts/news-classification/` with `PROMPT_VERSION`; stable prefix first, news in a delimited data block
-- [ ] `ComplianceFacade.screenUntrustedContent` (M1 scope per L6)
-- [ ] Code gate: ticker held, not duplicate, budget left
-- [ ] Classification -> `NewsClassification`; invalid structure -> retry -> `UNCLASSIFIED`; generation log + `checkAndRecordUsage`; `NewsClassified` event
-- [ ] `NewsFacade.classifyPending`; Kafka consumer calls it
-- [ ] WireMock tests with recorded responses: valid, malformed, timeout
+- [x] Decide L1–L6, R1 -> [ADR 0012](decisions/0012-news-classification-llm-call.md) (native structured output, Haiku 5.5 / `llama3.1:8b`, 4 synthetic few-shot in the system prompt, effort `low` + `maxTokens` 1024, `SYSTEM_ONLY` 5 min cache, no circuit breaker), [ADR 0013](decisions/0013-untrusted-content-screening-m1.md) (pattern list), [ADR 0014](decisions/0014-classification-output-shape.md) (relevance per holder, per item, `ANALYST`, `subject_id`)
+- [x] Dependencies: Spring AI 2.0.2 BOM, Anthropic + Ollama starters; model names in `application.yml` only; `spring.ai.model.chat` per profile
+- [x] Prompt in `prompts/news-classification/` (`prompt.properties`: version + SHA-256 guard); stable prefix first, news in a `<news_item>` block
+- [x] `ComplianceFacade.screenUntrustedContent` (M1 pattern list, `InjectionSuspected` event)
+- [x] Code gate: still `RECEIVED`, a ticker still held (else `SKIPPED`), budget per attempt
+- [x] Classification -> `NewsClassification`; invalid structure -> one re-ask -> `UNCLASSIFIED` (reason); generation log (cache tokens, `subject_id`) + `checkAndRecordUsage`; `NewsClassified` event; Flyway V11, V12
+- [x] Kafka consumer keeps calling `NewsFacade.processIngested` (now classifies); `classifyPending` moved to slice 6 (with the sweep)
+- [x] WireMock tests with hand-written responses: valid, malformed, re-ask, unknown ticker, timeout, 529, budget (`LlmNewsClassifierIT`)
+- [x] Relabel analyst rows `OTHER` -> `ANALYST` in the local CSV (22 rows)
 
 ### Slice 5 — Replay provider
 - [ ] Decide L7 normalisation of the replay key `hash(model, prompt_version, normalized input)`
 - [ ] `ChatModel` decorator; `AiopsFacade.findReplay`; `on-miss: fail | fallback`
-- [ ] Export replay fixtures to `evals/replay/`; `test` and `demo` use `replay`
+- [ ] Export replay fixtures to `evals/replay/`; `test` and `demo` use `replay` (demo has `spring.ai.model.chat: none` until then); replace the hand-written `src/test/resources/anthropic/` fixtures with recorded ones
 - [ ] Skill `llm-adapter` (pattern now implemented once)
 
 ### Slice 6 — Inbound adapters and daily pipeline
@@ -113,6 +114,7 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [ ] Neon project + `NEON_DATABASE_URL` secret (you); run the `job` and `cloud` profiles for the first time
 - [ ] `.github/workflows/morning-pipeline.yml`: news ingest + classification, Kafka service container, gated by `PIPELINE_ENABLED`
 - [ ] Sweep of old `RECEIVED` items (e.g. DLT'd or never delivered): decide age threshold, trigger (job step vs `classifyPending`), retry cap so a poison item is not swept forever; facade method + IT
+- [ ] `NewsFacade.classifyPending` (batch over `RECEIVED` items, moved from slice 4); decide whether `UNCLASSIFIED` `PROVIDER_ERROR` items are retried too
 
 ### Slice 7 — Daily portfolio summary
 - [ ] Decide S1 model, trigger (pipeline vs on demand), M1 `compliance.checkText` scope -> ADR
@@ -122,6 +124,7 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 
 ### Slice 8 — Classification eval
 - [ ] Decide E1 metric scope (sentiment only vs + relevance / event type), E2 harness (promptfoo vs Java runner vs Python + Anthropic SDK; Batch API support)
+- [ ] Human spot-check of the 22 `ANALYST` relabels (`evals/labelling/README.md`)
 - [ ] `evals/sentiment_golden.csv` from the 258 golden rows in `evals/labelling/`; few-shot examples never from the golden set; report per class and on `sample=random` rows alone; event types: accuracy + per-class counts or a longer ingest for rare classes (E1)
 - [ ] Runner via Message Batches API; macro F1, confusion matrix, cost per 1,000 items; optional Alpha Vantage baseline
 - [ ] `.github/workflows/evals.yml` (`workflow_dispatch` + `prompts/**`, `evals/**`); results table as PR comment
@@ -187,16 +190,17 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-10-18 | Snapshot `close` is the adjusted close, so a refresh rewrites history, but `importSnapshot` is `DO NOTHING`. Add an upsert mode, or always reset `daily_prices` before re-import? | Open (decide with the first refresh after M0 / M3) |
 | 2026-10-18 | The instrument universe lives in `quant/universe.py` and in Flyway V4/V6. Single source, or a test that compares them (today only the snapshot-to-DB direction is tested)? | Open |
 | 2026-10-18 | Approve is blocked while compliance violations are open (ADR 0007). Should an RM be able to override with a written justification (common in banks; needs its own audit trail)? | Open (decide at M4) |
-| 2026-10-19 | What is `Relevance` relative to: the ticker's materiality in general, or a specific portfolio (weight, mandate)? Decides whether classification is per item or per portfolio | Open (decide at M1 slice 4) |
+| 2026-10-19 | What is `Relevance` relative to: the ticker's materiality in general, or a specific portfolio (weight, mandate)? Decides whether classification is per item or per portfolio | Decided: per holder of the ticker, weighting in code ([ADR 0014](decisions/0014-classification-output-shape.md)) |
 | 2026-10-19 | ETFs (6 of 36 instruments) likely have no company news on Finnhub. Do held ETFs get news (e.g. via top holdings or macro news), or none? | None for now ([ADR 0009](decisions/0009-news-dedup-and-etf-news.md)); strategy (general news as `MACRO` first) to decide at M4 |
 | 2026-10-21 | Finnhub licence forbids redistributing data "or derived results". May the hand-labelled golden set (real headlines) be committed once the repo is public, or only IDs/hashes plus labels, or synthetic headlines? Exports are git-ignored until then | Open (decide before slice 8 / before the repo goes public) |
 | 2026-10-21 | A near-duplicate is linked to one ticker's original. If its URL is later fetched for a second ticker it stays `SKIPPED` even though the original may not concern that ticker. Acceptable? | Open (check on the labelled sample) |
 | 2026-10-23 | Same-event duplicates (e.g. "KFC switches from Pepsi to Coke" vs "KFC plans a massive soda change") score 0.09–0.49 on headline trigram similarity, far below 0.6. Trigram dedup only catches re-syndication. Do we need semantic (embedding) dedup, and where: ingest or classification? | Open (revisit D1 after the eval; 7 labelled pairs in `evals/labelling/`) |
-| 2026-10-23 | `EventType` has no value for analyst rating / price-target changes (~20 labelled rows) or customer contracts (KFC/Coke). Add `ANALYST` and `CONTRACT`, or keep them in `OTHER`? | Open (decide at M1 slice 4 with the prompt) |
-| 2026-10-23 | Relevance is labelled per ticker ("would an RM whose client holds it want to see it?"), multi-ticker items once for the most affected ticker. Does the classifier output per ticker or per item? | Labelling convention agreed; classifier output shape open (slice 4) |
+| 2026-10-23 | `EventType` has no value for analyst rating / price-target changes (~20 labelled rows) or customer contracts (KFC/Coke). Add `ANALYST` and `CONTRACT`, or keep them in `OTHER`? | Decided: `ANALYST` added, contracts `PRODUCT`; 22 rows relabelled ([ADR 0014](decisions/0014-classification-output-shape.md)) |
+| 2026-10-23 | Relevance is labelled per ticker ("would an RM whose client holds it want to see it?"), multi-ticker items once for the most affected ticker. Does the classifier output per ticker or per item? | Decided: per item + affected tickers ([ADR 0014](decisions/0014-classification-output-shape.md)) |
 | 2026-10-24 | An item whose message ends in `news.raw.DLT` stays `RECEIVED` with its outbox row published, so nothing re-sends it. Who picks it up: a sweep of old `RECEIVED` items (e.g. in `classifyPending` or the job runner), a DLT replay tool, or both? | Sweep (2026-10-24, DESIGN 7.1); age threshold, trigger and retry cap decided in slice 6 |
 | 2026-10-24 | `NewsIngested` carries the first-fetched `ticker` (Kafka key, K2); DESIGN 6.4 sketches `NewsIngested(newsId, occurredAt)`. Update the DESIGN sketch? | Done: DESIGN 6.4 updated (2026-10-24) |
-| 2026-10-21 | Should `ai_generation_log` reference the business object it was generated for (e.g. `newsId`, `briefId`)? Today only feature + correlation ID link a call to its input; an audit ("which call produced this classification?") may need a direct reference | Open (decide at M1 slice 4) |
+| 2026-10-21 | Should `ai_generation_log` reference the business object it was generated for (e.g. `newsId`, `briefId`)? Today only feature + correlation ID link a call to its input; an audit ("which call produced this classification?") may need a direct reference | Decided: nullable `subject_id` ([ADR 0014](decisions/0014-classification-output-shape.md)) |
+| 2026-10-24 | A provider outage turns every item of that run into `UNCLASSIFIED` (`PROVIDER_ERROR`) for good. Should the sweep retry those too (with a cap), or is a visible but unlabelled item acceptable? | Open (decide in slice 6 with the sweep) |
 
 ## Open questions from DESIGN
 

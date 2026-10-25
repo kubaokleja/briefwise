@@ -1,5 +1,6 @@
 package com.briefwise.news.domain.model;
 
+/** Main event of a news item. {@code ANALYST}: sell-side rating or price-target actions (ADR 0014). */
 public enum EventType {
     EARNINGS,
     GUIDANCE,
@@ -9,5 +10,6 @@ public enum EventType {
     MANAGEMENT,
     MACRO,
     PRODUCT,
+    ANALYST,
     OTHER
 }

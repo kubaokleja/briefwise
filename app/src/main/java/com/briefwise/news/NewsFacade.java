@@ -51,8 +51,10 @@ public class NewsFacade {
     }
 
     /**
-     * Handles one {@code news.raw} message; called by the Kafka listener. Idempotent: an item that is no longer
-     * {@code RECEIVED} is left alone (K3, ADR 0011).
+     * Handles one {@code news.raw} message; called by the Kafka listener. Code gate (still {@code RECEIVED}, a ticker
+     * still held), injection screening, then LLM classification (ADR 0012/0013): the item ends {@code CLASSIFIED},
+     * {@code UNCLASSIFIED} (fallback) or {@code SKIPPED}, or stays {@code RECEIVED} if the budget is used up.
+     * Idempotent: an item that is no longer {@code RECEIVED} is left alone (K3, ADR 0011).
      *
      * @throws NewsItemNotFoundException if no item has this id (the message goes to the DLT)
      */

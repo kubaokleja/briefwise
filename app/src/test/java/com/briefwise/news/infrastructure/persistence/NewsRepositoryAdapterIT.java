@@ -1,28 +1,39 @@
 package com.briefwise.news.infrastructure.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.briefwise.AbstractIntegrationTest;
 import com.briefwise.news.domain.model.DedupPolicy;
+import com.briefwise.news.domain.model.EventType;
 import com.briefwise.news.domain.model.FetchedNews;
+import com.briefwise.news.domain.model.NewsClassification;
 import com.briefwise.news.domain.model.NewsItem;
 import com.briefwise.news.domain.model.NewsStatus;
+import com.briefwise.news.domain.model.Relevance;
+import com.briefwise.news.domain.model.Sentiment;
+import com.briefwise.news.domain.model.UnclassifiedReason;
 import com.briefwise.news.domain.model.UrlHash;
 import com.briefwise.news.domain.port.NewsRepository;
 import com.briefwise.shared.domain.model.Ticker;
 import java.time.Duration;
 import java.time.Instant;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * The near-duplicate query against real pg_trgm. Headline pairs and their similarity scores are the examples
- * used to choose D1 (ADR 0009): 0.6 within 48h, same ticker.
+ * used to choose D1 (ADR 0009): 0.6 within 48h, same ticker. Also the conditional status writes and the V12
+ * classification columns and constraints.
  */
 class NewsRepositoryAdapterIT extends AbstractIntegrationTest {
 
@@ -126,11 +137,59 @@ class NewsRepositoryAdapterIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void only_the_first_transition_from_received_succeeds() {
+    void only_the_first_write_from_received_succeeds() {
         UUID id = store(AAPL, "Apple opens new campus", T0, Optional.empty());
 
-        assertThat(repository.transitionFromReceived(id, NewsStatus.CLASSIFIED)).isTrue();
-        assertThat(repository.transitionFromReceived(id, NewsStatus.UNCLASSIFIED)).isFalse();
-        assertThat(repository.findById(id).orElseThrow().status()).isEqualTo(NewsStatus.CLASSIFIED);
+        assertThat(repository.skipFromReceived(id)).isTrue();
+        assertThat(repository.classifyFromReceived(id, classification(Set.of(AAPL)), T0)).isFalse();
+        assertThat(repository.markUnclassifiedFromReceived(id, UnclassifiedReason.PROVIDER_ERROR, T0)).isFalse();
+        assertThat(repository.findById(id).orElseThrow().status()).isEqualTo(NewsStatus.SKIPPED);
+    }
+
+    private static NewsClassification classification(Set<Ticker> affected) {
+        return new NewsClassification(Sentiment.NEGATIVE, Relevance.HIGH, EventType.ANALYST, affected,
+                "Broker downgrade.", "v1");
+    }
+
+    @Test
+    void classification_stores_the_labels_and_marks_only_the_affected_tickers() {
+        UUID id = store(AAPL, "Broker downgrades Apple; Microsoft mentioned", T0, Optional.empty());
+        repository.addTicker(id, MSFT);
+
+        assertThat(repository.classifyFromReceived(id, classification(Set.of(AAPL)), T0.plusSeconds(60))).isTrue();
+
+        Map<String, Object> row = jdbc.queryForMap("SELECT * FROM news_items WHERE id = ?", id);
+        assertThat(row).containsEntry("status", "CLASSIFIED")
+                .containsEntry("sentiment", "NEGATIVE")
+                .containsEntry("relevance", "HIGH")
+                .containsEntry("event_type", "ANALYST")
+                .containsEntry("rationale", "Broker downgrade.")
+                .containsEntry("prompt_version", "v1")
+                .containsEntry("unclassified_reason", null);
+        assertThat(((Timestamp) row.get("classified_at")).toInstant()).isEqualTo(T0.plusSeconds(60));
+        assertThat(jdbc.queryForList("SELECT ticker FROM news_item_tickers WHERE news_item_id = ? AND affected",
+                String.class, id)).containsExactly("AAPL");
+    }
+
+    @Test
+    void unclassified_item_keeps_its_reason_and_no_labels() {
+        UUID id = store(AAPL, "Apple headline with an injection", T0, Optional.empty());
+
+        assertThat(repository.markUnclassifiedFromReceived(id, UnclassifiedReason.INJECTION_SUSPECTED, T0)).isTrue();
+
+        Map<String, Object> row = jdbc.queryForMap("SELECT * FROM news_items WHERE id = ?", id);
+        assertThat(row).containsEntry("status", "UNCLASSIFIED")
+                .containsEntry("unclassified_reason", "INJECTION_SUSPECTED")
+                .containsEntry("sentiment", null);
+    }
+
+    @Test
+    void schema_rejects_a_classified_item_without_labels() {
+        UUID id = store(AAPL, "Apple opens new campus", T0, Optional.empty());
+
+        assertThatThrownBy(() -> jdbc.update("UPDATE news_items SET status = 'CLASSIFIED' WHERE id = ?", id))
+                .isInstanceOf(DataIntegrityViolationException.class);
+        assertThatThrownBy(() -> jdbc.update("UPDATE news_items SET status = 'UNCLASSIFIED' WHERE id = ?", id))
+                .isInstanceOf(DataIntegrityViolationException.class);
     }
 }

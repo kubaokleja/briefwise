@@ -15,7 +15,7 @@ import org.springframework.test.context.DynamicPropertySource;
  * Postgres and Kafka container) across test classes. Requires Docker. The news classifier is a recording fake
  * ({@link RecordingNewsClassifier}) for the same reason: overriding it per class would mean per-class contexts.
  * <p>
- * One WireMock server stands in for every external HTTP API (Finnhub so far) and is shared for the same reason:
+ * One WireMock server stands in for every external HTTP API (Finnhub, Anthropic) and is shared for the same reason:
  * per-class servers would mean per-class contexts. Tests that stub it reset it first. It stops with the JVM.
  */
 @SpringBootTest
@@ -29,6 +29,7 @@ public abstract class AbstractIntegrationTest {
     @DynamicPropertySource
     static void externalApis(DynamicPropertyRegistry registry) {
         registry.add("briefwise.news.finnhub.base-url", WIREMOCK::baseUrl);
+        registry.add("spring.ai.anthropic.base-url", WIREMOCK::baseUrl);
     }
 
     private static WireMockServer startWireMock() {

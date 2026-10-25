@@ -71,7 +71,7 @@ In the portfolio deployment the pipeline steps run in GitHub Actions and briefs 
 | Milestone | Feature | AI and engineering concepts |
 |---|---|---|
 | **M0** (F1) | Skeleton: bounded contexts, synthetic portfolios, market data, CI | DDD + hexagonal, ArchUnit, Flyway, structured logging, correlation ID, Docker Compose, Kafka (KRaft), **CI from the first commit**, Claude Code skills |
-| **M1** (F2) | News pipeline: ingest via Kafka, deduplication, LLM classification, daily portfolio summary, daily scheduled pipeline | System prompt, **structured output** to records, **few-shot**, **temperature**, **token budgeting**, generation log with `prompt_version`, **resilience + fallback**, code gate before the LLM, tool calling, prompt caching, **transactional outbox**, idempotent consumer, DLT, **execution modes**, **replay provider**, **classification eval** |
+| **M1** (F2) | News pipeline: ingest via Kafka, deduplication, LLM classification, daily portfolio summary, daily scheduled pipeline | System prompt, **structured output** to records, **few-shot**, **temperature / effort**, **token budgeting**, generation log with `prompt_version`, **resilience + fallback**, code gate before the LLM, tool calling, prompt caching, **transactional outbox**, idempotent consumer, DLT, **execution modes**, **replay provider**, **classification eval** |
 | **M2** (F3) | Q&A "why is X down?" over SEC filings and news, with citations | **Embeddings**, **pgvector + HNSW**, **cosine similarity**, RAG (vector baseline → hybrid), chunking long documents, reranking, metadata filtering, query rewriting, **hallucination control**, **SSE streaming**, **RAG eval** |
 | **M3** (F4) | Volatility and VaR forecast, risk alerts, backtest | Feature engineering, walk-forward validation, GARCH vs ML, leakage, MLflow |
 | **M4** (F5) | Morning brief agent, approval workflow, own MCP server | Workflow vs agent, orchestrator-workers, evaluator-optimizer, **two-layer guardrail**, human-in-the-loop, authentication and roles, MCP, **trajectory eval** |
@@ -211,7 +211,7 @@ public record NewsClassification(Sentiment sentiment, Relevance relevance, Event
                                  Set<Ticker> tickers, String rationale, String promptVersion) {}
 public enum Sentiment { NEGATIVE, NEUTRAL, POSITIVE }
 public enum Relevance { LOW, MEDIUM, HIGH }
-public enum EventType { EARNINGS, GUIDANCE, M_AND_A, REGULATORY, LITIGATION, MANAGEMENT, MACRO, PRODUCT, OTHER }
+public enum EventType { EARNINGS, GUIDANCE, M_AND_A, REGULATORY, LITIGATION, MANAGEMENT, MACRO, PRODUCT, ANALYST, OTHER }
 
 // research
 public record Filing(UUID id, Ticker ticker, FilingType type, LocalDate filedAt, String accessionNo) {}
@@ -245,7 +245,7 @@ public record RiskAlertRaised(Ticker ticker, AlertType type, Instant occurredAt)
 public record BriefDrafted(UUID briefId, UUID portfolioId, Instant occurredAt) {}
 public record BriefComplianceFailed(UUID briefId, List<RuleId> rules, Instant occurredAt) {}
 public record BriefApproved(UUID briefId, String approvedBy, Instant occurredAt) {}
-public record InjectionSuspected(UUID contentId, String source, Instant occurredAt) {}
+public record InjectionSuspected(UUID contentId, String source, List<String> rules, Instant occurredAt) {}
 ```
 
 - **In-process events** go through `ApplicationEventPublisher`.
@@ -274,7 +274,7 @@ Trigger: admin "run now" endpoint | in-app scheduler | job runner (GitHub Action
       → CODE GATE: ticker held, not a duplicate, daily token budget not exceeded
       → untrusted content screening (compliance.screenUntrustedContent)
       → classification with a cheap model → NewsClassification
-        (structured output, temperature 0, few-shot)
+        (native structured output, effort low + maxTokens, few-shot in the cached system prompt; ADR 0012)
       → LLM error after retry → status UNCLASSIFIED (fallback); the item stays in the feed
       → persist + generation log (prompt_version, tokens, cost) + NewsClassified event
       → poison message → news.raw.DLT
@@ -363,7 +363,7 @@ Per the rule in CLAUDE.md, none of these is decided silently. Each one is settle
 | Filing chunking | Fixed size with overlap · by 10-K section (Item 1A, Item 7…) · hybrid | By section + size limit | recall@k and citation correctness |
 | Retrieval | Vectors only · hybrid (BM25 + vectors) | Hybrid | recall@k, comparison in README |
 | Reranking | None · cross-encoder · LLM as reranker | None → add in F3 | Recall/precision gain vs cost and latency |
-| Temperature | 0 for classification · 0.3–0.5 for commentary | As listed | Stability across runs |
+| Temperature | 0 for classification · 0.3–0.5 for commentary | As listed; models without temperature (e.g. Haiku 5.5) use `effort` instead: `low` for classification ([ADR 0012](decisions/0012-news-classification-llm-call.md)) | Stability across runs |
 | Brief: workflow vs agent | Fixed sequence · agent with tools · hybrid | Hybrid | Task success, cost, latency, trajectory eval |
 | Agent framework | Spring AI · Embabel · LangGraph (comparison) | Spring AI | Comparison table after F5 |
 | Resilience | Resilience4j · native `@Retryable` from Spring Framework 7 | Resilience4j | Decide at bootstrap; record in an ADR |

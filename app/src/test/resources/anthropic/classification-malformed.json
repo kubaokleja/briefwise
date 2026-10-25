@@ -1,0 +1,12 @@
+{
+  "id": "msg_test_malformed",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-haiku-5-5",
+  "content": [
+    {"type": "text", "text": "{\"rationale\": \"Quarterly revenue beat expectations.\", \"sentiment\": \"POSITIVE\", \"relev"}
+  ],
+  "stop_reason": "max_tokens",
+  "stop_sequence": null,
+  "usage": {"input_tokens": 92, "output_tokens": 1024, "cache_creation_input_tokens": 1180, "cache_read_input_tokens": 0}
+}

@@ -1,4 +1,9 @@
 # Replay provider + seeded snapshot: runs without any API key.
+spring:
+  ai:
+    model:
+      chat: none              # no LLM until the replay provider (M1 slice 5); news stays RECEIVED
+
 briefwise:
   market:
     price-snapshot:

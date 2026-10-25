@@ -36,6 +36,12 @@ class GenerationLogEntity {
     @Column(name = "completion_tokens", nullable = false)
     private int completionTokens;
 
+    @Column(name = "cache_write_tokens", nullable = false)
+    private int cacheWriteTokens;
+
+    @Column(name = "cache_read_tokens", nullable = false)
+    private int cacheReadTokens;
+
     @Column(name = "cost_usd", nullable = false)
     private BigDecimal costUsd;
 
@@ -48,12 +54,16 @@ class GenerationLogEntity {
     @Column(name = "is_fallback", nullable = false)
     private boolean fallback;
 
+    @Column(name = "subject_id")
+    private UUID subjectId;
+
     protected GenerationLogEntity() {
     }
 
     GenerationLogEntity(UUID id, String feature, String model, String promptVersion, String prompt,
-                        String response, int promptTokens, int completionTokens, BigDecimal costUsd,
-                        long latencyMs, String correlationId, boolean fallback) {
+                        String response, int promptTokens, int completionTokens, int cacheWriteTokens,
+                        int cacheReadTokens, BigDecimal costUsd, long latencyMs, String correlationId,
+                        boolean fallback, UUID subjectId) {
         this.id = id;
         this.feature = feature;
         this.model = model;
@@ -62,10 +72,13 @@ class GenerationLogEntity {
         this.response = response;
         this.promptTokens = promptTokens;
         this.completionTokens = completionTokens;
+        this.cacheWriteTokens = cacheWriteTokens;
+        this.cacheReadTokens = cacheReadTokens;
         this.costUsd = costUsd;
         this.latencyMs = latencyMs;
         this.correlationId = correlationId;
         this.fallback = fallback;
+        this.subjectId = subjectId;
     }
 
     public UUID getId() {

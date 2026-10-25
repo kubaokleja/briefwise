@@ -6,6 +6,7 @@ import static org.awaitility.Awaitility.await;
 import com.briefwise.AbstractIntegrationTest;
 import com.briefwise.news.NewsFacade.PublishSummaryView;
 import com.briefwise.news.domain.model.EventType;
+import com.briefwise.news.domain.model.ClassifierResult;
 import com.briefwise.news.domain.model.NewsClassification;
 import com.briefwise.news.domain.model.NewsItem;
 import com.briefwise.news.domain.model.Relevance;
@@ -15,7 +16,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -57,7 +57,7 @@ class NewsKafkaIT extends AbstractIntegrationTest {
         jdbc.update("DELETE FROM news_outbox");
         jdbc.update("DELETE FROM news_items");
         classifier.reset();
-        classifier.answer(item -> Optional.of(classification(item)));
+        classifier.answer(item -> new ClassifierResult.Classified(classification(item)));
     }
 
     private static NewsClassification classification(NewsItem item) {

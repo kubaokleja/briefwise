@@ -25,6 +25,24 @@ spring:
         delivery.timeout.ms: 10000
     consumer:
       auto-offset-reset: earliest   # a new consumer group starts at the oldest message, not the newest
+  ai:                          # Spring AI 2.0. Model names live here only, never in code (ADR 0012)
+    model:
+      chat: none               # anthropic | ollama | none: exactly one chat model per profile
+      embedding: none          # embeddings come with M2
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY:}
+      timeout: 20s             # per HTTP attempt (R1, ADR 0012)
+      max-retries: 1           # SDK transport retries after the first attempt
+      chat:
+        model: claude-haiku-5-5
+        max-tokens: 1024       # default; the classifier also sets it per call
+        cache-options:
+          strategy: SYSTEM_ONLY  # cache the system prompt + few-shot prefix (L5); default TTL 5 minutes
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      chat:
+        model: llama3.1:8b     # dev only, never for evals; pull: docker compose exec ollama ollama pull llama3.1:8b
+        temperature: 0.0
 
 management:
   endpoints:
@@ -78,6 +96,12 @@ briefwise:
       retry-backoff: 1s
       send-timeout: 15s      # relay wait for one broker ack
       consumer-enabled: true
+    classification:          # LLM call per item (ADR 0012); model: spring.ai.<provider>.chat.model
+      feature: news-classification
+      max-tokens: 1024       # adaptive thinking + ~100 tokens of JSON
+      effort: low            # Anthropic only; Haiku 5.5 takes no temperature
+      max-attempts: 2        # first call + one re-ask after invalid output
+      max-summary-chars: 2000
     finnhub:                 # free tier: personal use only, about 60 calls/min, 30/s hard cap (checked 2026-10-21)
       base-url: https://finnhub.io/api/v1
       api-key: ${FINNHUB_API_KEY:}
@@ -88,9 +112,10 @@ briefwise:
   aiops:
     # USD per 1M tokens, Anthropic first-party rates (checked 2026-10-21; re-check before relying on them).
     # Haiku 5.5 rates apply to prompts up to 100K tokens. Every model the app calls needs an entry (ADR 0008).
+    # Cache prices (5-minute write, read) checked 2026-10-24; without them 1.25x / 0.1x of input apply.
     pricing:
-      claude-haiku-5-5: { input: 0.10, output: 0.50 }
-      claude-sonnet-5-5: { input: 2.00, output: 10.00 }
+      claude-haiku-5-5: { input: 0.10, output: 0.50, cache-write: 0.125, cache-read: 0.01 }
+      claude-sonnet-5-5: { input: 2.00, output: 10.00, cache-write: 2.50, cache-read: 0.10 }
     # USD per feature per UTC day (ADR 0008). A feature without an entry cannot call an LLM.
     daily-budget-usd:
       news-classification: 0.10

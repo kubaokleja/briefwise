@@ -1,0 +1,13 @@
+{
+  "id": "msg_test_valid",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-haiku-5-5",
+  "content": [
+    {"type": "thinking", "thinking": "Earnings beat for Apple; company-specific and price-moving.", "signature": "c2lnLXRlc3Q="},
+    {"type": "text", "text": "{\"rationale\": \"Quarterly revenue beat expectations.\", \"sentiment\": \"Positive\", \"relevance\": \"HIGH\", \"eventType\": \"EARNINGS\", \"affectedTickers\": [\"AAPL\"]}"}
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {"input_tokens": 92, "output_tokens": 61, "cache_creation_input_tokens": 0, "cache_read_input_tokens": 1180}
+}

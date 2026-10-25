@@ -1,32 +1,33 @@
 package com.briefwise.news;
 
-import com.briefwise.news.domain.model.NewsClassification;
+import com.briefwise.news.domain.model.ClassifierResult;
 import com.briefwise.news.domain.model.NewsItem;
 import com.briefwise.news.domain.port.NewsClassifier;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import org.springframework.context.annotation.Primary;
 
 /**
- * Replaces the placeholder classifier in every {@code *IT} (imported by {@code AbstractIntegrationTest}, so all
- * tests keep one Spring context). Records each call; by default answers like the placeholder (empty). Called from the
- * Kafka listener thread, hence the thread-safe fields.
+ * Replaces the LLM classifier in every {@code *IT} (imported by {@code AbstractIntegrationTest}, so all tests keep
+ * one Spring context); {@code LlmNewsClassifierIT} tests the real adapter directly. Records each call; by default
+ * defers, so items stay {@code RECEIVED}. Called from the Kafka listener thread, hence the thread-safe fields.
  */
 @Primary
 public class RecordingNewsClassifier implements NewsClassifier {
 
     private final List<NewsItem> calls = new CopyOnWriteArrayList<>();
-    private volatile Function<NewsItem, Optional<NewsClassification>> answer = item -> Optional.empty();
+    private static final Function<NewsItem, ClassifierResult> DEFER = item -> new ClassifierResult.Deferred("test");
+
+    private volatile Function<NewsItem, ClassifierResult> answer = DEFER;
 
     @Override
-    public Optional<NewsClassification> classify(NewsItem item) {
+    public ClassifierResult classify(NewsItem item) {
         calls.add(item);
         return answer.apply(item);
     }
 
-    public void answer(Function<NewsItem, Optional<NewsClassification>> answer) {
+    public void answer(Function<NewsItem, ClassifierResult> answer) {
         this.answer = answer;
     }
 
@@ -36,6 +37,6 @@ public class RecordingNewsClassifier implements NewsClassifier {
 
     public void reset() {
         calls.clear();
-        answer = item -> Optional.empty();
+        answer = DEFER;
     }
 }
