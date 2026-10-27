@@ -2,27 +2,34 @@ package com.briefwise.aiops.infrastructure.persistence;
 
 import com.briefwise.aiops.domain.model.DailyUsage;
 import com.briefwise.aiops.domain.model.NewGeneration;
+import com.briefwise.aiops.domain.model.ReplayEntry;
+import com.briefwise.aiops.domain.model.ReplayKey;
 import com.briefwise.aiops.domain.port.DailyUsageRepository;
 import com.briefwise.aiops.domain.port.GenerationRepository;
+import com.briefwise.aiops.domain.port.ReplayStore;
 import com.briefwise.shared.domain.model.TokenCount;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Outbound adapter for both aiops ports. The log is a plain JPA insert; daily totals use SQL so the increment is
- * one atomic {@code INSERT ... ON CONFLICT DO UPDATE} (no read-modify-write race between concurrent callers).
+ * Outbound adapter for the aiops ports. The log is a plain JPA insert; daily totals use SQL so the increment is
+ * one atomic {@code INSERT ... ON CONFLICT DO UPDATE} (no read-modify-write race between concurrent callers). As a
+ * {@link ReplayStore} it returns the newest usable answer for a key, asked after the committed fixtures.
  */
 @Component
+@Order(2)
 @Transactional(readOnly = true)
-class AiopsRepositoryAdapter implements GenerationRepository, DailyUsageRepository {
+class AiopsRepositoryAdapter implements GenerationRepository, DailyUsageRepository, ReplayStore {
 
     private static final String USAGE_COLUMNS =
             "usage_date, feature, call_count, prompt_tokens, completion_tokens, cost_usd";
@@ -41,8 +48,19 @@ class AiopsRepositoryAdapter implements GenerationRepository, DailyUsageReposito
         GenerationLogEntity entity = new GenerationLogEntity(UUID.randomUUID(), g.feature(), g.model(),
                 g.promptVersion(), g.prompt(), g.response().orElse(null), g.tokens().promptTokens(),
                 g.tokens().completionTokens(), g.tokens().cacheWriteTokens(), g.tokens().cacheReadTokens(), costUsd,
-                g.latency().toMillis(), correlationId.orElse(null), g.fallback(), g.subjectId().orElse(null));
+                g.latency().toMillis(), correlationId.orElse(null), g.fallback(), g.subjectId().orElse(null),
+                g.replayKey().map(ReplayKey::hash).orElse(null));
         return generations.save(entity).getId();
+    }
+
+    @Override
+    public Optional<ReplayEntry> find(ReplayKey key) {
+        return jdbc.query("""
+                        SELECT model, response, created_at FROM ai_generation_log
+                        WHERE replay_key = ? ORDER BY created_at DESC LIMIT 1""",
+                (rs, row) -> new ReplayEntry(key, rs.getString("model"), rs.getString("response"),
+                        rs.getObject("created_at", OffsetDateTime.class).toInstant()),
+                key.hash()).stream().findFirst();
     }
 
     @Override

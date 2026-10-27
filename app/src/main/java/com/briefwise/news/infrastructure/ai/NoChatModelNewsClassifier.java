@@ -9,8 +9,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
- * Active when no chat model is configured ({@code spring.ai.model.chat=none}, e.g. the {@code demo} profile until the
- * replay provider in M1 slice 5): never calls an LLM, so every item stays {@code RECEIVED} for a later run. No cost.
+ * Active when no chat model is configured ({@code spring.ai.model.chat=none}, the shared default; every profile picks
+ * one, and {@code demo} uses the replay provider): never calls an LLM, so every item stays {@code RECEIVED} for a
+ * later run. No cost.
  */
 @Component
 @ConditionalOnProperty(name = "spring.ai.model.chat", havingValue = "none", matchIfMissing = true)

@@ -9,11 +9,12 @@ import java.util.UUID;
 /**
  * One LLM call as reported by the calling adapter. {@code response} is empty when the call failed;
  * {@code fallback} is true when the caller used its fallback result instead of the model's answer.
- * {@code subjectId} is the business object the call was made for, e.g. the news item (ADR 0014).
+ * {@code subjectId} is the business object the call was made for, e.g. the news item (ADR 0014). {@code replayKey}
+ * is set only for a usable answer, so the {@code replay} provider never returns a malformed one (ADR 0015).
  */
 public record NewGeneration(String feature, String model, String promptVersion, String prompt,
                             Optional<String> response, TokenCount tokens, Duration latency, boolean fallback,
-                            Optional<UUID> subjectId) {
+                            Optional<UUID> subjectId, Optional<ReplayKey> replayKey) {
 
     public NewGeneration {
         requireText(feature, "feature");
@@ -24,8 +25,12 @@ public record NewGeneration(String feature, String model, String promptVersion, 
         Objects.requireNonNull(tokens, "tokens");
         Objects.requireNonNull(latency, "latency");
         Objects.requireNonNull(subjectId, "subjectId");
+        Objects.requireNonNull(replayKey, "replayKey");
         if (latency.isNegative()) {
             throw new IllegalArgumentException("latency must not be negative");
+        }
+        if (replayKey.isPresent() && (response.isEmpty() || fallback)) {
+            throw new IllegalArgumentException("only a usable answer (response present, no fallback) gets a replay key");
         }
     }
 

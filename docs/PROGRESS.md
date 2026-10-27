@@ -34,6 +34,66 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 11 — 2026-10-27 — M1 slice 5: replay provider
+
+**Phase:** M1 / slice 5
+**Goal:** Answer LLM calls from recordings in CI and the demo (zero cost, deterministic), and write the `llm-adapter`
+skill.
+
+**Done**
+- Checked the Spring AI 2.0.2 sources: `CallAdvisor`/`CallAdvisorChain`, `ChatClientRequest`/`Response` records with a
+  context map, `ChatModelCallAdvisor` at `LOWEST_PRECEDENCE`, advisor params accumulate across `.advisors(...)` calls.
+- `aiops` domain: `ReplayKey` (L7 normalisation + SHA-256), `ReplayEntry`, `ReplayPolicy`, ports `ReplayStore`
+  (outbound) and `Replays` (inbound); `NewGeneration.replayKey` only for usable answers. `ReplayService` asks the
+  stores in order.
+- Stores: `ReplayFixtureStore` (`evals/replay/*.jsonl` at startup; a duplicate key or malformed line fails startup)
+  before `AiopsRepositoryAdapter` (newest `ai_generation_log` row per key). Flyway V13 `replay_key` + partial index.
+- `ReplayAdvisor` (package-private, just before the model call): pass through / hit with a `briefwise.replayed`
+  marker / `ReplayMissException` / fallback. `LlmProperties` (`briefwise.llm.*`).
+- `AiopsFacade`: `findReplay`, `replay(ReplayRequest)` (advisor + key params), `isReplayed`;
+  `GenerationEntry.replay` carries the same request so record and lookup hash the same parts.
+- `LlmNewsClassifier`: replay advisor on every call. Replayed answers are parsed but not logged, billed or re-asked;
+  a miss -> `Deferred("no replay entry")`.
+- Profiles: `test` and `demo` replay with `fail`. Demo: Anthropic with a dummy key and the discard port (no
+  `spring.ai.model.chat: none` any more).
+- `evals/replay/`: `synthetic_news.sql` (10 hand-written items, each sentiment, 9 event types, one multi-ticker),
+  `export_replay.sql`, README with the recording procedure (WireMock proxy-record, cache check, header scrub).
+- Tests: `ReplayKeyTest`, `ReplayServiceTest`, `ReplayAdvisorTest`, `ReplayFixtureStoreTest`,
+  `NewGenerationTest`, `AiopsFacadeIT` (+2), `LlmNewsClassifierIT` (now `on-miss: fallback`, replay-key
+  assertions, record-then-replay), new `ReplayNewsClassificationIT` (hit with zero HTTP requests, miss defers,
+  other model misses). `FlywayBaselineIT` 12 -> 13 migrations. `./mvnw verify`: 187 unit + 82 IT green.
+- Skill `llm-adapter`; DESIGN 6.2 (aiops facade methods) and 13.3 (advisor) updated.
+
+**Decisions** ([ADR 0015](decisions/0015-replay-provider.md))
+- Mechanism: `ChatClient` advisor instead of the `ChatModel` decorator in DESIGN; L7 light normalisation, call options
+  not in the key; replay hits not logged; recordings from one live Haiku run on synthetic items.
+
+**AI concepts introduced / explained**
+- Record/playback (VCR pattern): determinism and zero cost vs fidelity. Replay proves wiring, the eval proves
+  quality.
+- Cache keys and normalisation: false hits (too loose) vs misses (too strict); why the prompt version stands for the
+  system prompt.
+- Advisors as middleware in the `ChatClient` chain: ordering, short-circuiting before the model call.
+- Why a replayed answer must not be logged or billed (cost and audit stay truthful).
+
+**Domain questions added** (also in PLANNING)
+- How and where to seed the demo with synthetic news + matching fixtures.
+
+**Open questions / blockers**
+- Recording run not done: needs your `ANTHROPIC_API_KEY` (< 0.01 USD), steps in `evals/replay/README.md`. Until then
+  `evals/replay/` has no `*.jsonl` and `classification-valid.json` stays hand-written.
+- Maven wrapper from Git Bash cannot download Maven (Avast TLS): run `mvnw.cmd` from PowerShell with the user-level
+  `JAVA_HOME` / `JAVA_TOOL_OPTIONS`.
+
+**Next session**
+- Recording run (your call), then M1 slice 6: jobs context, job runner, morning pipeline workflow, sweep,
+  `classifyPending`.
+
+**Proposed commit message**
+> feat(aiops): replay LLM answers from recordings via a ChatClient advisor in test and demo profiles
+
+---
+
 ## Session 10 — 2026-10-24 — M1 slice 4: classification, first LLM adapter by hand
 
 **Phase:** M1 / slice 4
