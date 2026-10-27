@@ -185,7 +185,7 @@ ArchUnit rules (checked on every build): domain purity, no access to another con
 | `risk` | Forecasts and alerts | `getForecast`, `getAlerts`, `evaluateAlerts` |
 | `brief` | Brief and client commentary | `generateBrief`, `approve`, `reject`, `edit` |
 | `compliance` | Text and input validation | `checkText`, `screenUntrustedContent` |
-| `aiops` | AI observability, cost, token budgets, replay | `recordGeneration`, `checkAndRecordUsage`, `getCostSummary`, `findReplay` |
+| `aiops` | AI observability, cost, token budgets, replay | `recordGeneration`, `ensureBudgetAvailable`, `checkAndRecordUsage`, `getCostSummary`, `findReplay`, `replay`, `isReplayed` |
 | `access` | Users, roles, login | `authenticate`, `getCurrentUser` |
 
 ### 6.3 Domain model (sketch)
@@ -549,7 +549,7 @@ No feature-flag library (Unleash, FF4J) at this stage: `@ConfigurationProperties
 ### 13.3 LLM providers and replay
 - `ollama`: local development, zero cost (quality differs — never use it for evals).
 - `anthropic`: evals, daily jobs, on-demand features. Every call is recorded in `ai_generation_log`.
-- `replay`: a `ChatModel` decorator that looks up `hash(model, prompt_version, normalized input)` in `ai_generation_log`. The generation log doubles as a response cache. CI, the local demo and repeated dev runs cost nothing and are deterministic.
+- `replay`: a Spring AI `ChatClient` advisor that answers from recordings keyed by `hash(feature, model, prompt_version, normalized input)`: committed fixtures in `evals/replay/` first, then `ai_generation_log`, which doubles as a response cache. Replayed answers are not logged or billed; on a miss `on-miss: fail` defers the work and `fallback` calls the model ([ADR 0015](decisions/0015-replay-provider.md)). CI, the local demo and repeated dev runs cost nothing and are deterministic.
 
 ### 13.4 Cheap model, cached prefix, batches
 - Classification on Claude Haiku 5.5; Sonnet 5.5 only for commentary.

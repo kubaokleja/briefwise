@@ -76,9 +76,10 @@ briefwise:
       enabled: true
     brief:
       enabled: false         # expensive model; on demand by default
-  llm:
+  llm:                       # ADR 0015. provider=replay answers from recordings; others pass to spring.ai.model.chat
     replay:
-      on-miss: fail          # fail (CI, demo) | fallback (local)
+      on-miss: fail          # fail (CI, demo): never call the model | fallback: call it and record the answer
+      fixtures-dir: ../evals/replay   # committed *.jsonl fixtures, relative to app/; asked before ai_generation_log
   news:
     ingest:
       lookback-days: 2       # today + 2 UTC days back; overlap with the last run is dropped by URL hash
