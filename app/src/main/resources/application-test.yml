@@ -2,7 +2,7 @@
 spring:
   ai:
     model:
-      chat: anthropic         # pointed at WireMock by AbstractIntegrationTest; replay replaces it in slice 5
+      chat: anthropic         # pointed at WireMock by AbstractIntegrationTest; the replay advisor answers first
     anthropic:
       api-key: test-key
       max-retries: 0          # WireMock stubs decide each answer

@@ -7,6 +7,7 @@ import com.briefwise.AbstractIntegrationTest;
 import com.briefwise.aiops.AiopsFacade.BudgetView;
 import com.briefwise.aiops.AiopsFacade.CostSummaryView;
 import com.briefwise.aiops.AiopsFacade.GenerationEntry;
+import com.briefwise.aiops.AiopsFacade.ReplayRequest;
 import com.briefwise.aiops.domain.model.NoBudgetConfiguredException;
 import com.briefwise.aiops.domain.model.UnpricedModelException;
 import com.briefwise.shared.domain.exception.UsageLimitExceededException;
@@ -57,7 +58,7 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
         UUID subject = UUID.randomUUID();
         UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "Classify: ...",
                 Optional.of("{\"sentiment\":\"NEUTRAL\"}"), new TokenCount(1_000, 500), Duration.ofMillis(420),
-                false, Optional.of(subject)));
+                false, Optional.of(subject), Optional.empty()));
 
         Map<String, Object> row = jdbc.queryForMap("SELECT * FROM ai_generation_log WHERE id = ?", id);
         assertThat(row).containsEntry("feature", FEATURE)
@@ -74,9 +75,39 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void usable_answer_with_a_replay_request_is_found_again_and_the_newest_row_wins() {
+        String input = "<news_item>\nheadline: " + UUID.randomUUID() + "\n</news_item>";
+        ReplayRequest replay = new ReplayRequest(FEATURE, MODEL, "v1", input);
+        facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "system\n\n---\n\n" + input,
+                Optional.of("{\"answer\":\"old\"}"), new TokenCount(10, 5), Duration.ofMillis(100), false,
+                Optional.empty(), Optional.of(replay)));
+        UUID newest = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "system\n\n---\n\n" + input,
+                Optional.of("{\"answer\":\"new\"}"), new TokenCount(10, 5), Duration.ofMillis(100), false,
+                Optional.empty(), Optional.of(replay)));
+
+        assertThat(jdbc.queryForObject("SELECT replay_key FROM ai_generation_log WHERE id = ?", String.class, newest))
+                .matches("[0-9a-f]{64}");
+        // Same request with Windows line endings and extra spaces: the normalised key is the same (L7).
+        assertThat(facade.findReplay(new ReplayRequest(FEATURE, MODEL, "v1", "  " + input.replace("\n", "\r\n"))))
+                .contains("{\"answer\":\"new\"}");
+        assertThat(facade.findReplay(new ReplayRequest(FEATURE, MODEL, "v2", input))).isEmpty();
+    }
+
+    @Test
+    void row_without_a_replay_request_is_not_replayable() {
+        UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "Classify: ...",
+                Optional.of("{}"), new TokenCount(10, 5), Duration.ofMillis(100), false, Optional.empty(),
+                Optional.empty()));
+
+        assertThat(jdbc.queryForMap("SELECT replay_key FROM ai_generation_log WHERE id = ?", id))
+                .containsEntry("replay_key", null);
+    }
+
+    @Test
     void failed_call_is_logged_without_response_and_flagged_as_fallback() {
         UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "Classify: ...",
-                Optional.empty(), new TokenCount(0, 0), Duration.ofSeconds(30), true, Optional.empty()));
+                Optional.empty(), new TokenCount(0, 0), Duration.ofSeconds(30), true, Optional.empty(),
+                Optional.empty()));
 
         Map<String, Object> row = jdbc.queryForMap("SELECT * FROM ai_generation_log WHERE id = ?", id);
         assertThat(row.get("response")).isNull();
@@ -88,7 +119,7 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
     void cached_prefix_tokens_are_logged_and_priced_with_the_standard_cache_multipliers() {
         UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "Classify: ...",
                 Optional.of("{}"), new TokenCount(100, 50, 0, 1_000), Duration.ofMillis(300), false,
-                Optional.empty()));
+                Optional.empty(), Optional.empty()));
 
         Map<String, Object> row = jdbc.queryForMap("SELECT * FROM ai_generation_log WHERE id = ?", id);
         assertThat(row).containsEntry("cache_write_tokens", 0).containsEntry("cache_read_tokens", 1_000);

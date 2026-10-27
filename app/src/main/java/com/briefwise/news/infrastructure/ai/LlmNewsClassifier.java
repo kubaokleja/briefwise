@@ -2,11 +2,13 @@ package com.briefwise.news.infrastructure.ai;
 
 import com.briefwise.aiops.AiopsFacade;
 import com.briefwise.aiops.AiopsFacade.GenerationEntry;
+import com.briefwise.aiops.AiopsFacade.ReplayRequest;
 import com.briefwise.news.domain.model.ClassifierResult;
 import com.briefwise.news.domain.model.NewsClassification;
 import com.briefwise.news.domain.model.NewsItem;
 import com.briefwise.news.domain.model.UnclassifiedReason;
 import com.briefwise.news.domain.port.NewsClassifier;
+import com.briefwise.shared.domain.exception.ReplayMissException;
 import com.briefwise.shared.domain.exception.UsageLimitExceededException;
 import com.briefwise.shared.domain.model.TokenCount;
 import java.time.Duration;
@@ -32,6 +34,8 @@ import tools.jackson.databind.json.JsonMapper;
  * {@link BeanOutputConverter}; the response is parsed here rather than by {@code ChatClient.entity()}, so a malformed
  * answer is still logged and counted. Invalid output gets a re-ask up to {@code max-attempts}; a provider error
  * (already retried by the SDK) ends the item at once. Neither throws: both become {@link ClassifierResult.Failed}.
+ * Every call carries the replay advisor (ADR 0015): a replayed answer is parsed the same way but neither logged nor
+ * billed, and a replay miss with {@code on-miss: fail} defers the item.
  */
 @Component
 @ConditionalOnExpression(LlmNewsClassifier.CHAT_MODEL_CONFIGURED)
@@ -69,6 +73,7 @@ class LlmNewsClassifier implements NewsClassifier {
     @Override
     public ClassifierResult classify(NewsItem item) {
         String data = prompt.render(item);
+        ReplayRequest replay = new ReplayRequest(properties.feature(), defaultModel, prompt.version(), data);
         UnclassifiedReason reason = UnclassifiedReason.INVALID_OUTPUT;
         for (int attempt = 1; attempt <= properties.maxAttempts(); attempt++) {
             try {
@@ -77,14 +82,23 @@ class LlmNewsClassifier implements NewsClassifier {
                 return new ClassifierResult.Deferred("daily budget for " + properties.feature() + " is used up");
             }
             boolean lastAttempt = attempt == properties.maxAttempts();
-            Attempt result = call(item, data);
+            Attempt result;
+            try {
+                result = call(item, data, replay);
+            } catch (ReplayMissException e) {
+                log.info("No replay entry for news item {}; it stays RECEIVED", item.id());
+                return new ClassifierResult.Deferred("no replay entry");
+            }
+            if (result.replayed()) {
+                return replayedResult(item, result);
+            }
             if (result.classification().isPresent()) {
-                record(item, data, result, false);
+                record(item, data, replay, result, false);
                 return new ClassifierResult.Classified(result.classification().get());
             }
             reason = result.failure();
             boolean giveUp = lastAttempt || reason == UnclassifiedReason.PROVIDER_ERROR;
-            record(item, data, result, giveUp);
+            record(item, data, replay, result, giveUp);
             if (giveUp) {
                 break;
             }
@@ -93,7 +107,20 @@ class LlmNewsClassifier implements NewsClassifier {
         return new ClassifierResult.Failed(reason);
     }
 
-    private Attempt call(NewsItem item, String data) {
+    /**
+     * Only usable answers are recorded, so an unusable replay means the parser no longer accepts an old recording
+     * (e.g. {@link ClassificationAnswer} changed without a prompt version bump). Asking again would replay the same
+     * text, so the item fails at once and the warning names the cause.
+     */
+    private ClassifierResult replayedResult(NewsItem item, Attempt result) {
+        if (result.classification().isPresent()) {
+            return new ClassifierResult.Classified(result.classification().get());
+        }
+        log.warn("Replayed classification for news item {} is no longer usable; re-record the fixture", item.id());
+        return new ClassifierResult.Failed(UnclassifiedReason.INVALID_OUTPUT);
+    }
+
+    private Attempt call(NewsItem item, String data, ReplayRequest replay) {
         long start = System.nanoTime();
         ChatResponse response;
         try {
@@ -105,39 +132,49 @@ class LlmNewsClassifier implements NewsClassifier {
                             .param(ChatClientAttributes.STRUCTURED_OUTPUT_NATIVE.getKey(), true)
                             .param(ChatClientAttributes.STRUCTURED_OUTPUT_SCHEMA.getKey(), converter.getJsonSchema())
                             .param(ChatClientAttributes.OUTPUT_FORMAT.getKey(), converter.getFormat()))
+                    .advisors(aiops.replay(replay))
                     .call()
                     .chatResponse();
+        } catch (ReplayMissException e) {
+            throw e;
         } catch (RuntimeException e) {
             log.warn("Classification call for news item {} failed: {}", item.id(), e.toString());
             return Attempt.failed(UnclassifiedReason.PROVIDER_ERROR, Optional.empty(), Optional.empty(),
-                    new TokenCount(0, 0), elapsedSince(start));
+                    new TokenCount(0, 0), elapsedSince(start), false);
         }
         Duration latency = elapsedSince(start);
+        boolean replayed = aiops.isReplayed(response);
         Optional<String> model = Optional.ofNullable(response).map(r -> r.getMetadata().getModel())
                 .filter(m -> !m.isBlank());
         TokenCount tokens = tokensOf(response);
         Optional<String> text = Optional.ofNullable(response).map(ChatResponse::getResult)
                 .map(g -> g.getOutput().getText());
         if (text.isEmpty() || text.get().isBlank()) {
-            return Attempt.failed(UnclassifiedReason.INVALID_OUTPUT, model, text, tokens, latency);
+            return Attempt.failed(UnclassifiedReason.INVALID_OUTPUT, model, text, tokens, latency, replayed);
         }
         try {
             NewsClassification classification = converter.convert(text.get())
                     .toClassification(item, prompt.version());
             return new Attempt(Optional.of(classification), UnclassifiedReason.INVALID_OUTPUT, model, text, tokens,
-                    latency);
+                    latency, replayed);
         } catch (RuntimeException e) {
             log.warn("Unusable classification for news item {}: {}", item.id(), e.getMessage());
-            return Attempt.failed(UnclassifiedReason.INVALID_OUTPUT, model, text, tokens, latency);
+            return Attempt.failed(UnclassifiedReason.INVALID_OUTPUT, model, text, tokens, latency, replayed);
         }
     }
 
-    /** Every attempt is logged and counted, including malformed answers (they cost tokens too). */
-    private void record(NewsItem item, String data, Attempt attempt, boolean fallback) {
+    /**
+     * Every live attempt is logged and counted, including malformed answers (they cost tokens too). Only a usable
+     * answer carries the replay request, so replay never returns a malformed one. The key is built from the same
+     * request as the lookup (configured model name), not from the model ID the provider reports back.
+     */
+    private void record(NewsItem item, String data, ReplayRequest replay, Attempt attempt, boolean fallback) {
         String model = attempt.model().orElse(defaultModel);
+        Optional<ReplayRequest> replayable = attempt.classification().isPresent() ? Optional.of(replay)
+                : Optional.empty();
         aiops.recordGeneration(new GenerationEntry(properties.feature(), model, prompt.version(),
                 prompt.system() + LOG_SEPARATOR + data, attempt.response(), attempt.tokens(), attempt.latency(),
-                fallback, Optional.of(item.id())));
+                fallback, Optional.of(item.id()), replayable));
         aiops.checkAndRecordUsage(properties.feature(), model, attempt.tokens());
     }
 
@@ -159,11 +196,12 @@ class LlmNewsClassifier implements NewsClassifier {
     }
 
     private record Attempt(Optional<NewsClassification> classification, UnclassifiedReason failure,
-                           Optional<String> model, Optional<String> response, TokenCount tokens, Duration latency) {
+                           Optional<String> model, Optional<String> response, TokenCount tokens, Duration latency,
+                           boolean replayed) {
 
         static Attempt failed(UnclassifiedReason reason, Optional<String> model, Optional<String> response,
-                              TokenCount tokens, Duration latency) {
-            return new Attempt(Optional.empty(), reason, model, response, tokens, latency);
+                              TokenCount tokens, Duration latency, boolean replayed) {
+            return new Attempt(Optional.empty(), reason, model, response, tokens, latency, replayed);
         }
     }
 }

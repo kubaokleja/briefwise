@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-/** Write-only for now: rows are inserted and never read back by the app until replay (M1 slice 5). */
+/** Insert-only. The replay lookup reads rows back with SQL ({@code AiopsRepositoryAdapter}), not through JPA. */
 @Entity
 @Table(name = "ai_generation_log")
 class GenerationLogEntity {
@@ -57,13 +57,16 @@ class GenerationLogEntity {
     @Column(name = "subject_id")
     private UUID subjectId;
 
+    @Column(name = "replay_key")
+    private String replayKey;
+
     protected GenerationLogEntity() {
     }
 
     GenerationLogEntity(UUID id, String feature, String model, String promptVersion, String prompt,
                         String response, int promptTokens, int completionTokens, int cacheWriteTokens,
                         int cacheReadTokens, BigDecimal costUsd, long latencyMs, String correlationId,
-                        boolean fallback, UUID subjectId) {
+                        boolean fallback, UUID subjectId, String replayKey) {
         this.id = id;
         this.feature = feature;
         this.model = model;
@@ -79,6 +82,7 @@ class GenerationLogEntity {
         this.correlationId = correlationId;
         this.fallback = fallback;
         this.subjectId = subjectId;
+        this.replayKey = replayKey;
     }
 
     public UUID getId() {

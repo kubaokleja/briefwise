@@ -38,12 +38,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.TestPropertySource;
 
 /**
  * The real LLM adapter against WireMock standing in for the Anthropic Messages API (never a live call). Covers the
  * request shape (ADR 0012), valid, malformed, re-ask, timeout and provider error, the budget gate, and that every
- * attempt lands in {@code ai_generation_log} and the daily usage.
+ * attempt lands in {@code ai_generation_log} and the daily usage. Replay is on with {@code on-miss: fallback}
+ * (ADR 0015) and the log is emptied before each test, so every first call is a miss that reaches WireMock; the last
+ * test shows the recorded answer being replayed. Replay with {@code fail}: {@code ReplayNewsClassificationIT}.
  */
+@TestPropertySource(properties = "briefwise.llm.replay.on-miss=fallback")
 class LlmNewsClassifierIT extends AbstractIntegrationTest {
 
     private static final String MESSAGES = "/v1/messages";
@@ -139,6 +143,8 @@ class LlmNewsClassifierIT extends AbstractIntegrationTest {
         assertThat(rows).allSatisfy(row -> assertThat(row).containsEntry("is_fallback", false));
         assertThat(rows).anySatisfy(row -> assertThat(row).containsEntry("cache_write_tokens", 1180)
                 .containsEntry("completion_tokens", 1024));
+        // Only the usable answer is replayable (ADR 0015): the malformed attempt gets no key.
+        assertThat(rows).extracting(row -> row.get("replay_key") != null).containsExactlyInAnyOrder(false, true);
     }
 
     @Test
@@ -150,6 +156,7 @@ class LlmNewsClassifierIT extends AbstractIntegrationTest {
         assertThat(result).isEqualTo(new ClassifierResult.Failed(UnclassifiedReason.INVALID_OUTPUT));
         WIREMOCK.verify(2, postRequestedFor(urlPathEqualTo(MESSAGES)));
         assertThat(logRows()).extracting(row -> row.get("is_fallback")).containsExactlyInAnyOrder(false, true);
+        assertThat(logRows()).extracting(row -> row.get("replay_key")).containsOnlyNulls();
     }
 
     @Test
@@ -193,5 +200,22 @@ class LlmNewsClassifierIT extends AbstractIntegrationTest {
         assertThat(classifier.classify(item)).isInstanceOf(ClassifierResult.Deferred.class);
         WIREMOCK.verify(0, postRequestedFor(urlPathEqualTo(MESSAGES)));
         assertThat(logRows()).isEmpty();
+    }
+
+    @Test
+    void recorded_answer_is_replayed_for_the_same_input_without_a_call_a_log_row_or_usage() {
+        WIREMOCK.stubFor(post(urlPathEqualTo(MESSAGES)).willReturn(okJson(fixture("classification-valid.json"))));
+        ClassifierResult live = classifier.classify(item);
+        NewsItem sameContent = new NewsItem(UUID.randomUUID(), item.headline(), item.summary(),
+                "https://example.com/apple-syndicated", item.publishedAt(), item.source(), item.tickers(),
+                NewsStatus.RECEIVED, Optional.empty());
+
+        ClassifierResult replayed = classifier.classify(sameContent);
+
+        assertThat(replayed).isEqualTo(live);
+        WIREMOCK.verify(1, postRequestedFor(urlPathEqualTo(MESSAGES)));
+        assertThat(logRows()).hasSize(1);
+        assertThat(jdbc.queryForObject("SELECT call_count FROM ai_daily_usage WHERE feature = ? AND usage_date = ?",
+                Integer.class, "news-classification", LocalDate.now(ZoneOffset.UTC))).isEqualTo(1);
     }
 }

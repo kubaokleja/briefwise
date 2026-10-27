@@ -2,7 +2,10 @@
 spring:
   ai:
     model:
-      chat: none              # no LLM until the replay provider (M1 slice 5); news stays RECEIVED
+      chat: anthropic         # only so ChatClient exists: replay + on-miss fail never reaches it (ADR 0015)
+    anthropic:
+      api-key: replay-only-no-key
+      base-url: http://127.0.0.1:9   # discard port: even a bug cannot reach the real API or spend money
 
 briefwise:
   market:

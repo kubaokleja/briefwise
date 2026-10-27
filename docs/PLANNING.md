@@ -102,10 +102,11 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] Relabel analyst rows `OTHER` -> `ANALYST` in the local CSV (22 rows)
 
 ### Slice 5 — Replay provider
-- [ ] Decide L7 normalisation of the replay key `hash(model, prompt_version, normalized input)`
-- [ ] `ChatModel` decorator; `AiopsFacade.findReplay`; `on-miss: fail | fallback`
-- [ ] Export replay fixtures to `evals/replay/`; `test` and `demo` use `replay` (demo has `spring.ai.model.chat: none` until then); replace the hand-written `src/test/resources/anthropic/` fixtures with recorded ones
-- [ ] Skill `llm-adapter` (pattern now implemented once)
+- [x] Decide L7 normalisation of the replay key -> [ADR 0015](decisions/0015-replay-provider.md) (SHA-256 of feature, model, prompt version, data block; NFC, line endings, whitespace; case kept; hits not logged)
+- [x] `ChatClient` advisor instead of a `ChatModel` decorator (ADR 0015); `AiopsFacade.findReplay`, `replay`, `isReplayed`; `on-miss: fail | fallback` (`ReplayMissException` -> item stays `RECEIVED`); Flyway V13 `replay_key`
+- [x] `test` and `demo` use `replay` + `fail` (demo: dummy key, discard port); fixture store for `evals/replay/*.jsonl`; `synthetic_news.sql`, `export_replay.sql`, recording procedure in `evals/replay/README.md`
+- [ ] Recording run (you: `ANTHROPIC_API_KEY`, < 0.01 USD): export `evals/replay/news-classification.jsonl`, replace `classification-valid.json` with the recorded body, confirm cache read tokens
+- [x] Skill `llm-adapter` (pattern now implemented once)
 
 ### Slice 6 — Inbound adapters and daily pipeline
 - [ ] `jobs` context: `POST /api/admin/jobs/{job}/run`; `docs/api.http` (happy path, 404 unknown job, 400)
@@ -200,6 +201,7 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-10-24 | An item whose message ends in `news.raw.DLT` stays `RECEIVED` with its outbox row published, so nothing re-sends it. Who picks it up: a sweep of old `RECEIVED` items (e.g. in `classifyPending` or the job runner), a DLT replay tool, or both? | Sweep (2026-10-24, DESIGN 7.1); age threshold, trigger and retry cap decided in slice 6 |
 | 2026-10-24 | `NewsIngested` carries the first-fetched `ticker` (Kafka key, K2); DESIGN 6.4 sketches `NewsIngested(newsId, occurredAt)`. Update the DESIGN sketch? | Done: DESIGN 6.4 updated (2026-10-24) |
 | 2026-10-21 | Should `ai_generation_log` reference the business object it was generated for (e.g. `newsId`, `briefId`)? Today only feature + correlation ID link a call to its input; an audit ("which call produced this classification?") may need a direct reference | Decided: nullable `subject_id` ([ADR 0014](decisions/0014-classification-output-shape.md)) |
+| 2026-10-27 | The demo has no news (no Finnhub key). Seed it from `evals/replay/synthetic_news.sql` with matching replay fixtures, and where: a demo-only seed at startup or the M6 demo Compose profile? | Open (decide at M6, or earlier if the demo is shown) |
 | 2026-10-24 | A provider outage turns every item of that run into `UNCLASSIFIED` (`PROVIDER_ERROR`) for good. Should the sweep retry those too (with a cap), or is a visible but unlabelled item acceptable? | Open (decide in slice 6 with the sweep) |
 
 ## Open questions from DESIGN
