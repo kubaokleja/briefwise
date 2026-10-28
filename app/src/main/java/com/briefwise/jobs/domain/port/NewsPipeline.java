@@ -14,4 +14,7 @@ public interface NewsPipeline {
     long consumerLag();
 
     Map<String, Object> classifyPending();
+
+    /** Counts per outcome and {@code stoppedOnDeferral}. */
+    Map<String, Object> summarizePortfolios();
 }

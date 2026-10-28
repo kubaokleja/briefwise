@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 /**
  * Jobs that can be run on demand, by the in-app scheduler or by the job runner (DESIGN 13.2). The id is the key in
  * {@code briefwise.jobs.<id>} and the value of {@code --briefwise.job}. {@code news-ingest}: ingest, publish, (runner:
- * wait until consumed), sweep. {@code news-classify}: the sweep alone.
+ * wait until consumed), sweep, portfolio summaries. {@code news-classify}: the sweep alone.
  */
 public enum JobName {
     NEWS_INGEST("news-ingest"),

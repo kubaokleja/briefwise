@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.briefwise.AbstractIntegrationTest;
+import com.briefwise.news.domain.model.ClassifiedNews;
 import com.briefwise.news.domain.model.DedupPolicy;
 import com.briefwise.news.domain.model.EventType;
 import com.briefwise.news.domain.model.FetchedNews;
@@ -268,5 +269,53 @@ class NewsRepositoryAdapterIT extends AbstractIntegrationTest {
                 .isEqualTo("RETRIES_EXHAUSTED");
         assertThatThrownBy(() -> repository.incrementSweepAttempts(UUID.randomUUID()))
                 .isInstanceOf(NewsItemNotFoundException.class);
+    }
+
+    private UUID classified(String headline, Instant publishedAt, Relevance relevance, Set<Ticker> affected,
+                            Ticker... alsoFetchedFor) {
+        UUID id = store(affected.iterator().next(), headline, publishedAt, Optional.empty());
+        for (Ticker t : affected) {
+            repository.addTicker(id, t);
+        }
+        for (Ticker t : alsoFetchedFor) {
+            repository.addTicker(id, t);
+        }
+        repository.classifyFromReceived(id, new NewsClassification(Sentiment.POSITIVE, relevance, EventType.PRODUCT,
+                affected, "Synthetic rationale.", "v1"), publishedAt.plusSeconds(300));
+        return id;
+    }
+
+    @Test
+    void selection_reads_classified_items_of_held_affected_tickers_within_the_window() {
+        Ticker nvda = new Ticker("NVDA");
+        UUID wanted = classified("Apple and Microsoft sign a deal", T0, Relevance.HIGH, Set.of(AAPL, MSFT));
+        classified("Microsoft only fetched for Apple", T0, Relevance.HIGH, Set.of(MSFT), AAPL); // AAPL not affected
+        classified("Too old", T0.minus(Duration.ofHours(30)), Relevance.HIGH, Set.of(AAPL));
+        classified("Listicle", T0, Relevance.LOW, Set.of(AAPL));
+        classified("Not held", T0, Relevance.HIGH, Set.of(nvda));
+        store(AAPL, "Still received", T0, Optional.empty());
+
+        List<ClassifiedNews> found = repository.findClassified(Set.of(AAPL), T0.minus(Duration.ofHours(24)),
+                Set.of(Relevance.MEDIUM, Relevance.HIGH), 50);
+
+        assertThat(found).singleElement().satisfies(n -> {
+            assertThat(n.id()).isEqualTo(wanted);
+            assertThat(n.affectedTickers()).containsExactlyInAnyOrder(AAPL, MSFT);
+            assertThat(n.relevance()).isEqualTo(Relevance.HIGH);
+            assertThat(n.eventType()).isEqualTo(EventType.PRODUCT);
+            assertThat(n.rationale()).isEqualTo("Synthetic rationale.");
+            assertThat(n.classifiedAt()).isEqualTo(T0.plusSeconds(300));
+        });
+    }
+
+    @Test
+    void selection_returns_the_newest_items_up_to_the_limit() {
+        classified("Older", T0.minusSeconds(600), Relevance.MEDIUM, Set.of(AAPL));
+        UUID newest = classified("Newest", T0, Relevance.MEDIUM, Set.of(AAPL));
+
+        List<ClassifiedNews> found = repository.findClassified(Set.of(AAPL), T0.minus(Duration.ofHours(24)),
+                Set.of(Relevance.MEDIUM), 1);
+
+        assertThat(found).extracting(ClassifiedNews::id).containsExactly(newest);
     }
 }

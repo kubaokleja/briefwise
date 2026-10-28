@@ -1,0 +1,13 @@
+{
+  "id": "msg_test_summary_valid",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-haiku-5-5",
+  "content": [
+    {"type": "thinking", "thinking": "One earnings item for AAPL; one point.", "signature": "c2lnLXRlc3Q="},
+    {"type": "text", "text": "{\"points\": [{\"text\": \"AAPL: Apple reported quarterly revenue below analyst estimates.\", \"newsIds\": [\"00000000-0000-4000-8000-0000000000a1\"]}]}"}
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {"input_tokens": 820, "output_tokens": 140, "cache_creation_input_tokens": 0, "cache_read_input_tokens": 0}
+}

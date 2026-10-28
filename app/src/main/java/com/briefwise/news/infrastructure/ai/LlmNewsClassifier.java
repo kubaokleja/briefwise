@@ -23,6 +23,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.MapperFeature;
@@ -58,6 +59,7 @@ class LlmNewsClassifier implements NewsClassifier {
 
     LlmNewsClassifier(ChatClient.Builder chatClientBuilder, ChatModel chatModel, AiopsFacade aiops,
                       NewsClassificationPrompt prompt, NewsClassificationProperties properties,
+                      @Qualifier("newsClassificationCallOptions")
                       Supplier<ChatOptions.Builder<?>> newsClassificationCallOptions) {
         this.chatClient = chatClientBuilder.build();
         this.defaultModel = chatModel.getOptions().getModel();

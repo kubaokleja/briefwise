@@ -1,5 +1,6 @@
 ### Briefwise API: happy path, 404, 400 per context. Run the app (`local` profile) and use IntelliJ / VS Code REST Client.
-### These cases are verified automatically by PortfolioControllerIT, MarketControllerIT and AdminJobControllerIT.
+### These cases are verified automatically by PortfolioControllerIT, MarketControllerIT, AdminJobControllerIT and
+### PortfolioNewsControllerIT.
 @host = http://localhost:8080
 @corePortfolio = b0000000-0000-4000-8000-000000000002
 
@@ -50,7 +51,7 @@ GET {{host}}/api/market/instruments/AAPL/prices?from=2026-10-15&to=2026-10-01
 POST {{host}}/api/admin/jobs/news-classify/run
 X-Correlation-ID: manual-job-001
 
-### Ingest + publish + sweep - 200 (needs FINNHUB_API_KEY and Kafka)
+### Ingest + publish + sweep + portfolio summaries - 200 (needs FINNHUB_API_KEY and Kafka)
 POST {{host}}/api/admin/jobs/news-ingest/run
 
 ### Unknown job - 404
@@ -58,6 +59,21 @@ POST {{host}}/api/admin/jobs/risk-alerts/run
 
 ### Malformed job id - 400
 POST {{host}}/api/admin/jobs/News_Ingest/run
+
+################################################################ news
+### Per portfolio (ADR 0017). Reading never calls the LLM; the news-ingest job makes the summary.
+
+### Relevant news: HIGH/MEDIUM, last 24 h, held affected tickers, by relevance then weight - 200
+GET {{host}}/api/portfolios/{{corePortfolio}}/news/relevant
+
+### Latest daily summary (aiGenerated / fallback / empty, cited points, disclaimer) - 200, or 404 before the first run
+GET {{host}}/api/portfolios/{{corePortfolio}}/news/summary
+
+### Unknown portfolio - 404
+GET {{host}}/api/portfolios/00000000-0000-4000-8000-0000000000ff/news/relevant
+
+### Malformed id - 400
+GET {{host}}/api/portfolios/not-a-uuid/news/summary
 
 ################################################################ ops
 

@@ -1,5 +1,6 @@
 package com.briefwise.news.infrastructure.config;
 
+import com.briefwise.news.domain.model.Relevance;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -16,11 +17,13 @@ import org.springframework.validation.annotation.Validated;
  * (overlap is absorbed by the URL hash). {@code dedup}: the near-duplicate rule (D1, ADR 0009). {@code outbox}: the
  * polling relay (ADR 0011); {@code relay-enabled} and {@code poll-interval} are read by the relay scheduler.
  * {@code sweep}: which stuck {@code RECEIVED} items {@code classifyPending} picks up (ADR 0016).
+ * {@code selection}: which classified news a portfolio sees and its summary is made from (ADR 0017).
  */
 @Validated
 @ConfigurationProperties("briefwise.news")
 record NewsProperties(@Valid @DefaultValue Ingest ingest, @Valid @DefaultValue Dedup dedup,
-                      @Valid @DefaultValue Outbox outbox, @Valid @DefaultValue Sweep sweep) {
+                      @Valid @DefaultValue Outbox outbox, @Valid @DefaultValue Sweep sweep,
+                      @Valid @DefaultValue Selection selection) {
 
     record Ingest(@DefaultValue("2") @PositiveOrZero int lookbackDays) {}
 
@@ -36,4 +39,8 @@ record NewsProperties(@Valid @DefaultValue Ingest ingest, @Valid @DefaultValue D
                  @DefaultValue("200") @Positive int batchSize,
                  @DefaultValue("3") @Positive int maxAttempts,
                  @DefaultValue("48h") @NotNull Duration providerErrorRetryWindow) {}
+
+    record Selection(@DefaultValue("24h") @NotNull Duration window,
+                     @DefaultValue("15") @Positive int maxItems,
+                     @DefaultValue("MEDIUM") @NotNull Relevance minRelevance) {}
 }

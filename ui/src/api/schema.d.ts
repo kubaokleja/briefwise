@@ -100,10 +100,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/portfolios/{portfolioId}/news/relevant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["relevant"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/portfolios/{portfolioId}/news/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        CitationResponse: {
+            excerpt: string;
+            locator: string;
+            sourceId: string;
+            type: string;
+        };
         DailyMoveResponse: {
             change: number;
             changePercent: number;
@@ -134,6 +172,10 @@ export interface components {
             /** @enum {string} */
             status: "SUCCEEDED" | "SKIPPED" | "FAILED" | "TIMED_OUT";
         };
+        PointResponse: {
+            citations: components["schemas"]["CitationResponse"][];
+            text: string;
+        };
         PortfolioResponse: {
             /** Format: uuid */
             clientId: string;
@@ -154,6 +196,41 @@ export interface components {
             date: string;
             /** Format: int64 */
             volume: number;
+        };
+        RelevantNewsResponse: {
+            eventType: string;
+            headline: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            publishedAt: string;
+            rationale: string;
+            relevance: string;
+            sentiment: string;
+            source: string;
+            tickers: string[];
+            url: string;
+            weight: number;
+        };
+        SummaryResponse: {
+            aiGenerated: boolean;
+            disclaimer: string;
+            empty: boolean;
+            fallback: boolean;
+            /** Format: date-time */
+            generatedAt: string;
+            model: string;
+            points: components["schemas"]["PointResponse"][];
+            /** Format: uuid */
+            portfolioId: string;
+            promptVersion: string;
+            /** Format: date */
+            summaryDate: string;
+            violations: components["schemas"]["ViolationResponse"][];
+        };
+        ViolationResponse: {
+            offendingText: string;
+            rule: string;
         };
     };
     responses: never;
@@ -293,6 +370,50 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PositionResponse"][];
+                };
+            };
+        };
+    };
+    relevant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                portfolioId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RelevantNewsResponse"][];
+                };
+            };
+        };
+    };
+    summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                portfolioId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SummaryResponse"];
                 };
             };
         };

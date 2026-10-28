@@ -52,6 +52,12 @@ This costs real money: about 10 Haiku 5.5 calls, well under 0.01 USD (twice for 
    `--briefwise.llm.provider=anthropic` instead.
 6. Export:
    `docker compose exec -T postgres psql -U briefwise -d briefwise -At -v feature=news-classification < evals/replay/export_replay.sql > evals/replay/news-classification.jsonl`
+   Daily summaries (ADR 0017): the summary only selects items published in the last 24 h, so first run
+   `UPDATE news_items SET published_at = now() - interval '1 hour' WHERE source = 'Synthetic';`. Then
+   `POST /api/admin/jobs/news-ingest/run` (its last step summarises every portfolio; without a Finnhub key the
+   ingest step fails but the summarize step still runs) and export with `-v feature=news-summary` to
+   `evals/replay/news-summary.jsonl`. A summary recording only replays while the selected items (ids, labels, text)
+   are exactly the same, so it suits a seeded demo, not CI with random ids.
 7. Stop the proxy. From `briefwise-recording/__files/`, pick one valid classification response body and copy it to
    `app/src/test/resources/anthropic/classification-valid.json`. Before anything is committed, check that no mapping
    file or body contains `x-api-key`, `anthropic-organization-id`, `request-id` or any other account header. Only

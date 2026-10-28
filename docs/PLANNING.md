@@ -119,10 +119,36 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] `NewsFacade.classifyPending`, `consumerLag`; stopgap `NewsStartupIngest` removed (labelling README uses the admin endpoint)
 
 ### Slice 7 — Daily portfolio summary
-- [ ] Decide S1 model, trigger (pipeline vs on demand), M1 `compliance.checkText` scope -> ADR
-- [ ] `NewsFacade.getRelevantNews`, `summarizeForPortfolio`; regenerate only when new HIGH-relevance news exists
-- [ ] Compliance rules (no recommendations, no forecasts, citations, disclaimer); AI marker; `isFallback`
-- [ ] WireMock + replay tests; facade `*IT`
+- [x] Decide S1 model, trigger, `checkText` scope, selection, gate, patterns, disclaimer, limits, few-shot ->
+  [ADR 0017](decisions/0017-daily-portfolio-summary.md) (Haiku 5.5, feature `news-summary`, effort `low`, 2048 tokens,
+  0.05 USD/day; `summarize` step after the sweep, GET only reads; deterministic advice-phrasing rules, one re-ask,
+  template fallback; HIGH+MEDIUM, 24 h, by relevance then weight, cap 15; no few-shot)
+- [x] `compliance`: `RuleId`, `Violation`, `ComplianceResult`, `Passage`, `TextRules`, `Disclaimer`;
+  `TextCheckService` behind port `TextCheck`; `ComplianceFacade.checkText(TextCheckRequest)`, `disclaimer()`;
+  `TextRulesTest` (true and false positives), `ComplianceFacadeIT` (+2)
+- [x] Flyway V15: `news_portfolio_summaries` (portfolio + UTC date unique, points/violations JSONB, `is_fallback`,
+  model, `prompt_version`, disclaimer; empty = no points), selection indexes; `FlywayBaselineIT` 14 -> 15
+- [x] Selection: port `PortfolioHoldings` + `FacadePortfolioHoldings`; `NewsRepository.findClassified` (JDBC,
+  affected tickers aggregated); `ClassifiedNews`, `RelevantNews`, `SelectionPolicy`; `RelevantNewsService`;
+  `NewsFacade.getRelevantNews`; repository IT (affected flag, window, relevance, limit)
+- [x] Summary: `PortfolioSummary`, `SummaryPoint`, `SummaryDraft`, `SummarizerResult`, `RegenerationGate`,
+  `SummaryComposer` (citations, template); ports `NewsSummarizer`, `SummaryCompliance`, `SummaryRepository`,
+  `PortfolioSummaries`, `RelevantNewsQuery`; `PortfolioSummaryService`; `NewsFacade.summarizeForPortfolio`,
+  `summarizePortfolios`, `getLatestSummary` (`aiGenerated`, `fallback`, `empty`, disclaimer)
+- [x] LLM adapter via the `llm-adapter` skill: `prompts/news-summary/` (v1 + hash guard), `SummaryAnswer`,
+  `LlmNewsSummarizer`, `NoChatModelNewsSummarizer`, `NewsSummaryProperties`, `NewsSummaryConfig`;
+  `briefwise.news.selection.*`, `briefwise.news.summary.*`, `daily-budget-usd.news-summary`
+- [x] `jobs`: `summarize` step after the sweep (SKIPPED on timeout or deferral); `JobServiceTest` (+2),
+  `JobsFacadeIT`
+- [x] `GET /api/portfolios/{id}/news/relevant`, `/news/summary`; `docs/api.http` (200, 404, 400); OpenAPI + UI types
+  regenerated
+- [x] Tests: `SelectionPolicyTest`, `RegenerationGateTest`, `SummaryComposerTest`, `RelevantNewsServiceTest`,
+  `PortfolioSummaryServiceTest`, `NewsSummaryPromptTest`, `SummaryAnswerTest`, `LlmNewsSummarizerIT` (WireMock),
+  `ReplayNewsSummaryIT`, `SummaryRepositoryAdapterIT`, `NewsSummaryFacadeIT`, `PortfolioNewsControllerIT`;
+  DESIGN 6.2, 6.3, 7.1, 13.7 updated
+- [ ] Recording run for `news-summary` (you, with the slice 5 recording run; procedure in `evals/replay/README.md`)
+- [ ] Slice 10: `model` / `promptVersion` of the summary response are nullable, but the generated TS types say
+  `string`; mark them nullable in the spec (or handle `null` in the UI)
 
 ### Slice 8 — Classification eval
 - [ ] Decide E1 metric scope (sentiment only vs + relevance / event type), E2 harness (promptfoo vs Java runner vs Python + Anthropic SDK; Batch API support)
@@ -205,7 +231,10 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-10-21 | Should `ai_generation_log` reference the business object it was generated for (e.g. `newsId`, `briefId`)? Today only feature + correlation ID link a call to its input; an audit ("which call produced this classification?") may need a direct reference | Decided: nullable `subject_id` ([ADR 0014](decisions/0014-classification-output-shape.md)) |
 | 2026-10-27 | The demo has no news (no Finnhub key). Seed it from `evals/replay/synthetic_news.sql` with matching replay fixtures, and where: a demo-only seed at startup or the M6 demo Compose profile? | Open (decide at M6, or earlier if the demo is shown) |
 | 2026-10-28 | `sweep_attempts` counts every sweep pick, also a budget deferral (at most one per run). Over several budget-starved days a healthy item could reach `RETRIES_EXHAUSTED`. Count only failed attempts instead, or is the bound acceptable? | Open (watch the first weeks of pipeline runs) |
-| 2026-10-28 | Should a stale `RECEIVED` item (e.g. several days old after a long outage) still be classified, or skipped as no longer relevant for the morning brief? | Open (decide with slice 7 / M4 brief inputs) |
+| 2026-10-28 | Should a stale `RECEIVED` item (e.g. several days old after a long outage) still be classified, or skipped as no longer relevant for the morning brief? | Summaries: excluded by the 24 h published window ([ADR 0017](decisions/0017-daily-portfolio-summary.md)); classification unchanged. Briefs: decide at M4 |
+| 2026-10-28 | A summary point cites news ids, but the model can still state a fact (or number) that is not in the cited item. Do summaries need number grounding / a faithfulness check before M4, or is citation-by-id plus the RM's review enough for an internal text? | Open (decide with the M4 brief eval) |
+| 2026-10-28 | The template fallback quotes third-party headlines verbatim, which can trip the recommendation rules ("Why you should buy Apple"). Violations are stored and shown. Should such points be dropped or reworded instead? | Open (watch real fallbacks) |
+| 2026-10-28 | The summary is per portfolio; a client with several portfolios gets several summaries with overlapping news. Merge per client? Ties to DESIGN 18 "brief per portfolio or per client" | Open (decide at start of M4) |
 | 2026-10-24 | A provider outage turns every item of that run into `UNCLASSIFIED` (`PROVIDER_ERROR`) for good. Should the sweep retry those too (with a cap), or is a visible but unlabelled item acceptable? | Decided: retried by the sweep within 48h, same cap ([ADR 0016](decisions/0016-jobs-sweep-and-job-runner.md)) |
 
 ## Open questions from DESIGN

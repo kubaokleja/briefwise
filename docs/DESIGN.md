@@ -180,11 +180,11 @@ ArchUnit rules (checked on every build): domain purity, no access to another con
 |---|---|---|
 | `portfolio` | Synthetic clients, portfolios, positions, weights | `getPortfolio`, `listPortfolios`, `getHoldings` |
 | `market` | Instruments, price history, returns | `getPriceHistory`, `getDailyMove` |
-| `news` | News pipeline and classification | `ingest`, `publishPending`, `processIngested`, `classifyPending`, `consumerLag`, `getRelevantNews`, `summarizeForPortfolio` |
+| `news` | News pipeline and classification | `ingest`, `publishPending`, `processIngested`, `classifyPending`, `consumerLag`, `getRelevantNews`, `summarizeForPortfolio`, `summarizePortfolios`, `getLatestSummary` |
 | `research` | RAG over filings | `ask`, `searchFilings`, `ingestFiling` |
 | `risk` | Forecasts and alerts | `getForecast`, `getAlerts`, `evaluateAlerts` |
 | `brief` | Brief and client commentary | `generateBrief`, `approve`, `reject`, `edit` |
-| `compliance` | Text and input validation | `checkText`, `screenUntrustedContent` |
+| `compliance` | Text and input validation | `checkText`, `disclaimer`, `screenUntrustedContent` |
 | `aiops` | AI observability, cost, token budgets, replay | `recordGeneration`, `ensureBudgetAvailable`, `checkAndRecordUsage`, `getCostSummary`, `findReplay`, `replay`, `isReplayed` |
 | `access` | Users, roles, login | `authenticate`, `getCurrentUser` |
 | `jobs` | Inbound adapters: admin endpoint, scheduler, job runner | `run` |
@@ -213,6 +213,11 @@ public record NewsClassification(Sentiment sentiment, Relevance relevance, Event
 public enum Sentiment { NEGATIVE, NEUTRAL, POSITIVE }
 public enum Relevance { LOW, MEDIUM, HIGH }
 public enum EventType { EARNINGS, GUIDANCE, M_AND_A, REGULATORY, LITIGATION, MANAGEMENT, MACRO, PRODUCT, ANALYST, OTHER }
+public record RelevantNews(ClassifiedNews news, Set<Ticker> heldTickers, BigDecimal weight) {}   // ADR 0017
+public record PortfolioSummary(UUID id, UUID portfolioId, LocalDate summaryDate, Instant generatedAt,
+                               List<SummaryPoint> points, boolean fallback, Optional<String> model,
+                               Optional<String> promptVersion, String disclaimer, List<SummaryViolation> violations) {}
+public record SummaryPoint(String text, List<Citation> citations) {}
 
 // research
 public record Filing(UUID id, Ticker ticker, FilingType type, LocalDate filedAt, String accessionNo) {}
@@ -230,8 +235,9 @@ public record MorningBrief(UUID id, UUID portfolioId, LocalDate date, BriefStatu
 public sealed interface BriefStatus permits Draft, ComplianceFailed, PendingApproval, Approved, Rejected {}
 
 // compliance
-public record ComplianceResult(boolean passed, List<Violation> violations) {}
+public record ComplianceResult(List<Violation> violations) {}   // passed() = no violations
 public record Violation(RuleId rule, String offendingText, String explanation) {}
+public enum RuleId { NO_RECOMMENDATION, NO_FORECAST, CITATION_REQUIRED, DISCLAIMER_REQUIRED }   // ADR 0017
 ```
 
 > **Domain Questions Log:** could `MorningBrief`, with its sections, citations and status history, become a God object? Candidate split: `BriefDraft` vs `ApprovedCommentary`.
@@ -279,6 +285,12 @@ Trigger: admin "run now" endpoint | in-app scheduler | job runner (GitHub Action
       → LLM error after retry → status UNCLASSIFIED (fallback); the item stays in the feed
       → persist + generation log (prompt_version, tokens, cost) + NewsClassified event
       → poison message → news.raw.DLT
+  → sweep of stuck RECEIVED items (classifyPending)
+  → per portfolio: daily news summary (ADR 0017)
+      → selection: CLASSIFIED, held affected ticker, HIGH/MEDIUM, last 24 h, by relevance then weight, max 15
+      → REGENERATION GATE: none today, today's is template/empty and news arrived, or a new HIGH item
+      → Haiku 5.5, cited points (news ids) → compliance.checkText → 1 re-ask → template fallback (isFallback)
+      → fixed disclaimer appended in code; stored per portfolio and UTC date; GET only reads
   → HIGH relevance → input to the morning brief
 ```
 
@@ -573,6 +585,7 @@ Prices checked 2026-10-16; re-check before relying on them.
 | Item | Assumption | Monthly cost |
 |---|---|---|
 | News classification (Haiku 5.5: $0.10 / $0.50 per MTok) | ~150 items/day after the gate, ~1.2k input + 200 output tokens, 22 weekdays | < 1 USD |
+| Daily portfolio summary (Haiku 5.5) | ≤ 1 call per portfolio per run past the gate, ~1k input + 200 output tokens, 3 portfolios (ADR 0017) | < 0.1 USD |
 | Briefs (Sonnet 5.5: $2 / $10 per MTok) | ~10k input + 2k output per brief, 5 portfolios, ~10 runs/month on demand | ~2 USD |
 | Evals | Sentiment eval ~600 calls per run on Haiku, via Batch API | < 0.5 USD per run |
 | Embeddings | Ollama locally | 0 |

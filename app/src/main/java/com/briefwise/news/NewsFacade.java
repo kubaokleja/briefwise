@@ -1,22 +1,34 @@
 package com.briefwise.news;
 
+import com.briefwise.news.domain.model.ClassifiedNews;
 import com.briefwise.news.domain.model.IngestSummary;
 import com.briefwise.news.domain.model.NewsItemNotFoundException;
+import com.briefwise.news.domain.model.PortfolioSummary;
 import com.briefwise.news.domain.model.RelaySummary;
+import com.briefwise.news.domain.model.RelevantNews;
+import com.briefwise.news.domain.model.SummaryRun;
 import com.briefwise.news.domain.model.SweepSummary;
 import com.briefwise.news.domain.port.NewsConsumerLag;
 import com.briefwise.news.domain.port.NewsIngest;
 import com.briefwise.news.domain.port.NewsProcessing;
 import com.briefwise.news.domain.port.OutboxRelay;
 import com.briefwise.news.domain.port.PendingClassification;
+import com.briefwise.news.domain.port.PortfolioSummaries;
+import com.briefwise.news.domain.port.RelevantNewsQuery;
+import com.briefwise.shared.domain.model.Citation;
 import com.briefwise.shared.domain.model.Ticker;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 /**
- * The only class other contexts may import from {@code news}. Planned next: getRelevantNews, summarizeForPortfolio
- * (M1 slice 7). Methods are added with the slice that implements them; no logic here, delegate only.
+ * The only class other contexts may import from {@code news}. Methods are added with the slice that implements them;
+ * no logic here, delegate and map.
  */
 @Component
 public class NewsFacade {
@@ -26,14 +38,18 @@ public class NewsFacade {
     private final NewsProcessing processing;
     private final PendingClassification pending;
     private final NewsConsumerLag consumerLag;
+    private final RelevantNewsQuery relevantNews;
+    private final PortfolioSummaries summaries;
 
     NewsFacade(NewsIngest ingest, OutboxRelay relay, NewsProcessing processing, PendingClassification pending,
-               NewsConsumerLag consumerLag) {
+               NewsConsumerLag consumerLag, RelevantNewsQuery relevantNews, PortfolioSummaries summaries) {
         this.ingest = ingest;
         this.relay = relay;
         this.processing = processing;
         this.pending = pending;
         this.consumerLag = consumerLag;
+        this.relevantNews = relevantNews;
+        this.summaries = summaries;
     }
 
     /**
@@ -92,6 +108,58 @@ public class NewsFacade {
         return consumerLag.lag();
     }
 
+    /**
+     * Classified news that matters to the portfolio now (ADR 0017): HIGH or MEDIUM relevance, published in the last
+     * 24 hours, at least one affected ticker held; most relevant first, then by portfolio weight; at most 15.
+     *
+     * @throws com.briefwise.shared.domain.exception.ResourceNotFoundException if the portfolio does not exist
+     */
+    public List<RelevantNewsView> getRelevantNews(UUID portfolioId) {
+        return relevantNews.relevantFor(portfolioId).stream().map(NewsFacade::toView).toList();
+    }
+
+    /**
+     * Makes the portfolio's daily news summary if the regeneration gate allows it (no summary today; today's is a
+     * template or empty and news arrived; or a new HIGH item), then the compliance check, one re-ask and the
+     * template fallback (ADR 0017). The LLM is called only past the gate.
+     *
+     * @throws com.briefwise.shared.domain.exception.ResourceNotFoundException if the portfolio does not exist
+     */
+    public SummaryOutcomeView summarizeForPortfolio(UUID portfolioId) {
+        return SummaryOutcomeView.valueOf(summaries.summarize(portfolioId).name());
+    }
+
+    /** {@link #summarizeForPortfolio} for every portfolio; stops at the first deferral (budget used up). */
+    public SummaryRunView summarizePortfolios() {
+        SummaryRun r = summaries.summarizeAll();
+        return new SummaryRunView(r.portfolios(), r.generated(), r.fallback(), r.empty(), r.unchanged(),
+                r.deferred(), r.failed(), r.stoppedOnDeferral());
+    }
+
+    /**
+     * The newest stored summary of the portfolio; never calls the LLM. Empty if none was made yet.
+     *
+     * @throws com.briefwise.shared.domain.exception.ResourceNotFoundException if the portfolio does not exist
+     */
+    public Optional<PortfolioSummaryView> getLatestSummary(UUID portfolioId) {
+        return summaries.latest(portfolioId).map(NewsFacade::toView);
+    }
+
+    private static RelevantNewsView toView(RelevantNews r) {
+        ClassifiedNews n = r.news();
+        return new RelevantNewsView(n.id(), n.headline(), n.url(), n.source(), n.publishedAt(),
+                r.heldTickers().stream().sorted(Comparator.comparing(Ticker::symbol)).toList(), r.weight(),
+                SentimentView.valueOf(n.sentiment().name()), RelevanceView.valueOf(n.relevance().name()),
+                EventTypeView.valueOf(n.eventType().name()), n.rationale());
+    }
+
+    private static PortfolioSummaryView toView(PortfolioSummary s) {
+        return new PortfolioSummaryView(s.portfolioId(), s.summaryDate(), s.generatedAt(),
+                s.points().stream().map(p -> new SummaryPointView(p.text(), p.citations())).toList(),
+                s.disclaimer(), !s.fallback() && !s.empty(), s.fallback(), s.empty(), s.model(), s.promptVersion(),
+                s.violations().stream().map(v -> new SummaryViolationView(v.rule(), v.offendingText())).toList());
+    }
+
     /** See {@link IngestSummary} for the meaning of each count. */
     public record IngestSummaryView(List<Ticker> queried, List<Ticker> skipped, List<Ticker> failed, int fetched,
                                     int inserted, int nearDuplicates, int alreadyKnown) {}
@@ -103,4 +171,38 @@ public class NewsFacade {
     public record ClassifyPendingView(int reopened, int picked, int classified, int unclassified, int skipped,
                                       int alreadyProcessed, int pending, int gaveUp, int failed,
                                       boolean stoppedOnDeferral) {}
+
+    public enum SentimentView { NEGATIVE, NEUTRAL, POSITIVE }
+
+    public enum RelevanceView { LOW, MEDIUM, HIGH }
+
+    public enum EventTypeView {
+        EARNINGS, GUIDANCE, M_AND_A, REGULATORY, LITIGATION, MANAGEMENT, MACRO, PRODUCT, ANALYST, OTHER
+    }
+
+    /** {@code heldTickers}: the item's affected tickers the portfolio holds; {@code weight}: the largest of theirs. */
+    public record RelevantNewsView(UUID id, String headline, String url, String source, Instant publishedAt,
+                                   List<Ticker> heldTickers, BigDecimal weight, SentimentView sentiment,
+                                   RelevanceView relevance, EventTypeView eventType, String rationale) {}
+
+    /** What {@link #summarizeForPortfolio} did. */
+    public enum SummaryOutcomeView { GENERATED, FALLBACK, EMPTY, UNCHANGED, DEFERRED }
+
+    /** See {@link SummaryRun}. */
+    public record SummaryRunView(int portfolios, int generated, int fallback, int empty, int unchanged, int deferred,
+                                 int failed, boolean stoppedOnDeferral) {}
+
+    /**
+     * {@code aiGenerated}: a model wrote the points (show the AI marker); false for a template {@code fallback}
+     * ("built from a template, AI unavailable") and for an {@code empty} summary. {@code violations}: rules a
+     * template still breaks (e.g. a quoted headline).
+     */
+    public record PortfolioSummaryView(UUID portfolioId, LocalDate summaryDate, Instant generatedAt,
+                                       List<SummaryPointView> points, String disclaimer, boolean aiGenerated,
+                                       boolean fallback, boolean empty, Optional<String> model,
+                                       Optional<String> promptVersion, List<SummaryViolationView> violations) {}
+
+    public record SummaryPointView(String text, List<Citation> citations) {}
+
+    public record SummaryViolationView(String rule, String offendingText) {}
 }

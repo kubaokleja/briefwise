@@ -1,14 +1,17 @@
 package com.briefwise.news.domain.port;
 
+import com.briefwise.news.domain.model.ClassifiedNews;
 import com.briefwise.news.domain.model.DedupPolicy;
 import com.briefwise.news.domain.model.NewsClassification;
 import com.briefwise.news.domain.model.NewsItem;
+import com.briefwise.news.domain.model.Relevance;
 import com.briefwise.news.domain.model.UnclassifiedReason;
 import com.briefwise.news.domain.model.UrlHash;
 import com.briefwise.shared.domain.model.Ticker;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /** Outbound port: stored news items. */
@@ -72,4 +75,12 @@ public interface NewsRepository {
      * @return the attempts including this one
      */
     int incrementSweepAttempts(UUID newsId);
+
+    /**
+     * {@code CLASSIFIED} items with one of {@code relevances}, published at or after {@code publishedSince}, with at
+     * least one of {@code tickers} among their affected tickers; each with all its affected tickers. Unordered and
+     * capped at {@code limit} newest; the selection policy orders and cuts.
+     */
+    List<ClassifiedNews> findClassified(Set<Ticker> tickers, Instant publishedSince, Set<Relevance> relevances,
+                                        int limit);
 }
