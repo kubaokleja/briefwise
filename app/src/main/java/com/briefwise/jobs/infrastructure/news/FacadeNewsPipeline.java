@@ -6,6 +6,7 @@ import com.briefwise.news.NewsFacade;
 import com.briefwise.news.NewsFacade.ClassifyPendingView;
 import com.briefwise.news.NewsFacade.IngestSummaryView;
 import com.briefwise.news.NewsFacade.PublishSummaryView;
+import com.briefwise.news.NewsFacade.SummaryRunView;
 import com.briefwise.shared.domain.model.Ticker;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -59,6 +60,21 @@ class FacadeNewsPipeline implements NewsPipeline {
         result.put("alreadyProcessed", s.alreadyProcessed());
         result.put("pending", s.pending());
         result.put("gaveUp", s.gaveUp());
+        result.put("failed", s.failed());
+        result.put("stoppedOnDeferral", s.stoppedOnDeferral());
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> summarizePortfolios() {
+        SummaryRunView s = news.summarizePortfolios();
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("portfolios", s.portfolios());
+        result.put("generated", s.generated());
+        result.put("fallback", s.fallback());
+        result.put("empty", s.empty());
+        result.put("unchanged", s.unchanged());
+        result.put("deferred", s.deferred());
         result.put("failed", s.failed());
         result.put("stoppedOnDeferral", s.stoppedOnDeferral());
         return result;

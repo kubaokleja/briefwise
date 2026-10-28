@@ -110,6 +110,17 @@ briefwise:
       effort: low            # Anthropic only; Haiku 5.5 takes no temperature
       max-attempts: 2        # first call + one re-ask after invalid output
       max-summary-chars: 2000
+    selection:               # getRelevantNews and the summary input (ADR 0017)
+      window: 24h            # published within; also keeps stale late-classified items out of today's summary
+      max-items: 15          # most relevant first, then by portfolio weight
+      min-relevance: MEDIUM
+    summary:                 # daily portfolio summary, one LLM call per portfolio past the gate (ADR 0017)
+      feature: news-summary
+      max-tokens: 2048       # adaptive thinking + up to 5 points of JSON
+      effort: low            # Anthropic only
+      max-attempts: 2        # first call + one re-ask after invalid output; the compliance re-ask is separate
+      max-points: 5
+      max-summary-chars: 300 # per item in the prompt
     finnhub:                 # free tier: personal use only, about 60 calls/min, 30/s hard cap (checked 2026-10-21)
       base-url: https://finnhub.io/api/v1
       api-key: ${FINNHUB_API_KEY:}
@@ -127,6 +138,7 @@ briefwise:
     # USD per feature per UTC day (ADR 0008). A feature without an entry cannot call an LLM.
     daily-budget-usd:
       news-classification: 0.10
+      news-summary: 0.05     # ~0.001 per call on Haiku 5.5
   cors:
     allowed-origins:
       - http://localhost:5173

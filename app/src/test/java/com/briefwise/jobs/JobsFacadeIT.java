@@ -44,6 +44,7 @@ class JobsFacadeIT extends AbstractIntegrationTest {
     void setUp() {
         jdbc.update("DELETE FROM news_outbox");
         jdbc.update("DELETE FROM news_items");
+        jdbc.update("DELETE FROM news_portfolio_summaries");
         classifier.reset();
         classifier.answer(item -> new ClassifierResult.Classified(new NewsClassification(Sentiment.NEUTRAL,
                 Relevance.LOW, EventType.OTHER, item.tickers(), "Synthetic test result.", "test-v1")));
@@ -63,11 +64,14 @@ class JobsFacadeIT extends AbstractIntegrationTest {
         JobRunView run = jobs.run("news-ingest", JobTrigger.RUNNER);
 
         assertThat(run.status()).isEqualTo(JobStatus.SUCCEEDED);
-        assertThat(run.steps()).extracting(JobStepView::name).containsExactly("ingest", "publish", "drain", "sweep");
+        assertThat(run.steps()).extracting(JobStepView::name)
+                .containsExactly("ingest", "publish", "drain", "sweep", "summarize");
         assertThat(run.steps().getFirst().result()).containsEntry("inserted", 1);
         // drain returned only after the consumer committed, so the item is already classified
         assertThat(jdbc.queryForObject("SELECT status FROM news_items WHERE url = ?", String.class,
                 "https://news.example.com/jobs-it-campus")).isEqualTo("CLASSIFIED");
-        assertThat(run.steps().getLast().result()).containsEntry("picked", 0);   // too young for the sweep
+        assertThat(run.steps().get(3).result()).containsEntry("picked", 0);   // too young for the sweep
+        // the item is LOW relevance, so every portfolio gets an empty summary without an LLM call
+        assertThat(run.steps().getLast().result()).containsEntry("portfolios", 3).containsEntry("empty", 3);
     }
 }

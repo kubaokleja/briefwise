@@ -34,6 +34,68 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 13 — 2026-10-28 — M1 slice 7: daily portfolio summary
+
+**Phase:** M1 / slice 7
+**Goal:** A short, cited daily news summary per portfolio, made in the pipeline behind a regeneration gate and a
+compliance check, with a template fallback; read through a GET.
+
+**Done**
+- `compliance`: `TextRules.M1` (advice-phrasing patterns for `NO_RECOMMENDATION` / `NO_FORECAST`,
+  `CITATION_REQUIRED`, `DISCLAIMER_REQUIRED`), `Disclaimer`, `TextCheckService`; `ComplianceFacade.checkText`,
+  `disclaimer()`.
+- Flyway V15: `news_portfolio_summaries` (one row per portfolio and UTC date, upserted; points and violations JSONB)
+  plus selection indexes. `FlywayBaselineIT` 14 -> 15.
+- `news` selection: `ClassifiedNews`, `RelevantNews`, `SelectionPolicy` (HIGH+MEDIUM, 24 h, relevance then held
+  weight, cap 15), `RelevantNewsService`, `NewsRepository.findClassified` (JDBC), `FacadePortfolioHoldings`;
+  `NewsFacade.getRelevantNews`.
+- `news` summary: `RegenerationGate`, `SummaryComposer` (citations from ids, template), `PortfolioSummaryService`
+  (gate -> LLM -> check -> one re-ask with corrections -> template fallback; loop stops at the first deferral),
+  `SummaryRepositoryAdapter`; `NewsFacade.summarizeForPortfolio`, `summarizePortfolios`, `getLatestSummary`.
+- LLM adapter by the `llm-adapter` skill: `prompts/news-summary/` v1, `SummaryAnswer`, `LlmNewsSummarizer`,
+  `NoChatModelNewsSummarizer`, `NewsSummaryConfig`/`Properties`; classifier options bean now `@Qualifier`ed.
+- `jobs`: `summarize` step after the sweep in `news-ingest` (SKIPPED on timeout or deferral).
+- `GET /api/portfolios/{id}/news/relevant`, `/news/summary` (`PortfolioNewsController`); `docs/api.http`;
+  `docs/openapi.json` + `ui/src/api/schema.d.ts` regenerated; `evals/replay/README.md` summary recording step;
+  DESIGN 6.2, 6.3, 7.1, 13.7.
+- Tests: `TextRulesTest`, `SelectionPolicyTest`, `RegenerationGateTest`, `SummaryComposerTest`,
+  `RelevantNewsServiceTest`, `PortfolioSummaryServiceTest`, `NewsSummaryPromptTest`, `SummaryAnswerTest`,
+  `JobServiceTest` (+2); `LlmNewsSummarizerIT`, `ReplayNewsSummaryIT`, `SummaryRepositoryAdapterIT`,
+  `NewsSummaryFacadeIT`, `PortfolioNewsControllerIT`, `NewsRepositoryAdapterIT` (+2), `ComplianceFacadeIT` (+2),
+  `JobsFacadeIT`; `RecordingNewsSummarizer` in the shared IT context. `./mvnw verify`: 286 unit + 119 IT green
+  (incl. `ArchitectureTest`); UI lint, typecheck, tests green.
+
+**Decisions** ([ADR 0017](decisions/0017-daily-portfolio-summary.md))
+- Haiku 5.5, feature `news-summary`, effort `low`, `max-tokens` 2048, 0.05 USD/day; no few-shot (prefix below the
+  cache minimum).
+- Pipeline step + read-only GET; deterministic advice-phrasing rules, one re-ask, template fallback; fixed
+  disclaimer appended in code.
+- Selection HIGH+MEDIUM / 24 h / relevance then weight / 15; gate: none today, today's template or empty, or a new
+  HIGH item. Stale `RECEIVED` items fall outside the window.
+
+**AI concepts introduced / explained**
+- Grounded summarisation (only the supplied items) and citation by id, validated in code.
+- Deterministic guardrails vs an LLM judge; re-ask with feedback (self-correction) bounded to one try.
+- The regeneration gate as cost control; graceful degradation to a template marked `isFallback`.
+- Why the disclaimer is appended in code, not generated.
+
+**Domain questions added** (also in PLANNING)
+- Faithfulness / number grounding of summary points before M4?
+- Template quotes headlines that can trip the rules.
+- Summary per portfolio vs per client.
+
+**Open questions / blockers**
+- Recording runs for `news-classification` and `news-summary` (yours) and the Neon setup are still open.
+- Summary `model` / `promptVersion` are nullable but typed `string` in the generated TS (slice 10).
+
+**Next session**
+- M1 slice 8: classification eval (decide E1, E2 first).
+
+**Proposed commit message**
+> feat(news): daily portfolio news summary with selection, regeneration gate, compliance check and template fallback
+
+---
+
 ## Session 12 — 2026-10-28 — M1 slice 6: inbound adapters, sweep and daily pipeline
 
 **Phase:** M1 / slice 6

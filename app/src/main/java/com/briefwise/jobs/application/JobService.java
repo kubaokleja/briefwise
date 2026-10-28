@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
  * next run (outbox rows pending, items {@code RECEIVED}).
  * <p>
  * {@code news-ingest}: ingest → publish until no outbox row is pending → (runner only) wait until the consumer lag
- * is 0 → sweep. {@code news-classify}: sweep.
+ * is 0 → sweep → summarize (portfolio summaries, ADR 0017). {@code news-classify}: sweep.
  */
 @Service
 class JobService implements Jobs {
@@ -75,7 +75,23 @@ class JobService implements Jobs {
         steps.add(timedOut
                 ? JobStep.of("sweep", JobStatus.SKIPPED, "max-duration reached; the next run sweeps")
                 : step("sweep", news::classifyPending));
+        steps.add(timedOut
+                ? JobStep.of("summarize", JobStatus.SKIPPED, "max-duration reached; previous summaries stay")
+                : summarize());
         return steps;
+    }
+
+    /**
+     * Daily portfolio summaries from what is classified now (ADR 0017). A deferral (budget used up, no chat model)
+     * stops the step and marks it {@code SKIPPED}, like a budget stop elsewhere; previous summaries stay.
+     */
+    private JobStep summarize() {
+        JobStep step = step("summarize", news::summarizePortfolios);
+        if (step.status() == JobStatus.SUCCEEDED && Boolean.TRUE.equals(step.result().get("stoppedOnDeferral"))) {
+            return new JobStep("summarize", JobStatus.SKIPPED, step.result(),
+                    Optional.of("summary deferred (budget used up or no model); previous summaries stay"));
+        }
+        return step;
     }
 
     /**

@@ -42,6 +42,7 @@ class JobServiceTest {
         when(news.publishPending()).thenReturn(new PublishResult(2, 0, false));
         when(news.consumerLag()).thenReturn(0L);
         when(news.classifyPending()).thenReturn(Map.of("picked", 0));
+        when(news.summarizePortfolios()).thenReturn(Map.of("generated", 3, "stoppedOnDeferral", false));
     }
 
     private static JobStep step(JobRun run, String name) {
@@ -49,24 +50,27 @@ class JobServiceTest {
     }
 
     @Test
-    void runner_ingests_publishes_waits_for_the_consumers_then_sweeps() {
+    void runner_ingests_publishes_waits_for_the_consumers_sweeps_then_summarizes() {
         JobRun run = service.run(JobName.NEWS_INGEST, JobTrigger.RUNNER);
 
         assertThat(run.status()).isEqualTo(JobStatus.SUCCEEDED);
-        assertThat(run.steps()).extracting(JobStep::name).containsExactly("ingest", "publish", "drain", "sweep");
+        assertThat(run.steps()).extracting(JobStep::name)
+                .containsExactly("ingest", "publish", "drain", "sweep", "summarize");
         assertThat(step(run, "ingest").result()).containsEntry("inserted", 2);
+        assertThat(step(run, "summarize").result()).containsEntry("generated", 3);
         InOrder order = inOrder(news);
         order.verify(news).ingest();
         order.verify(news).publishPending();
         order.verify(news).consumerLag();
         order.verify(news).classifyPending();
+        order.verify(news).summarizePortfolios();
     }
 
     @Test
     void admin_run_does_not_wait_for_the_consumers() {
         JobRun run = service.run(JobName.NEWS_INGEST, JobTrigger.ADMIN);
 
-        assertThat(run.steps()).extracting(JobStep::name).containsExactly("ingest", "publish", "sweep");
+        assertThat(run.steps()).extracting(JobStep::name).containsExactly("ingest", "publish", "sweep", "summarize");
         verify(news, never()).consumerLag();
     }
 
@@ -76,6 +80,28 @@ class JobServiceTest {
 
         assertThat(run.steps()).extracting(JobStep::name).containsExactly("sweep");
         verify(news, never()).ingest();
+        verify(news, never()).summarizePortfolios();
+    }
+
+    @Test
+    void deferred_summaries_skip_the_step_without_failing_the_run() {
+        when(news.summarizePortfolios()).thenReturn(Map.of("deferred", 1, "stoppedOnDeferral", true));
+
+        JobRun run = service.run(JobName.NEWS_INGEST, JobTrigger.RUNNER);
+
+        assertThat(run.status()).isEqualTo(JobStatus.SUCCEEDED);
+        assertThat(step(run, "summarize").status()).isEqualTo(JobStatus.SKIPPED);
+        assertThat(step(run, "summarize").result()).containsEntry("deferred", 1);
+    }
+
+    @Test
+    void failing_summaries_fail_the_run() {
+        when(news.summarizePortfolios()).thenThrow(new IllegalStateException("database down"));
+
+        JobRun run = service.run(JobName.NEWS_INGEST, JobTrigger.RUNNER);
+
+        assertThat(run.status()).isEqualTo(JobStatus.FAILED);
+        assertThat(step(run, "summarize").status()).isEqualTo(JobStatus.FAILED);
     }
 
     @Test
@@ -112,7 +138,9 @@ class JobServiceTest {
         assertThat(run.status()).isEqualTo(JobStatus.TIMED_OUT);
         assertThat(step(run, "drain").result()).containsEntry("lag", 3L);
         assertThat(step(run, "sweep").status()).isEqualTo(JobStatus.SKIPPED);
+        assertThat(step(run, "summarize").status()).isEqualTo(JobStatus.SKIPPED);
         verify(news, never()).classifyPending();
+        verify(news, never()).summarizePortfolios();
     }
 
     @Test

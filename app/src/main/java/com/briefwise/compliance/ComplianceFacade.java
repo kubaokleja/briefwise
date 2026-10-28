@@ -1,22 +1,27 @@
 package com.briefwise.compliance;
 
+import com.briefwise.compliance.domain.model.ComplianceResult;
+import com.briefwise.compliance.domain.model.Passage;
 import com.briefwise.compliance.domain.model.ScreeningResult;
 import com.briefwise.compliance.domain.port.ContentScreening;
+import com.briefwise.compliance.domain.port.TextCheck;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 /**
- * The only class other contexts may import from {@code compliance}. Planned next: checkText (M1 slice 7 / M4).
- * Methods are added with the milestone that implements them (DESIGN 6.2); no logic here, delegate only.
+ * The only class other contexts may import from {@code compliance}. Methods are added with the milestone that
+ * implements them (DESIGN 6.2); no logic here, delegate only.
  */
 @Component
 public class ComplianceFacade {
 
     private final ContentScreening screening;
+    private final TextCheck textCheck;
 
-    ComplianceFacade(ContentScreening screening) {
+    ComplianceFacade(ContentScreening screening, TextCheck textCheck) {
         this.screening = screening;
+        this.textCheck = textCheck;
     }
 
     /**
@@ -31,5 +36,42 @@ public class ComplianceFacade {
         return new ScreeningView(result.suspected(), result.matchedRules());
     }
 
+    /**
+     * Checks a generated text against the compliance rules checked in code (DESIGN 11, ADR 0017): no
+     * recommendations, no forecasts or promises, at least one citation per passage, the fixed disclaimer present.
+     * Deterministic patterns only in M1; paraphrases can pass.
+     */
+    public ComplianceResultView checkText(TextCheckRequest request) {
+        ComplianceResult result = textCheck.check(
+                request.passages().stream().map(p -> new Passage(p.text(), p.citations())).toList(),
+                request.fullText());
+        return new ComplianceResultView(result.passed(), result.violations().stream()
+                .map(v -> new ViolationView(v.rule().name(), v.offendingText(), v.explanation()))
+                .toList());
+    }
+
+    /** The fixed disclaimer, appended in code to every AI text shown to an RM. */
+    public String disclaimer() {
+        return textCheck.disclaimer();
+    }
+
     public record ScreeningView(boolean suspected, List<String> matchedRules) {}
+
+    /**
+     * @param passages the factual passages (e.g. summary points) with their citation counts
+     * @param fullText the whole text as shown, including the disclaimer
+     */
+    public record TextCheckRequest(List<PassageView> passages, String fullText) {
+
+        public TextCheckRequest {
+            passages = List.copyOf(passages);
+        }
+    }
+
+    public record PassageView(String text, int citations) {}
+
+    /** {@code rule} is a {@code RuleId} name, e.g. {@code NO_RECOMMENDATION}. */
+    public record ViolationView(String rule, String offendingText, String explanation) {}
+
+    public record ComplianceResultView(boolean passed, List<ViolationView> violations) {}
 }

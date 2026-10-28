@@ -182,10 +182,84 @@
         },
         "tags" : [ "portfolio-controller" ]
       }
+    },
+    "/api/portfolios/{portfolioId}/news/relevant" : {
+      "get" : {
+        "operationId" : "relevant",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "portfolioId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/RelevantNewsResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "portfolio-news-controller" ]
+      }
+    },
+    "/api/portfolios/{portfolioId}/news/summary" : {
+      "get" : {
+        "operationId" : "summary",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "portfolioId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SummaryResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "portfolio-news-controller" ]
+      }
     }
   },
   "components" : {
     "schemas" : {
+      "CitationResponse" : {
+        "type" : "object",
+        "properties" : {
+          "excerpt" : {
+            "type" : "string"
+          },
+          "locator" : {
+            "type" : "string"
+          },
+          "sourceId" : {
+            "type" : "string"
+          },
+          "type" : {
+            "type" : "string"
+          }
+        }
+      },
       "DailyMoveResponse" : {
         "type" : "object",
         "properties" : {
@@ -259,6 +333,20 @@
           }
         }
       },
+      "PointResponse" : {
+        "type" : "object",
+        "properties" : {
+          "citations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CitationResponse"
+            }
+          },
+          "text" : {
+            "type" : "string"
+          }
+        }
+      },
       "PortfolioResponse" : {
         "type" : "object",
         "properties" : {
@@ -311,6 +399,107 @@
           "volume" : {
             "type" : "integer",
             "format" : "int64"
+          }
+        }
+      },
+      "RelevantNewsResponse" : {
+        "type" : "object",
+        "properties" : {
+          "eventType" : {
+            "type" : "string"
+          },
+          "headline" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "publishedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "rationale" : {
+            "type" : "string"
+          },
+          "relevance" : {
+            "type" : "string"
+          },
+          "sentiment" : {
+            "type" : "string"
+          },
+          "source" : {
+            "type" : "string"
+          },
+          "tickers" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "url" : {
+            "type" : "string"
+          },
+          "weight" : {
+            "type" : "number"
+          }
+        }
+      },
+      "SummaryResponse" : {
+        "type" : "object",
+        "properties" : {
+          "aiGenerated" : {
+            "type" : "boolean"
+          },
+          "disclaimer" : {
+            "type" : "string"
+          },
+          "empty" : {
+            "type" : "boolean"
+          },
+          "fallback" : {
+            "type" : "boolean"
+          },
+          "generatedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "model" : {
+            "type" : "string"
+          },
+          "points" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PointResponse"
+            }
+          },
+          "portfolioId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "promptVersion" : {
+            "type" : "string"
+          },
+          "summaryDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "violations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ViolationResponse"
+            }
+          }
+        }
+      },
+      "ViolationResponse" : {
+        "type" : "object",
+        "properties" : {
+          "offendingText" : {
+            "type" : "string"
+          },
+          "rule" : {
+            "type" : "string"
           }
         }
       }
