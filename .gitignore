@@ -85,3 +85,6 @@ Desktop.ini
 
 # Hand-labelling exports: Finnhub headlines, personal-use licence (evals/labelling/README.md)
 evals/labelling/*.csv
+
+# Clear-text golden set (Finnhub text); only the gpg-encrypted copy is committed (ADR 0018)
+evals/sentiment_golden.csv

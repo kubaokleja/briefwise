@@ -30,3 +30,9 @@ briefwise:
       relay-enabled: false    # tests call NewsFacade.publishPending() themselves
     kafka:
       retry-backoff: 10ms
+    eval:                     # classification eval: synthetic fixture, reports under target/, fast polling
+      golden-path: src/test/resources/eval/golden-fixture.csv
+      results-dir: target/eval-results
+      batch:
+        poll-interval: 10ms
+        max-wait: 2s

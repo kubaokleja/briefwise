@@ -1,5 +1,6 @@
 package com.briefwise.aiops.domain.model;
 
+import com.briefwise.shared.domain.model.PricingTier;
 import com.briefwise.shared.domain.model.TokenCount;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -7,7 +8,7 @@ import java.util.Objects;
 
 /**
  * List price of one model in USD per million tokens. Input, output, cache-write and cache-read tokens are priced
- * separately (prompt caching, ADR 0012).
+ * separately (prompt caching, ADR 0012). A Message Batch request costs half of each ({@link PricingTier#BATCH}).
  */
 public record ModelPrice(BigDecimal inputUsdPerMTok, BigDecimal outputUsdPerMTok, BigDecimal cacheWriteUsdPerMTok,
                          BigDecimal cacheReadUsdPerMTok) {
@@ -18,6 +19,9 @@ public record ModelPrice(BigDecimal inputUsdPerMTok, BigDecimal outputUsdPerMTok
     /** Anthropic's standard multipliers on the input price: 5-minute cache write 1.25x, cache read 0.1x. */
     static final BigDecimal STANDARD_CACHE_WRITE_FACTOR = new BigDecimal("1.25");
     static final BigDecimal STANDARD_CACHE_READ_FACTOR = new BigDecimal("0.1");
+
+    /** Anthropic's Message Batches discount: 50% of every token price, stacking with the cache multipliers. */
+    static final BigDecimal BATCH_FACTOR = new BigDecimal("0.5");
 
     private static final BigDecimal ONE_MILLION = BigDecimal.valueOf(1_000_000);
 
@@ -46,10 +50,16 @@ public record ModelPrice(BigDecimal inputUsdPerMTok, BigDecimal outputUsdPerMTok
     }
 
     public BigDecimal costOf(TokenCount tokens) {
+        return costOf(tokens, PricingTier.STANDARD);
+    }
+
+    public BigDecimal costOf(TokenCount tokens, PricingTier tier) {
         BigDecimal input = inputUsdPerMTok.multiply(BigDecimal.valueOf(tokens.promptTokens()));
         BigDecimal output = outputUsdPerMTok.multiply(BigDecimal.valueOf(tokens.completionTokens()));
         BigDecimal cacheWrite = cacheWriteUsdPerMTok.multiply(BigDecimal.valueOf(tokens.cacheWriteTokens()));
         BigDecimal cacheRead = cacheReadUsdPerMTok.multiply(BigDecimal.valueOf(tokens.cacheReadTokens()));
-        return input.add(output).add(cacheWrite).add(cacheRead).divide(ONE_MILLION, COST_SCALE, RoundingMode.HALF_UP);
+        BigDecimal listPrice = input.add(output).add(cacheWrite).add(cacheRead);
+        BigDecimal billed = tier == PricingTier.BATCH ? listPrice.multiply(BATCH_FACTOR) : listPrice;
+        return billed.divide(ONE_MILLION, COST_SCALE, RoundingMode.HALF_UP);
     }
 }

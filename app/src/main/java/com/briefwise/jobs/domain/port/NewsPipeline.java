@@ -1,5 +1,6 @@
 package com.briefwise.jobs.domain.port;
 
+import com.briefwise.jobs.domain.model.EvalResult;
 import com.briefwise.jobs.domain.model.PublishResult;
 import java.util.Map;
 
@@ -17,4 +18,7 @@ public interface NewsPipeline {
 
     /** Counts per outcome and {@code stoppedOnDeferral}. */
     Map<String, Object> summarizePortfolios();
+
+    /** @throws IllegalStateException if the golden set is missing or malformed */
+    EvalResult evaluateClassification();
 }

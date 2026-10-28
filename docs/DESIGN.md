@@ -409,7 +409,7 @@ Evaluations are the backbone of the project and the main talking point in interv
 
 | Area | Dataset | Metrics | CI threshold (start) |
 |---|---|---|---|
-| News classification | `evals/sentiment_golden.csv` (258 golden rows: random + stratified company sample, see [ADR 0010](decisions/0010-golden-set-labelling.md)) | Macro F1, confusion matrix, cost per 1,000 | F1 drops by no more than 3 pp |
+| News classification | `evals/sentiment_golden.csv` (258 golden rows: random + stratified company sample, see [ADR 0010](decisions/0010-golden-set-labelling.md); committed only gpg-encrypted, [ADR 0018](decisions/0018-classification-eval.md)) | Macro F1, confusion matrix, cost per 1,000 for sentiment, relevance and event type, on all and on random rows | Sentiment macro F1 drops by no more than 3 pp vs `baseline.json` |
 | RAG | `evals/rag_golden.json` (40–50 questions + expected sources) | recall@5, faithfulness, citation correctness | recall@5 ≥ agreed baseline |
 | Brief | `evals/brief_cases/` (15–20 scenarios) | Task success, coverage of relevant events, compliance violations, **number grounding** | 0 ungrounded numbers |
 | Agent | Same scenarios | Trajectory correctness (right tools), step count, cost, latency | Trajectory ≥ 90% |
@@ -587,7 +587,7 @@ Prices checked 2026-10-16; re-check before relying on them.
 | News classification (Haiku 5.5: $0.10 / $0.50 per MTok) | ~150 items/day after the gate, ~1.2k input + 200 output tokens, 22 weekdays | < 1 USD |
 | Daily portfolio summary (Haiku 5.5) | ≤ 1 call per portfolio per run past the gate, ~1k input + 200 output tokens, 3 portfolios (ADR 0017) | < 0.1 USD |
 | Briefs (Sonnet 5.5: $2 / $10 per MTok) | ~10k input + 2k output per brief, 5 portfolios, ~10 runs/month on demand | ~2 USD |
-| Evals | Sentiment eval ~600 calls per run on Haiku, via Batch API | < 0.5 USD per run |
+| Evals | Classification eval 258 calls per run on Haiku 5.5, one Message Batch (half price); feature `news-classification-eval`, 0.50 USD/day, worst-case pre-flight estimate ([ADR 0018](decisions/0018-classification-eval.md)) | ~0.02 USD per run (< 0.5) |
 | Embeddings | Ollama locally | 0 |
 | Database | Neon free tier | 0 |
 | CI and daily pipeline | GitHub Actions free minutes (check current limits for private repos) | 0 |
@@ -618,7 +618,7 @@ Neon free tier: 100 CU-hours of compute per project per month, 0.5 GB storage pe
 | Workflow | Trigger | What it does |
 |---|---|---|
 | `ci.yml` | Every PR and push to `main` | Build, unit tests, ArchUnit, Testcontainers (Postgres + Kafka), deterministic evals, Python lint and tests for `quant/`, UI lint, typecheck, API types up to date, unit tests and build for `ui/` |
-| `evals.yml` | `workflow_dispatch` + path filter `prompts/**`, `evals/**` | LLM evals via Batch API; posts the results table as a PR comment; thresholds from section 10 block the merge |
+| `evals.yml` | `workflow_dispatch` + path filter `prompts/**`, `evals/**` (not `evals/results/**`) | LLM evals via Batch API (job `news-classification-eval`, profiles `job,eval`, golden set decrypted with `EVAL_DATA_PASSPHRASE`); posts the results table as a PR comment; thresholds from section 10 fail the check |
 | `morning-pipeline.yml` | Cron on weekdays (UTC) + `workflow_dispatch`; schedule active only if repo variable `PIPELINE_ENABLED == 'true'` | Quant batch → news ingest + classification → risk alerts, against Neon; Kafka as a service container |
 | `release.yml` | Tag `v*` | Build the app image, publish to GHCR, attach the jar and release notes |
 | Dependabot | Weekly | Maven/Gradle, npm, pip/uv, GitHub Actions |
@@ -693,7 +693,7 @@ Principles:
 | MCP | Spring AI MCP server (Streamable HTTP) |
 | Quant | Python 3.12+, uv, pandas, arch, scikit-learn, LightGBM, MLflow |
 | Frontend | React + TypeScript + Vite + Tailwind + Recharts + Zustand; types generated from OpenAPI (springdoc + openapi-typescript); Vitest + Testing Library, Playwright smoke ([ADR 0007](decisions/0007-ui-delivery-strategy.md)) |
-| Evals | JUnit (deterministic) + promptfoo (LLM, red-team) |
+| Evals | JUnit (deterministic) + Java batch runner in `app/` (LLM classification eval, ADR 0018) + promptfoo (red-team, M5) |
 | Observability | Micrometer / OpenTelemetry → Langfuse Cloud |
 | CI/CD | GitHub Actions (CI, evals with thresholds, morning pipeline, releases to GHCR), Dependabot |
 | Runtime | GitHub Actions + Neon; local Docker Compose |
@@ -721,7 +721,7 @@ briefwise/
 ├── quant/                      # Python: volatility models, batch, portfolio generator
 ├── research/                   # Notebooks (F0, F4)
 ├── prompts/                    # Versioned prompt templates
-├── evals/                      # Golden datasets, promptfoo configs, replay fixtures, reports
+├── evals/                      # Golden datasets (encrypted), labelling, replay fixtures, results/, promptfoo (M5)
 ├── .github/workflows/          # ci, evals, morning-pipeline, release
 ├── .claude/
 │   ├── skills/                 # Claude Code skills

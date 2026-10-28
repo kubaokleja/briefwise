@@ -1,5 +1,6 @@
 package com.briefwise.jobs.application;
 
+import com.briefwise.jobs.domain.model.EvalResult;
 import com.briefwise.jobs.domain.model.JobName;
 import com.briefwise.jobs.domain.model.JobRun;
 import com.briefwise.jobs.domain.model.JobStatus;
@@ -30,6 +31,8 @@ import org.springframework.stereotype.Service;
  * <p>
  * {@code news-ingest}: ingest → publish until no outbox row is pending → (runner only) wait until the consumer lag
  * is 0 → sweep → summarize (portfolio summaries, ADR 0017). {@code news-classify}: sweep.
+ * {@code news-classification-eval}: evaluate (ADR 0018); the step fails unless the eval passed its gate, so the job
+ * runner exits 1 and the {@code evals.yml} check goes red.
  */
 @Service
 class JobService implements Jobs {
@@ -54,6 +57,7 @@ class JobService implements Jobs {
         List<JobStep> steps = switch (job) {
             case NEWS_INGEST -> newsIngest(trigger, deadline);
             case NEWS_CLASSIFY -> List.of(step("sweep", news::classifyPending));
+            case NEWS_CLASSIFICATION_EVAL -> List.of(evaluate());
         };
         JobRun run = new JobRun(job, trigger, steps, startedAt, clock.instant());
         log.info("Job {} {} in {} ms: {}", job.id(), run.status(),
@@ -92,6 +96,20 @@ class JobService implements Jobs {
                     Optional.of("summary deferred (budget used up or no model); previous summaries stay"));
         }
         return step;
+    }
+
+    /**
+     * Only a pass succeeds: a regression, a refused batch (budget, leakage) and an unfinished batch all fail, because
+     * an eval that did not measure must not look like a green check.
+     */
+    private JobStep evaluate() {
+        try {
+            EvalResult result = news.evaluateClassification();
+            return new JobStep("evaluate", result.passed() ? JobStatus.SUCCEEDED : JobStatus.FAILED,
+                    result.figures(), Optional.of(result.message()));
+        } catch (RuntimeException e) {
+            return failed("evaluate", e);
+        }
     }
 
     /**

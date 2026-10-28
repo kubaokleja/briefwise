@@ -151,13 +151,30 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
   `string`; mark them nullable in the spec (or handle `null` in the UI)
 
 ### Slice 8 — Classification eval
-- [ ] Decide E1 metric scope (sentiment only vs + relevance / event type), E2 harness (promptfoo vs Java runner vs Python + Anthropic SDK; Batch API support)
-- [ ] Human spot-check of the 22 `ANALYST` relabels (`evals/labelling/README.md`)
-- [ ] `evals/sentiment_golden.csv` from the 258 golden rows in `evals/labelling/`; few-shot examples never from the golden set; report per class and on `sample=random` rows alone; event types: accuracy + per-class counts or a longer ingest for rare classes (E1)
-- [ ] Runner via Message Batches API; macro F1, confusion matrix, cost per 1,000 items; optional Alpha Vantage baseline
-- [ ] `.github/workflows/evals.yml` (`workflow_dispatch` + `prompts/**`, `evals/**`); results table as PR comment
-- [ ] ADR: classification model choice from the eval (L2)
-- [ ] Skill `new-eval-case`
+- [x] Decide E1, E2, golden-set publication, matrix -> [ADR 0018](decisions/0018-classification-eval.md) (all three
+  labels reported on all + random rows, only sentiment macro F1 gated at -3 pp vs `baseline.json`; Java batch runner
+  reusing the production prompt; golden set committed only gpg-encrypted; first run Haiku 5.5 as is)
+- [x] Human spot-check of the 22 `ANALYST` relabels (14 golden accepted, 14/14; `evals/labelling/README.md`)
+- [x] `evals/labelling/build_golden.py` -> `evals/sentiment_golden.csv` (258 golden rows, mojibake repaired, label and
+  few-shot leakage checks); `evals/scripts/{encrypt,decrypt}-golden.sh`; export command fixed for UTF-8
+- [ ] Encrypt and commit `evals/sentiment_golden.csv.gpg` (you: choose the passphrase, secret `EVAL_DATA_PASSPHRASE`)
+- [x] Domain: `GoldenCase`, `EvalLabels`, `EvalPrediction`, `ConfusionMatrix`, `ClassMetrics`, `LabelScores`,
+  `EvalScores`, `EvalReport`, `EvalBaseline`, `RegressionGate`, `BatchOutcome`, `EvalRun`; ports `GoldenSet`,
+  `BatchClassifier`, `EvalReports`, `ClassificationEvals`; `ClassificationEvalService`; `NewsFacade.evaluateClassification`
+- [x] `AnthropicBatchClassifier` (Message Batches via the SDK, same request shape as production, leakage + worst-case
+  budget pre-flight, polling, per-result log and usage), `NoBatchClassifier`, `EvalBatchConfig`; `CsvGoldenSet`,
+  `FileEvalReports` + `EvalMarkdown`; `PricingTier.BATCH` in aiops; budget `news-classification-eval` 0.50 USD/day
+- [x] `jobs`: `news-classification-eval` (step `evaluate`, fails unless `PASSED`); `application-eval.yml`; `docs/api.http`
+- [x] Tests: `LabelScoresTest`, `RegressionGateTest`, `EvalReportTest`, `ModelPriceTest` (+1),
+  `ClassificationEvalServiceTest`, `CsvGoldenSetTest`, `FileEvalReportsTest`, `JobServiceTest` (+3);
+  `AnthropicBatchClassifierIT` (WireMock), `NewsEvalFacadeIT`
+- [x] `.github/workflows/evals.yml` (`workflow_dispatch` + `prompts/**`, `evals/**`; decrypt, run, PR comment, artifact)
+- [ ] First live run (you, ~0.02 USD; `evals/results/news-classification/README.md`), commit `latest.json` as
+  `baseline.json`
+- [ ] ADR: classification model choice from the eval (L2), from the first run's numbers
+- [x] Skill `new-eval-case`
+- [ ] You: optionally make `classification-eval` a required check (path-filtered: required checks stay pending on PRs
+  that do not trigger it)
 
 ### Slice 9 — UI: News
 - [ ] react-router 8.4.0 (ADR 0007); router + nav in `AppShell`
@@ -166,8 +183,6 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [ ] "Run news now" button -> admin endpoint; 429 state
 
 ### Slice 10 — UI: Portfolio v0 and Dashboard v0
-- [ ] Portfolio v0: positions, daily move, daily AI summary with AI marker
-- [ ] Dashboard v0: portfolio tiles (daily performance, relevant news count)
 - [ ] OpenAPI spec + generated types updated; `ui-verify` green
 
 ## Backlog (one line each)
@@ -190,6 +205,7 @@ every screen has loading, empty and error states. Contingency cut order (nothing
   - [ ] UI: "suspected injection, content withheld" state + test; UI section in `SECURITY.md` (XSS rule, cookie auth)
 - [ ] **M6 (F7)** Hardened pipeline, eval gating in CI, observability, demo video
   - [ ] `ai_generation_log` retention ([DESIGN 13.6](DESIGN.md#136-storage-retention)): full text 30 days, then hash + metrics only
+  - [ ] Classification eval matrix (ADR 0018 backlog): Sonnet 5.5 comparison, Haiku without few-shot, Alpha Vantage baseline
   - [ ] UI: Admin (run now per job, token usage vs budget, cost summary + chart), last pipeline run on Dashboard, multi-stage Dockerfile serving the UI from Spring + `demo` Compose profile, Playwright in CI against `demo`, light mode, Evals screen
 - [ ] **Production-readiness review (after M6, before calling the project done)** Briefwise is a one-person learning
   and portfolio project (GitHub Actions + Neon, <= 5 CHF/month, synthetic data). Write a full analysis (an ADR plus
@@ -221,7 +237,7 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-10-18 | Approve is blocked while compliance violations are open (ADR 0007). Should an RM be able to override with a written justification (common in banks; needs its own audit trail)? | Open (decide at M4) |
 | 2026-10-19 | What is `Relevance` relative to: the ticker's materiality in general, or a specific portfolio (weight, mandate)? Decides whether classification is per item or per portfolio | Decided: per holder of the ticker, weighting in code ([ADR 0014](decisions/0014-classification-output-shape.md)) |
 | 2026-10-19 | ETFs (6 of 36 instruments) likely have no company news on Finnhub. Do held ETFs get news (e.g. via top holdings or macro news), or none? | None for now ([ADR 0009](decisions/0009-news-dedup-and-etf-news.md)); strategy (general news as `MACRO` first) to decide at M4 |
-| 2026-10-21 | Finnhub licence forbids redistributing data "or derived results". May the hand-labelled golden set (real headlines) be committed once the repo is public, or only IDs/hashes plus labels, or synthetic headlines? Exports are git-ignored until then | Open (decide before slice 8 / before the repo goes public) |
+| 2026-10-21 | Finnhub licence forbids redistributing data "or derived results". May the hand-labelled golden set (real headlines) be committed once the repo is public, or only IDs/hashes plus labels, or synthetic headlines? Exports are git-ignored until then | Decided: committed only gpg-encrypted, results hold metrics only ([ADR 0018](decisions/0018-classification-eval.md)) |
 | 2026-10-21 | A near-duplicate is linked to one ticker's original. If its URL is later fetched for a second ticker it stays `SKIPPED` even though the original may not concern that ticker. Acceptable? | Open (check on the labelled sample) |
 | 2026-10-23 | Same-event duplicates (e.g. "KFC switches from Pepsi to Coke" vs "KFC plans a massive soda change") score 0.09–0.49 on headline trigram similarity, far below 0.6. Trigram dedup only catches re-syndication. Do we need semantic (embedding) dedup, and where: ingest or classification? | Open (revisit D1 after the eval; 7 labelled pairs in `evals/labelling/`) |
 | 2026-10-23 | `EventType` has no value for analyst rating / price-target changes (~20 labelled rows) or customer contracts (KFC/Coke). Add `ANALYST` and `CONTRACT`, or keep them in `OTHER`? | Decided: `ANALYST` added, contracts `PRODUCT`; 22 rows relabelled ([ADR 0014](decisions/0014-classification-output-shape.md)) |

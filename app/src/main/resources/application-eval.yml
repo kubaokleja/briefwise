@@ -1,0 +1,15 @@
+# Classification eval (DESIGN 10, ADR 0018). Combine with `job`: SPRING_PROFILES_ACTIVE=job,eval and
+# --briefwise.job=news-classification-eval, run from the repo root (relative eval paths). Needs a Postgres for Flyway,
+# the generation log and the eval budget (a throwaway one in evals.yml) and ANTHROPIC_API_KEY. No Kafka: nothing is
+# published or consumed.
+spring:
+  kafka:
+    admin:
+      auto-create: false      # no broker in this run; topics are not needed
+
+briefwise:
+  news:
+    kafka:
+      consumer-enabled: false
+    outbox:
+      relay-enabled: false

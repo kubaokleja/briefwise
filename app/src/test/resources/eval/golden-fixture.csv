@@ -1,0 +1,8 @@
+id,sample,tickers,source,headline,summary,sentiment,relevance,event_type
+0b5c6a51-0001-4000-8000-000000000001,random,AAPL,Example Wire,Apple beats quarterly revenue estimates,"iPhone sales rose 8%, ahead of forecasts.",POSITIVE,HIGH,EARNINGS
+0b5c6a51-0002-4000-8000-000000000002,random,MSFT,Example Daily,3 Stocks to Watch This Week,"A ""watch list"" of large caps.",NEUTRAL,LOW,OTHER
+0b5c6a51-0003-4000-8000-000000000003,company,JNJ,Example Legal News,Johnson & Johnson faces new talc lawsuit,"Plaintiffs filed in Missouri.
+A second suit is expected.",NEGATIVE,HIGH,LITIGATION
+0b5c6a51-0004-4000-8000-000000000004,company,KO PEP,Example Wire,Coca-Cola and PepsiCo raise prices,Both cite input costs.,NEUTRAL,MEDIUM,PRODUCT
+0b5c6a51-0005-4000-8000-000000000005,random,XOM,Example Wire,Oil prices slip on demand worries,,NEUTRAL,LOW,MACRO
+0b5c6a51-0006-4000-8000-000000000006,company,JPM,Example Wire,Analyst lifts JPMorgan price target,Target raised to $380.,POSITIVE,MEDIUM,ANALYST

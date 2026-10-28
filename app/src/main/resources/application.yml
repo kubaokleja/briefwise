@@ -75,6 +75,8 @@ briefwise:
       cron: "0 */15 7-22 * * MON-FRI"
     news-classify:
       enabled: true
+    news-classification-eval:  # never scheduled: evals.yml (job runner) or "run now"; disabled would exit 0 = green
+      enabled: true
     risk-alerts:
       enabled: true
     brief:
@@ -121,6 +123,15 @@ briefwise:
       max-attempts: 2        # first call + one re-ask after invalid output; the compliance re-ask is separate
       max-points: 5
       max-summary-chars: 300 # per item in the prompt
+    eval:                    # classification eval against the golden set (DESIGN 10, ADR 0018); paths from the repo root
+      golden-path: evals/sentiment_golden.csv            # decrypted by evals/scripts/decrypt-golden.sh, git-ignored
+      results-dir: evals/results/news-classification     # latest.json + latest.md written, baseline.json read
+      max-drop-points: 3.0   # gate: sentiment macro F1 at most 3 pp below the baseline
+      batch:                 # Message Batches API: half price, asynchronous; model/max-tokens/effort as classification
+        feature: news-classification-eval
+        poll-interval: 30s
+        max-wait: 60m        # then the run fails (INCOMPLETE) and logs the batch id
+        request-timeout: 60s
     finnhub:                 # free tier: personal use only, about 60 calls/min, 30/s hard cap (checked 2026-10-21)
       base-url: https://finnhub.io/api/v1
       api-key: ${FINNHUB_API_KEY:}
@@ -139,6 +150,7 @@ briefwise:
     daily-budget-usd:
       news-classification: 0.10
       news-summary: 0.05     # ~0.001 per call on Haiku 5.5
+      news-classification-eval: 0.50   # DESIGN 13: < 0.5 USD per run; 258 items on Haiku 5.5 at batch price ~0.02
   cors:
     allowed-origins:
       - http://localhost:5173

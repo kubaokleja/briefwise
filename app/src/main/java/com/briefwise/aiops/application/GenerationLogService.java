@@ -4,6 +4,7 @@ import com.briefwise.aiops.domain.model.NewGeneration;
 import com.briefwise.aiops.domain.model.PriceList;
 import com.briefwise.aiops.domain.port.GenerationLog;
 import com.briefwise.aiops.domain.port.GenerationRepository;
+import com.briefwise.shared.domain.model.PricingTier;
 import com.briefwise.shared.infrastructure.web.CorrelationIdFilter;
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -23,8 +24,8 @@ class GenerationLogService implements GenerationLog {
     }
 
     @Override
-    public UUID record(NewGeneration generation) {
-        BigDecimal cost = prices.priceOf(generation.model()).costOf(generation.tokens());
+    public UUID record(NewGeneration generation, PricingTier tier) {
+        BigDecimal cost = prices.priceOf(generation.model()).costOf(generation.tokens(), tier);
         Optional<String> correlationId = Optional.ofNullable(MDC.get(CorrelationIdFilter.MDC_KEY));
         return generations.save(generation, cost, correlationId);
     }
