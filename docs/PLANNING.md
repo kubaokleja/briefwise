@@ -68,7 +68,7 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] Flyway: `ai_generation_log` (prompt, response, model, `prompt_version`, tokens, cost, latency, correlation ID) (V7), daily usage per feature (V8 `ai_daily_usage`)
 - [x] Model pricing in `application.yml` (`briefwise.aiops.pricing`, Haiku 5.5 + Sonnet 5.5); cost per call (`ModelPrice`)
 - [x] `AiopsFacade.recordGeneration`, `ensureBudgetAvailable` (added, ADR 0008), `checkAndRecordUsage` (daily budget per feature, B1), `getCostSummary`
-- [x] `UsageLimitExceededException` -> HTTP 429 ProblemDetail (job step marked skipped: slice 6)
+- [x] `UsageLimitExceededException` -> HTTP 429 ProblemDetail; job step marked `SKIPPED` (slice 6)
 - [x] Unit tests + facade `*IT`; no aiops endpoint until the M6 Admin UI, so no `api.http`
 
 ### Slice 2 — News domain, Finnhub ingest, dedup
@@ -109,13 +109,14 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] Skill `llm-adapter` (pattern now implemented once)
 
 ### Slice 6 — Inbound adapters and daily pipeline
-- [ ] `jobs` context: `POST /api/admin/jobs/{job}/run`; `docs/api.http` (happy path, 404 unknown job, 400)
-- [ ] Scheduler only when `briefwise.execution.mode=scheduled`, guarded by `jobs.<name>.enabled`
-- [ ] Job runner (`job` profile, `--briefwise.job=news-ingest`): exits when consumer lag is 0 or after `max-duration`
-- [ ] Neon project + `NEON_DATABASE_URL` secret (you); run the `job` and `cloud` profiles for the first time
-- [ ] `.github/workflows/morning-pipeline.yml`: news ingest + classification, Kafka service container, gated by `PIPELINE_ENABLED`
-- [ ] Sweep of old `RECEIVED` items (e.g. DLT'd or never delivered): decide age threshold, trigger (job step vs `classifyPending`), retry cap so a poison item is not swept forever; facade method + IT
-- [ ] `NewsFacade.classifyPending` (batch over `RECEIVED` items, moved from slice 4); decide whether `UNCLASSIFIED` `PROVIDER_ERROR` items are retried too
+- [x] Decide sweep shape, PROVIDER_ERROR retry, done condition, timeout exit code, admin auth before M4 -> [ADR 0016](decisions/0016-jobs-sweep-and-job-runner.md) (sweep = `classifyPending`, min-age 10m, batch 200, cap 3 -> `RETRIES_EXHAUSTED`, stop at first deferral; PROVIDER_ERROR reopened within 48h; Kafka consumer lag via `Admin`; exit 0/1/2; endpoint open until M4)
+- [x] `jobs` context: `JobsFacade.run`, `JobService` (steps ingest -> publish -> drain -> sweep), `POST /api/admin/jobs/{job}/run`; `docs/api.http` (happy path, 404 unknown job, 400 malformed id)
+- [x] Scheduler only when `briefwise.execution.mode=scheduled`, guarded by `jobs.<name>.enabled`
+- [x] Job runner (`--briefwise.job=news-ingest`): waits for consumer lag 0 or `briefwise.job-runner.max-duration` (15m); exit code via `ExitCodeGenerator` + `BriefwiseApplication`; relay scheduler off in `job`
+- [ ] Neon project + secrets `NEON_JDBC_URL`, `NEON_DB_USER`, `NEON_DB_PASSWORD`, `ANTHROPIC_API_KEY`, `FINNHUB_API_KEY` + variable `PIPELINE_ENABLED` (you); run `cloud,job` locally once against Neon
+- [x] `.github/workflows/morning-pipeline.yml`: news ingest + classification, Kafka service container, gated by `PIPELINE_ENABLED` (first `workflow_dispatch` after merge to `master`)
+- [x] Sweep of old `RECEIVED` items: Flyway V14 (`sweep_attempts`, `RETRIES_EXHAUSTED`, partial indexes); `NewsSweepService`; repository + Kafka ITs (DLT'd item swept)
+- [x] `NewsFacade.classifyPending`, `consumerLag`; stopgap `NewsStartupIngest` removed (labelling README uses the admin endpoint)
 
 ### Slice 7 — Daily portfolio summary
 - [ ] Decide S1 model, trigger (pipeline vs on demand), M1 `compliance.checkText` scope -> ADR
@@ -157,6 +158,7 @@ every screen has loading, empty and error states. Contingency cut order (nothing
 - [ ] **M3 (F4)** Volatility/VaR forecast, risk alerts, backtest, MLflow
   - [ ] UI: forecast vs realised volatility chart (Recharts), VaR with model name/version, alerts list, alert count on Dashboard, position heatmap; mapper unit tests
 - [ ] **M4 (F5)** Morning brief, approval workflow, MCP server, trajectory eval
+  - [ ] Role `ADMIN` on `POST /api/admin/jobs/{job}/run` (open until login exists, ADR 0016)
   - [ ] UI: Login (httpOnly cookie + CSRF), route guard, role-based nav, 401/403 states; Brief screen (SSE progress, sections + citations, violations, edit, Approve disabled while violations open, Reject with reason, `isFallback` banner, change history); briefs awaiting approval on Dashboard; Playwright smoke (local); reassess server-state library
 - [ ] **M5 (F6)** Red-team, guardrails, MODEL_CARD / AI_RISK_ASSESSMENT / SECURITY
   - [ ] UI: "suspected injection, content withheld" state + test; UI section in `SECURITY.md` (XSS rule, cookie auth)
@@ -198,11 +200,13 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-10-23 | Same-event duplicates (e.g. "KFC switches from Pepsi to Coke" vs "KFC plans a massive soda change") score 0.09–0.49 on headline trigram similarity, far below 0.6. Trigram dedup only catches re-syndication. Do we need semantic (embedding) dedup, and where: ingest or classification? | Open (revisit D1 after the eval; 7 labelled pairs in `evals/labelling/`) |
 | 2026-10-23 | `EventType` has no value for analyst rating / price-target changes (~20 labelled rows) or customer contracts (KFC/Coke). Add `ANALYST` and `CONTRACT`, or keep them in `OTHER`? | Decided: `ANALYST` added, contracts `PRODUCT`; 22 rows relabelled ([ADR 0014](decisions/0014-classification-output-shape.md)) |
 | 2026-10-23 | Relevance is labelled per ticker ("would an RM whose client holds it want to see it?"), multi-ticker items once for the most affected ticker. Does the classifier output per ticker or per item? | Decided: per item + affected tickers ([ADR 0014](decisions/0014-classification-output-shape.md)) |
-| 2026-10-24 | An item whose message ends in `news.raw.DLT` stays `RECEIVED` with its outbox row published, so nothing re-sends it. Who picks it up: a sweep of old `RECEIVED` items (e.g. in `classifyPending` or the job runner), a DLT replay tool, or both? | Sweep (2026-10-24, DESIGN 7.1); age threshold, trigger and retry cap decided in slice 6 |
+| 2026-10-24 | An item whose message ends in `news.raw.DLT` stays `RECEIVED` with its outbox row published, so nothing re-sends it. Who picks it up: a sweep of old `RECEIVED` items (e.g. in `classifyPending` or the job runner), a DLT replay tool, or both? | Decided: sweep in `classifyPending`, min-age 10m, cap 3 ([ADR 0016](decisions/0016-jobs-sweep-and-job-runner.md)) |
 | 2026-10-24 | `NewsIngested` carries the first-fetched `ticker` (Kafka key, K2); DESIGN 6.4 sketches `NewsIngested(newsId, occurredAt)`. Update the DESIGN sketch? | Done: DESIGN 6.4 updated (2026-10-24) |
 | 2026-10-21 | Should `ai_generation_log` reference the business object it was generated for (e.g. `newsId`, `briefId`)? Today only feature + correlation ID link a call to its input; an audit ("which call produced this classification?") may need a direct reference | Decided: nullable `subject_id` ([ADR 0014](decisions/0014-classification-output-shape.md)) |
 | 2026-10-27 | The demo has no news (no Finnhub key). Seed it from `evals/replay/synthetic_news.sql` with matching replay fixtures, and where: a demo-only seed at startup or the M6 demo Compose profile? | Open (decide at M6, or earlier if the demo is shown) |
-| 2026-10-24 | A provider outage turns every item of that run into `UNCLASSIFIED` (`PROVIDER_ERROR`) for good. Should the sweep retry those too (with a cap), or is a visible but unlabelled item acceptable? | Open (decide in slice 6 with the sweep) |
+| 2026-10-28 | `sweep_attempts` counts every sweep pick, also a budget deferral (at most one per run). Over several budget-starved days a healthy item could reach `RETRIES_EXHAUSTED`. Count only failed attempts instead, or is the bound acceptable? | Open (watch the first weeks of pipeline runs) |
+| 2026-10-28 | Should a stale `RECEIVED` item (e.g. several days old after a long outage) still be classified, or skipped as no longer relevant for the morning brief? | Open (decide with slice 7 / M4 brief inputs) |
+| 2026-10-24 | A provider outage turns every item of that run into `UNCLASSIFIED` (`PROVIDER_ERROR`) for good. Should the sweep retry those too (with a cap), or is a visible but unlabelled item acceptable? | Decided: retried by the sweep within 48h, same cap ([ADR 0016](decisions/0016-jobs-sweep-and-job-runner.md)) |
 
 ## Open questions from DESIGN
 

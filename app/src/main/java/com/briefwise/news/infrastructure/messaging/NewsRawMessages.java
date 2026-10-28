@@ -16,6 +16,7 @@ class NewsRawMessages {
     static final String TOPIC = "news.raw";
     static final String DEAD_LETTER_TOPIC = "news.raw.DLT";
     static final String CORRELATION_HEADER = "X-Correlation-ID";
+    static final String CONSUMER_GROUP = "briefwise-news";
 
     /** {@code messageId} is the outbox row id: the same for every re-send of one row. */
     record NewsRawMessage(UUID messageId, UUID newsId, Instant occurredAt) {}

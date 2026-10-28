@@ -15,14 +15,14 @@ import org.springframework.validation.annotation.Validated;
  * {@code briefwise.news.*}. {@code ingest.lookback-days}: each run asks for today and that many UTC days before
  * (overlap is absorbed by the URL hash). {@code dedup}: the near-duplicate rule (D1, ADR 0009). {@code outbox}: the
  * polling relay (ADR 0011); {@code relay-enabled} and {@code poll-interval} are read by the relay scheduler.
+ * {@code sweep}: which stuck {@code RECEIVED} items {@code classifyPending} picks up (ADR 0016).
  */
 @Validated
 @ConfigurationProperties("briefwise.news")
 record NewsProperties(@Valid @DefaultValue Ingest ingest, @Valid @DefaultValue Dedup dedup,
-                      @Valid @DefaultValue Outbox outbox) {
+                      @Valid @DefaultValue Outbox outbox, @Valid @DefaultValue Sweep sweep) {
 
-    record Ingest(@DefaultValue("2") @PositiveOrZero int lookbackDays,
-                  @DefaultValue("false") boolean onStartup) {}
+    record Ingest(@DefaultValue("2") @PositiveOrZero int lookbackDays) {}
 
     record Dedup(@DefaultValue("0.6") @DecimalMin(value = "0", inclusive = false) @DecimalMax("1")
                  double headlineSimilarity,
@@ -31,4 +31,9 @@ record NewsProperties(@Valid @DefaultValue Ingest ingest, @Valid @DefaultValue D
     record Outbox(@DefaultValue("true") boolean relayEnabled,
                   @DefaultValue("5s") @NotNull Duration pollInterval,
                   @DefaultValue("100") @Positive int batchSize) {}
+
+    record Sweep(@DefaultValue("10m") @NotNull Duration minAge,
+                 @DefaultValue("200") @Positive int batchSize,
+                 @DefaultValue("3") @Positive int maxAttempts,
+                 @DefaultValue("48h") @NotNull Duration providerErrorRetryWindow) {}
 }

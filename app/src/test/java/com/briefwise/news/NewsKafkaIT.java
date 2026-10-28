@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import com.briefwise.AbstractIntegrationTest;
+import com.briefwise.news.NewsFacade.ClassifyPendingView;
 import com.briefwise.news.NewsFacade.PublishSummaryView;
 import com.briefwise.news.domain.model.EventType;
 import com.briefwise.news.domain.model.ClassifierResult;
@@ -30,7 +31,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 /**
  * {@code news.raw} end to end on a real broker (Testcontainers Kafka): outbox relay, idempotent consumer (K3),
- * retries and the dead-letter topic (ADR 0011). The classifier is the recording fake; no LLM is involved.
+ * retries and the dead-letter topic (ADR 0011), consumer lag and the sweep of a dead-lettered item (ADR 0016). The
+ * classifier is the recording fake; no LLM is involved.
  */
 class NewsKafkaIT extends AbstractIntegrationTest {
 
@@ -187,5 +189,37 @@ class NewsKafkaIT extends AbstractIntegrationTest {
         ConsumerRecord<Object, Object> dead = awaitRecord("news.raw.DLT",
                 r -> String.valueOf(r.value()).contains(unknown.toString()));
         assertThat(header(dead, "kafka_dlt-exception-cause-fqcn")).endsWith("NewsItemNotFoundException");
+    }
+
+    @Test
+    void consumer_lag_reaches_zero_once_every_message_is_consumed() throws Exception {
+        UUID newsId = storeReceived("Apple item for the lag check");
+
+        send(message(newsId));
+
+        await().atMost(WAIT).until(() -> "CLASSIFIED".equals(status(newsId)));
+        await().atMost(WAIT).until(() -> facade.consumerLag() == 0);
+    }
+
+    @Test
+    void item_dead_lettered_by_the_consumer_is_classified_by_a_later_sweep() throws Exception {
+        UUID newsId = storeReceived("Apple item that fails on the first run");
+        classifier.answer(item -> {
+            throw new IllegalStateException("classifier failed");
+        });
+        send(message(newsId));
+        awaitRecord("news.raw.DLT", r -> String.valueOf(r.value()).contains(newsId.toString()));
+        assertThat(status(newsId)).isEqualTo("RECEIVED");
+
+        // Next run: the classifier works again and the item is older than the sweep's min-age.
+        classifier.answer(item -> new ClassifierResult.Classified(classification(item)));
+        jdbc.update("UPDATE news_items SET created_at = now() - interval '1 hour' WHERE id = ?", newsId);
+        ClassifyPendingView sweep = facade.classifyPending();
+
+        assertThat(sweep.picked()).isEqualTo(1);
+        assertThat(sweep.classified()).isEqualTo(1);
+        assertThat(status(newsId)).isEqualTo("CLASSIFIED");
+        assertThat(jdbc.queryForObject("SELECT sweep_attempts FROM news_items WHERE id = ?", Integer.class, newsId))
+                .isEqualTo(1);
     }
 }

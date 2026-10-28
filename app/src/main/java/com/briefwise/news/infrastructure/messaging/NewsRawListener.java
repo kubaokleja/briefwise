@@ -27,7 +27,7 @@ class NewsRawListener {
         this.messages = messages;
     }
 
-    @KafkaListener(topics = NewsRawMessages.TOPIC, groupId = "briefwise-news",
+    @KafkaListener(topics = NewsRawMessages.TOPIC, groupId = NewsRawMessages.CONSUMER_GROUP,
             containerFactory = NewsKafkaConfig.LISTENER_FACTORY,
             autoStartup = "${briefwise.news.kafka.consumer-enabled:true}")
     void onMessage(ConsumerRecord<String, String> record) {

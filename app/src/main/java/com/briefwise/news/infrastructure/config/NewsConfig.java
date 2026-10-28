@@ -3,10 +3,11 @@ package com.briefwise.news.infrastructure.config;
 import com.briefwise.news.domain.model.DedupPolicy;
 import com.briefwise.news.domain.model.IngestPolicy;
 import com.briefwise.news.domain.model.RelayPolicy;
+import com.briefwise.news.domain.model.SweepPolicy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** Turns {@code briefwise.news.*} into the domain policies the ingest and relay services use. */
+/** Turns {@code briefwise.news.*} into the domain policies the ingest, relay and sweep services use. */
 @Configuration(proxyBeanMethods = false)
 class NewsConfig {
 
@@ -19,5 +20,12 @@ class NewsConfig {
     @Bean
     RelayPolicy relayPolicy(NewsProperties properties) {
         return new RelayPolicy(properties.outbox().batchSize());
+    }
+
+    @Bean
+    SweepPolicy sweepPolicy(NewsProperties properties) {
+        NewsProperties.Sweep sweep = properties.sweep();
+        return new SweepPolicy(sweep.minAge(), sweep.batchSize(), sweep.maxAttempts(),
+                sweep.providerErrorRetryWindow());
     }
 }

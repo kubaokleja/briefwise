@@ -2,6 +2,7 @@ package com.briefwise.news.infrastructure.persistence;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -55,6 +56,35 @@ interface NewsItemJpaRepository extends JpaRepository<NewsItemEntity, UUID> {
             """)
     int markUnclassifiedFromReceived(@Param("newsId") UUID newsId, @Param("reason") String reason,
                                      @Param("at") Instant at);
+
+
+    @Query(nativeQuery = true, value = """
+            SELECT n.id FROM news_items n
+            WHERE n.status = 'RECEIVED' AND n.created_at < :createdBefore
+              AND NOT EXISTS (SELECT 1 FROM news_outbox o WHERE o.aggregate_id = n.id AND o.published_at IS NULL)
+            ORDER BY n.created_at, n.id
+            LIMIT :limit
+            """)
+    List<UUID> findSweepable(@Param("createdBefore") Instant createdBefore, @Param("limit") int limit);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            UPDATE news_items
+            SET status = 'RECEIVED', unclassified_reason = NULL, classified_at = NULL, updated_at = now()
+            WHERE status = 'UNCLASSIFIED' AND unclassified_reason = 'PROVIDER_ERROR'
+              AND created_at < :createdBefore AND classified_at >= :classifiedSince AND sweep_attempts < :maxAttempts
+            """)
+    int reopenProviderErrors(@Param("createdBefore") Instant createdBefore,
+                             @Param("classifiedSince") Instant classifiedSince, @Param("maxAttempts") int maxAttempts);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            UPDATE news_items SET sweep_attempts = sweep_attempts + 1, updated_at = now() WHERE id = :newsId
+            """)
+    int incrementSweepAttempts(@Param("newsId") UUID newsId);
+
+    @Query(nativeQuery = true, value = "SELECT sweep_attempts FROM news_items WHERE id = :newsId")
+    int findSweepAttempts(@Param("newsId") UUID newsId);
 
     /**
      * pg_trgm {@code similarity()} is computed per candidate; the candidates are already narrowed to one ticker and

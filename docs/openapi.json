@@ -8,6 +8,32 @@
     "url" : "/"
   } ],
   "paths" : {
+    "/api/admin/jobs/{job}/run" : {
+      "post" : {
+        "operationId" : "runJob",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "job",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/JobRunView"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "admin-job-controller" ]
+      }
+    },
     "/api/market/instruments/{ticker}/daily-move" : {
       "get" : {
         "operationId" : "dailyMove",
@@ -181,6 +207,55 @@
           },
           "ticker" : {
             "type" : "string"
+          }
+        }
+      },
+      "JobRunView" : {
+        "type" : "object",
+        "properties" : {
+          "endedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "job" : {
+            "type" : "string"
+          },
+          "startedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "SUCCEEDED", "SKIPPED", "FAILED", "TIMED_OUT" ]
+          },
+          "steps" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/JobStepView"
+            }
+          },
+          "trigger" : {
+            "type" : "string",
+            "enum" : [ "ADMIN", "SCHEDULER", "RUNNER" ]
+          }
+        }
+      },
+      "JobStepView" : {
+        "type" : "object",
+        "properties" : {
+          "message" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "result" : {
+            "type" : "object",
+            "additionalProperties" : { }
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "SUCCEEDED", "SKIPPED", "FAILED", "TIMED_OUT" ]
           }
         }
       },
