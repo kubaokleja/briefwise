@@ -3,11 +3,13 @@ package com.briefwise.news.infrastructure.persistence;
 import com.briefwise.news.domain.model.DedupPolicy;
 import com.briefwise.news.domain.model.NewsClassification;
 import com.briefwise.news.domain.model.NewsItem;
+import com.briefwise.news.domain.model.NewsItemNotFoundException;
 import com.briefwise.news.domain.model.UnclassifiedReason;
 import com.briefwise.news.domain.model.UrlHash;
 import com.briefwise.news.domain.port.NewsRepository;
 import com.briefwise.shared.domain.model.Ticker;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -79,5 +81,25 @@ class NewsRepositoryAdapter implements NewsRepository {
     @Transactional
     public boolean markUnclassifiedFromReceived(UUID newsId, UnclassifiedReason reason, Instant classifiedAt) {
         return items.markUnclassifiedFromReceived(newsId, reason.name(), classifiedAt) == 1;
+    }
+
+    @Override
+    public List<UUID> findSweepable(Instant createdBefore, int limit) {
+        return items.findSweepable(createdBefore, limit);
+    }
+
+    @Override
+    @Transactional
+    public int reopenProviderErrors(Instant createdBefore, Instant classifiedSince, int maxAttempts) {
+        return items.reopenProviderErrors(createdBefore, classifiedSince, maxAttempts);
+    }
+
+    @Override
+    @Transactional
+    public int incrementSweepAttempts(UUID newsId) {
+        if (items.incrementSweepAttempts(newsId) == 0) {
+            throw new NewsItemNotFoundException(newsId);
+        }
+        return items.findSweepAttempts(newsId);
     }
 }

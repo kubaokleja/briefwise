@@ -7,6 +7,7 @@ import com.briefwise.news.domain.model.UnclassifiedReason;
 import com.briefwise.news.domain.model.UrlHash;
 import com.briefwise.shared.domain.model.Ticker;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,4 +50,26 @@ public interface NewsRepository {
      * @return false if the item was no longer {@code RECEIVED}
      */
     boolean markUnclassifiedFromReceived(UUID newsId, UnclassifiedReason reason, Instant classifiedAt);
+
+    /**
+     * Ids of {@code RECEIVED} items created before {@code createdBefore} that have no unpublished outbox row (those
+     * belong to the relay), oldest first.
+     */
+    List<UUID> findSweepable(Instant createdBefore, int limit);
+
+    /**
+     * Puts {@code UNCLASSIFIED} {@code PROVIDER_ERROR} items back to {@code RECEIVED} (labels and reason cleared) if
+     * they were created before {@code createdBefore}, classified at or after {@code classifiedSince} and have fewer
+     * than {@code maxAttempts} sweep attempts.
+     *
+     * @return how many items were reopened
+     */
+    int reopenProviderErrors(Instant createdBefore, Instant classifiedSince, int maxAttempts);
+
+    /**
+     * Counts one sweep attempt.
+     *
+     * @return the attempts including this one
+     */
+    int incrementSweepAttempts(UUID newsId);
 }

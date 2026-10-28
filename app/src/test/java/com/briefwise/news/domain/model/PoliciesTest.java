@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-/** Small value objects of the news context: dedup and ingest policies, classification. */
+/** Small value objects of the news context: dedup, ingest and sweep policies, classification. */
 class PoliciesTest {
 
     private static final Duration WINDOW = Duration.ofHours(48);
@@ -41,5 +41,19 @@ class PoliciesTest {
                 tickers, " ", "v1")).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> new NewsClassification(Sentiment.POSITIVE, Relevance.HIGH, EventType.EARNINGS,
                 tickers, "beat estimates", "")).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void sweep_policy_needs_positive_counts_and_non_negative_durations() {
+        Duration tenMinutes = Duration.ofMinutes(10);
+        assertThatThrownBy(() -> new SweepPolicy(tenMinutes, 0, 3, WINDOW))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new SweepPolicy(tenMinutes, 200, 0, WINDOW))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new SweepPolicy(Duration.ofMinutes(-1), 200, 3, WINDOW))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new SweepPolicy(tenMinutes, 200, 3, null))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThat(new SweepPolicy(Duration.ZERO, 1, 1, Duration.ZERO).minAge()).isZero();
     }
 }

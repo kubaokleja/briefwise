@@ -4,6 +4,22 @@
  */
 
 export interface paths {
+    "/api/admin/jobs/{job}/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["runJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/market/instruments/{ticker}/daily-move": {
         parameters: {
             query?: never;
@@ -97,6 +113,27 @@ export interface components {
             previousClose: number;
             ticker: string;
         };
+        JobRunView: {
+            /** Format: date-time */
+            endedAt: string;
+            job: string;
+            /** Format: date-time */
+            startedAt: string;
+            /** @enum {string} */
+            status: "SUCCEEDED" | "SKIPPED" | "FAILED" | "TIMED_OUT";
+            steps: components["schemas"]["JobStepView"][];
+            /** @enum {string} */
+            trigger: "ADMIN" | "SCHEDULER" | "RUNNER";
+        };
+        JobStepView: {
+            message: string;
+            name: string;
+            result: {
+                [key: string]: unknown;
+            };
+            /** @enum {string} */
+            status: "SUCCEEDED" | "SKIPPED" | "FAILED" | "TIMED_OUT";
+        };
         PortfolioResponse: {
             /** Format: uuid */
             clientId: string;
@@ -127,6 +164,28 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    runJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["JobRunView"];
+                };
+            };
+        };
+    };
     dailyMove: {
         parameters: {
             query?: never;

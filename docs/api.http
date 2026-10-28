@@ -1,5 +1,5 @@
 ### Briefwise API: happy path, 404, 400 per context. Run the app (`local` profile) and use IntelliJ / VS Code REST Client.
-### These cases are verified automatically by PortfolioControllerIT and MarketControllerIT.
+### These cases are verified automatically by PortfolioControllerIT, MarketControllerIT and AdminJobControllerIT.
 @host = http://localhost:8080
 @corePortfolio = b0000000-0000-4000-8000-000000000002
 
@@ -41,6 +41,23 @@ GET {{host}}/api/market/instruments/AAPL/prices?from=2026-10-01
 
 ### 'from' after 'to' - 400
 GET {{host}}/api/market/instruments/AAPL/prices?from=2026-10-15&to=2026-10-01
+
+################################################################ jobs
+### "Run now" (DESIGN 13.2, ADR 0016). Synchronous; 200 with the run status even if a step failed. Open until M4.
+### news-ingest calls Finnhub and, through the consumer, the LLM (local: Ollama). news-classify is the sweep alone.
+
+### Sweep of stuck RECEIVED items - 200
+POST {{host}}/api/admin/jobs/news-classify/run
+X-Correlation-ID: manual-job-001
+
+### Ingest + publish + sweep - 200 (needs FINNHUB_API_KEY and Kafka)
+POST {{host}}/api/admin/jobs/news-ingest/run
+
+### Unknown job - 404
+POST {{host}}/api/admin/jobs/risk-alerts/run
+
+### Malformed job id - 400
+POST {{host}}/api/admin/jobs/News_Ingest/run
 
 ################################################################ ops
 

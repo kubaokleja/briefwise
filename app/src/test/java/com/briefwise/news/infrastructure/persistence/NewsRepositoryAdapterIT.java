@@ -9,6 +9,7 @@ import com.briefwise.news.domain.model.EventType;
 import com.briefwise.news.domain.model.FetchedNews;
 import com.briefwise.news.domain.model.NewsClassification;
 import com.briefwise.news.domain.model.NewsItem;
+import com.briefwise.news.domain.model.NewsItemNotFoundException;
 import com.briefwise.news.domain.model.NewsStatus;
 import com.briefwise.news.domain.model.Relevance;
 import com.briefwise.news.domain.model.Sentiment;
@@ -33,7 +34,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 /**
  * The near-duplicate query against real pg_trgm. Headline pairs and their similarity scores are the examples
  * used to choose D1 (ADR 0009): 0.6 within 48h, same ticker. Also the conditional status writes and the V12
- * classification columns and constraints.
+ * classification columns and constraints, and the sweep queries (V14, ADR 0016).
  */
 class NewsRepositoryAdapterIT extends AbstractIntegrationTest {
 
@@ -191,5 +192,81 @@ class NewsRepositoryAdapterIT extends AbstractIntegrationTest {
                 .isInstanceOf(DataIntegrityViolationException.class);
         assertThatThrownBy(() -> jdbc.update("UPDATE news_items SET status = 'UNCLASSIFIED' WHERE id = ?", id))
                 .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    // --- sweep (V14, ADR 0016). created_at is the database clock, so ages are set relative to now().
+
+    private UUID storeAged(Duration age) {
+        UUID id = store(AAPL, "Apple item " + UUID.randomUUID(), T0, Optional.empty());
+        jdbc.update("UPDATE news_items SET created_at = now() - ? * interval '1 second' WHERE id = ?",
+                age.toSeconds(), id);
+        return id;
+    }
+
+    private void outboxRow(UUID newsId, boolean published) {
+        jdbc.update("""
+                INSERT INTO news_outbox (id, aggregate_id, topic, message_key, payload, published_at)
+                VALUES (?, ?, 'news.raw', 'AAPL', '{}'::jsonb, CASE WHEN ? THEN now() END)""",
+                UUID.randomUUID(), newsId, published);
+    }
+
+    private Instant tenMinutesAgo() {
+        return jdbc.queryForObject("SELECT now() - interval '10 minutes'", Timestamp.class).toInstant();
+    }
+
+    @Test
+    void sweep_picks_old_received_items_with_a_published_or_no_outbox_row_oldest_first() {
+        UUID oldest = storeAged(Duration.ofHours(3));
+        outboxRow(oldest, true);
+        UUID noOutbox = storeAged(Duration.ofHours(2));
+        UUID stillPending = storeAged(Duration.ofHours(1));   // the relay's job, not the sweep's
+        outboxRow(stillPending, false);
+        UUID young = storeAged(Duration.ofMinutes(1));         // a consumer may still be working on it
+        outboxRow(young, true);
+        UUID classified = storeAged(Duration.ofHours(4));
+        repository.markUnclassifiedFromReceived(classified, UnclassifiedReason.INVALID_OUTPUT, T0);
+
+        assertThat(repository.findSweepable(tenMinutesAgo(), 10)).containsExactly(oldest, noOutbox);
+        assertThat(repository.findSweepable(tenMinutesAgo(), 1)).containsExactly(oldest);
+    }
+
+    private void unclassified(UUID id, UnclassifiedReason reason, Instant classifiedAt) {
+        repository.markUnclassifiedFromReceived(id, reason, classifiedAt);
+    }
+
+    @Test
+    void only_recent_provider_errors_under_the_cap_are_reopened() {
+        Instant now = jdbc.queryForObject("SELECT now()", Timestamp.class).toInstant();
+        UUID recent = storeAged(Duration.ofHours(1));
+        unclassified(recent, UnclassifiedReason.PROVIDER_ERROR, now.minus(Duration.ofHours(1)));
+        UUID stale = storeAged(Duration.ofDays(3));
+        unclassified(stale, UnclassifiedReason.PROVIDER_ERROR, now.minus(Duration.ofDays(3)));
+        UUID exhausted = storeAged(Duration.ofHours(1));
+        unclassified(exhausted, UnclassifiedReason.PROVIDER_ERROR, now.minus(Duration.ofHours(1)));
+        jdbc.update("UPDATE news_items SET sweep_attempts = 3 WHERE id = ?", exhausted);
+        UUID invalid = storeAged(Duration.ofHours(1));
+        unclassified(invalid, UnclassifiedReason.INVALID_OUTPUT, now.minus(Duration.ofHours(1)));
+
+        int reopened = repository.reopenProviderErrors(tenMinutesAgo(), now.minus(Duration.ofHours(48)), 3);
+
+        assertThat(reopened).isEqualTo(1);
+        Map<String, Object> row = jdbc.queryForMap("SELECT * FROM news_items WHERE id = ?", recent);
+        assertThat(row).containsEntry("status", "RECEIVED").containsEntry("unclassified_reason", null)
+                .containsEntry("classified_at", null);
+        assertThat(jdbc.queryForList("SELECT status FROM news_items WHERE id IN (?, ?, ?)", String.class,
+                stale, exhausted, invalid)).containsOnly("UNCLASSIFIED");
+    }
+
+    @Test
+    void sweep_attempts_are_counted_and_the_give_up_reason_is_allowed() {
+        UUID id = storeAged(Duration.ofHours(1));
+
+        assertThat(repository.incrementSweepAttempts(id)).isEqualTo(1);
+        assertThat(repository.incrementSweepAttempts(id)).isEqualTo(2);
+        assertThat(repository.markUnclassifiedFromReceived(id, UnclassifiedReason.RETRIES_EXHAUSTED, T0)).isTrue();
+        assertThat(jdbc.queryForObject("SELECT unclassified_reason FROM news_items WHERE id = ?", String.class, id))
+                .isEqualTo("RETRIES_EXHAUSTED");
+        assertThatThrownBy(() -> repository.incrementSweepAttempts(UUID.randomUUID()))
+                .isInstanceOf(NewsItemNotFoundException.class);
     }
 }

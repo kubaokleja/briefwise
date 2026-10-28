@@ -180,13 +180,14 @@ ArchUnit rules (checked on every build): domain purity, no access to another con
 |---|---|---|
 | `portfolio` | Synthetic clients, portfolios, positions, weights | `getPortfolio`, `listPortfolios`, `getHoldings` |
 | `market` | Instruments, price history, returns | `getPriceHistory`, `getDailyMove` |
-| `news` | News pipeline and classification | `ingest`, `classifyPending`, `getRelevantNews`, `summarizeForPortfolio` |
+| `news` | News pipeline and classification | `ingest`, `publishPending`, `processIngested`, `classifyPending`, `consumerLag`, `getRelevantNews`, `summarizeForPortfolio` |
 | `research` | RAG over filings | `ask`, `searchFilings`, `ingestFiling` |
 | `risk` | Forecasts and alerts | `getForecast`, `getAlerts`, `evaluateAlerts` |
 | `brief` | Brief and client commentary | `generateBrief`, `approve`, `reject`, `edit` |
 | `compliance` | Text and input validation | `checkText`, `screenUntrustedContent` |
 | `aiops` | AI observability, cost, token budgets, replay | `recordGeneration`, `ensureBudgetAvailable`, `checkAndRecordUsage`, `getCostSummary`, `findReplay`, `replay`, `isReplayed` |
 | `access` | Users, roles, login | `authenticate`, `getCurrentUser` |
+| `jobs` | Inbound adapters: admin endpoint, scheduler, job runner | `run` |
 
 ### 6.3 Domain model (sketch)
 
@@ -281,9 +282,9 @@ Trigger: admin "run now" endpoint | in-app scheduler | job runner (GitHub Action
   → HIGH relevance → input to the morning brief
 ```
 
-**Why the outbox:** in GitHub Actions Kafka lives only for the duration of the workflow run. Postgres is the source of truth: anything not yet consumed stays `RECEIVED` and the relay re-publishes pending outbox rows on the next run. Nothing is lost when the broker disappears. An item whose message ends in `news.raw.DLT` also stays `RECEIVED`; a sweep of old `RECEIVED` items picks it up again (shape decided in M1 slice 6). Relay, key and idempotency: [ADR 0011](decisions/0011-news-outbox-relay-key-and-idempotency.md).
+**Why the outbox:** in GitHub Actions Kafka lives only for the duration of the workflow run. Postgres is the source of truth: anything not yet consumed stays `RECEIVED` and the relay re-publishes pending outbox rows on the next run. Nothing is lost when the broker disappears. An item whose message ends in `news.raw.DLT` also stays `RECEIVED`; a sweep of old `RECEIVED` items (`classifyPending`) picks it up again, together with never-consumed and budget-deferred items and recent `PROVIDER_ERROR` items; after 3 sweep attempts an item ends `UNCLASSIFIED` (`RETRIES_EXHAUSTED`) ([ADR 0016](decisions/0016-jobs-sweep-and-job-runner.md)). Relay, key and idempotency: [ADR 0011](decisions/0011-news-outbox-relay-key-and-idempotency.md).
 
-**Job completion:** in job mode the runner publishes, consumes, and exits when consumer lag reaches 0 or after `max-duration`.
+**Job completion:** in job mode the runner publishes, consumes, and exits when consumer lag reaches 0 or after `max-duration`, then sweeps. Exit code 0 done, 1 a step failed or timed out, 2 unknown job ([ADR 0016](decisions/0016-jobs-sweep-and-job-runner.md)).
 
 ### 7.2 Morning pipeline and risk batch (M3)
 
@@ -540,7 +541,7 @@ class SchedulingConfig { /* @Scheduled methods call facades, guarded by jobs.<na
 
 | Adapter | When | Notes |
 |---|---|---|
-| Admin endpoint `POST /api/admin/jobs/{job}/run` | Always (role `ADMIN`) | On demand from UI or `api.http` |
+| Admin endpoint `POST /api/admin/jobs/{job}/run` | Always (role `ADMIN` from M4; open until login exists, ADR 0016) | On demand from UI or `api.http`; ignores `enabled` |
 | In-app scheduler | Only `mode=scheduled` | For an always-on host, if one is ever used |
 | Job runner (`job` profile) | GitHub Actions | `--briefwise.job=news-ingest`, runs and exits |
 
@@ -609,7 +610,7 @@ Neon free tier: 100 CU-hours of compute per project per month, 0.5 GB storage pe
 | `release.yml` | Tag `v*` | Build the app image, publish to GHCR, attach the jar and release notes |
 | Dependabot | Weekly | Maven/Gradle, npm, pip/uv, GitHub Actions |
 
-Rules: secrets only in GitHub Secrets (`ANTHROPIC_API_KEY`, `NEON_DATABASE_URL`, `FINNHUB_API_KEY`); workflows triggered from forks never receive secrets; failed pipeline runs notify by email (GitHub default). In public repositories scheduled workflows are disabled after 60 days without repository activity — keep that in mind after the project ends.
+Rules: secrets only in GitHub Secrets (`ANTHROPIC_API_KEY`, `NEON_JDBC_URL`, `NEON_DB_USER`, `NEON_DB_PASSWORD`, `FINNHUB_API_KEY`); workflows triggered from forks never receive secrets; failed pipeline runs notify by email (GitHub default). In public repositories scheduled workflows are disabled after 60 days without repository activity — keep that in mind after the project ends.
 
 ### 14.3 Demo
 1. **2–3 minute video** in the README (the main artefact for recruiters).

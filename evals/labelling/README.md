@@ -11,10 +11,17 @@ output exists for these items, so the model's answers cannot shape the labels.
    ```powershell
    $env:FINNHUB_API_KEY = "<your key>"
    cd app
-   ./mvnw spring-boot:run "-Dspring-boot.run.arguments=--briefwise.news.ingest.on-startup=true --briefwise.news.ingest.lookback-days=30"
+   ./mvnw spring-boot:run "-Dspring-boot.run.arguments=--briefwise.news.ingest.lookback-days=30 --briefwise.news.kafka.consumer-enabled=false"
    ```
 
-   Look for `Startup news ingest: N new, ...` in the log, then stop the app.
+   Then, in a second terminal, run the ingest job once (the consumer is off, so nothing is classified; without Kafka
+   the `publish` step reports `FAILED`, which is fine here):
+
+   ```powershell
+   Invoke-RestMethod -Method Post http://localhost:8080/api/admin/jobs/news-ingest/run | ConvertTo-Json -Depth 5
+   ```
+
+   Check `inserted` in the `ingest` step, then stop the app.
 3. Export (repo root):
 
    ```powershell

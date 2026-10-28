@@ -34,6 +34,64 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 12 — 2026-10-28 — M1 slice 6: inbound adapters, sweep and daily pipeline
+
+**Phase:** M1 / slice 6
+**Goal:** Trigger the news pipeline from an admin endpoint, the in-app scheduler and a job runner for GitHub Actions,
+and pick up items stuck in `RECEIVED` with a sweep.
+
+**Done**
+- Checked the kafka-clients 4.2.1 `Admin` API (`describeTopics`, `listConsumerGroupOffsets`, `listOffsets`) in the jar.
+- Flyway V14: `news_items.sweep_attempts`, reason `RETRIES_EXHAUSTED`, partial indexes for the sweep and for reopening
+  provider errors. `FlywayBaselineIT` 13 -> 14.
+- `news`: `SweepPolicy`, `SweepSummary`, ports `PendingClassification` (inbound) and `NewsConsumerLag` (outbound);
+  `NewsSweepService` (reopen recent `PROVIDER_ERROR` -> pick old `RECEIVED` without a pending outbox row -> count the
+  attempt -> give up above the cap or `process`; stop at the first deferral); `KafkaNewsConsumerLag`;
+  `NewsFacade.classifyPending`, `consumerLag`; `briefwise.news.sweep.*`. Stopgap `NewsStartupIngest` removed.
+- New `jobs` context: `JobName`, `JobRun`/`JobStep`/`JobStatus`/`JobTrigger`, `RunPolicy`; `JobService` (ingest ->
+  publish until nothing pending -> drain (runner only) -> sweep; failing steps recorded, budget -> `SKIPPED`, timeout
+  skips the sweep); `JobsFacade.run`; `FacadeNewsPipeline`; `AdminJobController`
+  (`POST /api/admin/jobs/{job}/run`); `SchedulingConfig` (`mode=scheduled` + `enabled`); `JobLauncher` (enabled flag,
+  correlation ID per run); `JobRunner` (`--briefwise.job`, exit 0/1/2 via `ExitCodeGenerator`, `BriefwiseApplication`
+  exits). `briefwise.job-runner.*`; relay scheduler off in `job`.
+- `.github/workflows/morning-pipeline.yml` (cron `30 4 * * 1-5` + dispatch, `PIPELINE_ENABLED`, Kafka service,
+  `cloud,job`, Neon secrets). `docs/api.http` jobs section; `docs/openapi.json` + `ui/src/api/schema.d.ts`
+  regenerated; labelling README uses the admin endpoint; DESIGN 6.2, 7.1, 13.2, 14.2 updated.
+- Tests: `NewsSweepServiceTest`, `JobServiceTest`, `JobModelTest`, `JobRunnerTest`, `JobLauncherTest`, `PoliciesTest`
+  (+1); `NewsRepositoryAdapterIT` (+3 sweep queries), `NewsKafkaIT` (+lag reaches 0, DLT'd item swept),
+  `JobsFacadeIT` (runner end to end over Kafka), `AdminJobControllerIT` (200/404/400). `./mvnw verify`: 222 unit +
+  91 IT green; UI lint, typecheck, tests green.
+
+**Decisions** ([ADR 0016](decisions/0016-jobs-sweep-and-job-runner.md))
+- Sweep = `classifyPending` (min-age 10m, batch 200, cap 3 -> `RETRIES_EXHAUSTED`, stop at first deferral);
+  `PROVIDER_ERROR` retried within 48h; done = Kafka consumer lag 0; timeout exits 1; admin endpoint open until M4;
+  Neon secrets as in `application-cloud.yml`.
+- `JobsFacade` added (the plan said "only if needed"): controllers in this codebase call their own context's facade.
+
+**AI concepts introduced / explained**
+- Consumer lag (end offset minus committed offset) as the "done" signal of a batch job on a short-lived broker.
+- Reconciliation sweep vs DLT replay: Postgres as the source of truth repairs whatever the message path lost.
+- Retry caps against poison items; stopping on a deferral because the LLM budget is per feature and day.
+- Exit codes as the contract between a job and CI (GitHub emails on a non-zero exit).
+
+**Domain questions added** (also in PLANNING)
+- Does counting budget deferrals as sweep attempts risk giving up on healthy items?
+- Should stale `RECEIVED` items still be classified?
+
+**Open questions / blockers**
+- Neon project and GitHub Secrets/variable are yours; then run `cloud,job` locally once and dispatch the workflow
+  after the branch is merged (`workflow_dispatch` needs the file on `master`).
+- The slice 5 recording run is still open.
+- The workflow has not run yet; first run may need fixes (Neon JDBC URL with `sslmode=require`).
+
+**Next session**
+- Neon setup + first pipeline run (yours), then M1 slice 7: daily portfolio summary (decide S1 first).
+
+**Proposed commit message**
+> feat(jobs): run the news pipeline from an admin endpoint, scheduler and job runner, and sweep stuck items
+
+---
+
 ## Session 11 — 2026-10-27 — M1 slice 5: replay provider
 
 **Phase:** M1 / slice 5

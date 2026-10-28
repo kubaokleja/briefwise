@@ -10,3 +10,6 @@ spring:
 briefwise:
   llm:
     provider: anthropic
+  news:
+    outbox:
+      relay-enabled: false    # the runner publishes itself, then waits for consumer lag 0 (ADR 0016)

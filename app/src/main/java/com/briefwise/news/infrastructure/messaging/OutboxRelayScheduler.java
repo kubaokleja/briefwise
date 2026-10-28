@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 /**
  * Runs the outbox relay every {@code briefwise.news.outbox.poll-interval} while
  * {@code briefwise.news.outbox.relay-enabled=true}. Not a business job (it moves already stored rows), so it is not
- * gated by {@code briefwise.execution.mode}; the job runner (M1 slice 6) calls {@link NewsFacade#publishPending()}
+ * gated by {@code briefwise.execution.mode}; the job runner calls {@link NewsFacade#publishPending()}
  * itself. Off in {@code test}, where tests call the facade.
  */
 @Configuration(proxyBeanMethods = false)

@@ -66,7 +66,10 @@ springdoc:
 briefwise:
   execution:
     mode: on-demand          # on-demand | scheduled
-  jobs:
+  job-runner:                # --briefwise.job=<id> runs one job and exits (ADR 0016)
+    max-duration: 15m        # then exit 1; leftovers stay RECEIVED / pending for the next run
+    lag-poll-interval: 2s
+  jobs:                      # enabled: scheduler and job runner only; "run now" always works
     news-ingest:
       enabled: true
       cron: "0 */15 7-22 * * MON-FRI"
@@ -83,7 +86,6 @@ briefwise:
   news:
     ingest:
       lookback-days: 2       # today + 2 UTC days back; overlap with the last run is dropped by URL hash
-      on-startup: false      # stopgap trigger until the admin endpoint / job runner (M1 slice 6)
     dedup:                   # near-duplicate headline (D1, ADR 0009): same ticker, within window, similarity >=
       headline-similarity: 0.6
       window: 48h
@@ -97,6 +99,11 @@ briefwise:
       retry-backoff: 1s
       send-timeout: 15s      # relay wait for one broker ack
       consumer-enabled: true
+    sweep:                   # classifyPending: items stuck in RECEIVED (ADR 0016)
+      min-age: 10m           # never races the relay or a consumer still at work
+      batch-size: 200        # oldest first; the run stops at the first deferral (budget used up)
+      max-attempts: 3        # then UNCLASSIFIED (RETRIES_EXHAUSTED)
+      provider-error-retry-window: 48h   # PROVIDER_ERROR items this recent are reopened and retried
     classification:          # LLM call per item (ADR 0012); model: spring.ai.<provider>.chat.model
       feature: news-classification
       max-tokens: 1024       # adaptive thinking + ~100 tokens of JSON

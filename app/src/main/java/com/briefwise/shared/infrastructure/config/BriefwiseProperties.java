@@ -8,8 +8,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Typed {@code briefwise.*} configuration (DESIGN 13.2). Configuration only: nothing reads
- * {@code jobs} or {@code llm} yet; the news, aiops and jobs contexts will.
+ * Typed {@code briefwise.*} configuration (DESIGN 13.2). {@code jobs} is read by the scheduler and the job runner
+ * ({@code enabled}, {@code cron}); the admin endpoint ignores {@code enabled}.
  */
 @Validated
 @ConfigurationProperties("briefwise")
