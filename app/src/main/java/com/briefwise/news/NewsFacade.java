@@ -1,13 +1,18 @@
 package com.briefwise.news;
 
 import com.briefwise.news.domain.model.ClassifiedNews;
+import com.briefwise.news.domain.model.EvalBaseline;
+import com.briefwise.news.domain.model.EvalReport;
+import com.briefwise.news.domain.model.EvalRun;
 import com.briefwise.news.domain.model.IngestSummary;
 import com.briefwise.news.domain.model.NewsItemNotFoundException;
 import com.briefwise.news.domain.model.PortfolioSummary;
+import com.briefwise.news.domain.model.RegressionGate.GateResult;
 import com.briefwise.news.domain.model.RelaySummary;
 import com.briefwise.news.domain.model.RelevantNews;
 import com.briefwise.news.domain.model.SummaryRun;
 import com.briefwise.news.domain.model.SweepSummary;
+import com.briefwise.news.domain.port.ClassificationEvals;
 import com.briefwise.news.domain.port.NewsConsumerLag;
 import com.briefwise.news.domain.port.NewsIngest;
 import com.briefwise.news.domain.port.NewsProcessing;
@@ -40,9 +45,11 @@ public class NewsFacade {
     private final NewsConsumerLag consumerLag;
     private final RelevantNewsQuery relevantNews;
     private final PortfolioSummaries summaries;
+    private final ClassificationEvals evals;
 
     NewsFacade(NewsIngest ingest, OutboxRelay relay, NewsProcessing processing, PendingClassification pending,
-               NewsConsumerLag consumerLag, RelevantNewsQuery relevantNews, PortfolioSummaries summaries) {
+               NewsConsumerLag consumerLag, RelevantNewsQuery relevantNews, PortfolioSummaries summaries,
+               ClassificationEvals evals) {
         this.ingest = ingest;
         this.relay = relay;
         this.processing = processing;
@@ -50,6 +57,7 @@ public class NewsFacade {
         this.consumerLag = consumerLag;
         this.relevantNews = relevantNews;
         this.summaries = summaries;
+        this.evals = evals;
     }
 
     /**
@@ -145,6 +153,22 @@ public class NewsFacade {
         return summaries.latest(portfolioId).map(NewsFacade::toView);
     }
 
+    /**
+     * Classification eval (DESIGN 10, ADR 0018): the golden set in one Message Batch with the production prompt,
+     * scores written to the report, then the regression gate on sentiment macro F1. Only {@code PASSED} is a pass.
+     *
+     * @throws IllegalStateException if the golden set is missing (not decrypted) or malformed
+     */
+    public ClassificationEvalView evaluateClassification() {
+        EvalRun run = evals.evaluate();
+        Optional<EvalReport> report = run.report();
+        return new ClassificationEvalView(EvalStatusView.valueOf(run.status().name()), run.message(),
+                report.map(EvalReport::cases).orElse(0), report.map(EvalReport::invalid).orElse(0),
+                report.map(r -> r.all().sentiment().macroF1()),
+                run.gate().flatMap(GateResult::baseline).map(EvalBaseline::sentimentMacroF1),
+                report.map(EvalReport::costUsd), report.map(EvalReport::batchId));
+    }
+
     private static RelevantNewsView toView(RelevantNews r) {
         ClassifiedNews n = r.news();
         return new RelevantNewsView(n.id(), n.headline(), n.url(), n.source(), n.publishedAt(),
@@ -205,4 +229,17 @@ public class NewsFacade {
     public record SummaryPointView(String text, List<Citation> citations) {}
 
     public record SummaryViolationView(String rule, String offendingText) {}
+
+    /** See {@link EvalRun}: only {@code PASSED} is a pass. */
+    public enum EvalStatusView { PASSED, REGRESSED, REFUSED, INCOMPLETE }
+
+    /** Scores are empty when nothing was measured (refused or incomplete batch). */
+    public record ClassificationEvalView(EvalStatusView status, String message, int cases, int invalid,
+                                         Optional<Double> sentimentMacroF1, Optional<Double> baselineSentimentMacroF1,
+                                         Optional<BigDecimal> costUsd, Optional<String> batchId) {
+
+        public boolean passed() {
+            return status == EvalStatusView.PASSED;
+        }
+    }
 }

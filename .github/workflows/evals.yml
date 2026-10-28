@@ -1,0 +1,117 @@
+name: Evals
+
+# DESIGN 10 / 14.2, ADR 0018: the news classification eval through the Message Batches API (half price,
+# asynchronous). Runs on demand and on PRs that change prompts/** or evals/**; never on every push (cost rule).
+# The golden set holds Finnhub text that may not be published, so only its gpg copy is committed and it is decrypted
+# here. The job's exit code is the gate: sentiment macro F1 at most 3 pp below
+# evals/results/news-classification/baseline.json (no baseline yet: passes and says so).
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'prompts/**'
+      - 'evals/**'
+      - '!evals/results/**'   # committing a new baseline is not a reason to pay for another run
+
+permissions:
+  contents: read
+  pull-requests: write   # the results comment
+
+# A submitted batch is paid for, so a newer push waits instead of cancelling it.
+concurrency:
+  group: evals-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  classification-eval:
+    name: classification-eval
+    runs-on: ubuntu-latest
+    # briefwise.news.eval.batch.max-wait is 60m; the build and startup take a few minutes.
+    timeout-minutes: 75
+
+    services:
+      # Throwaway database for Flyway, the generation log and the eval budget; same image as docker-compose.yml.
+      postgres:
+        image: pgvector/pgvector:0.8.7-pg16
+        env:
+          POSTGRES_DB: briefwise
+          POSTGRES_USER: briefwise
+          POSTGRES_PASSWORD: briefwise
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U briefwise -d briefwise"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Fork PRs get no secrets: say so and skip instead of failing (the eval then has not run for that PR).
+      - name: Check secrets
+        id: secrets
+        env:
+          EVAL_DATA_PASSPHRASE: ${{ secrets.EVAL_DATA_PASSPHRASE }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$EVAL_DATA_PASSPHRASE" ] || [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::notice::EVAL_DATA_PASSPHRASE or ANTHROPIC_API_KEY is not available; the eval was skipped."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-java@v6
+        if: steps.secrets.outputs.run == 'true'
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+          cache-dependency-path: app/pom.xml
+
+      - name: Decrypt the golden set
+        if: steps.secrets.outputs.run == 'true'
+        env:
+          EVAL_DATA_PASSPHRASE: ${{ secrets.EVAL_DATA_PASSPHRASE }}
+        run: bash evals/scripts/decrypt-golden.sh
+
+      - name: Build the app
+        if: steps.secrets.outputs.run == 'true'
+        working-directory: app
+        run: ./mvnw --batch-mode --no-transfer-progress -DskipTests package
+
+      # From the repo root: the eval paths (golden set, results) are relative to it.
+      # Exit code 0 passed, 1 regressed / refused (budget, leakage) / batch unfinished, 2 unknown job.
+      - name: Classification eval
+        if: steps.secrets.outputs.run == 'true'
+        env:
+          SPRING_PROFILES_ACTIVE: job,eval
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: java -jar app/target/briefwise-app-*.jar --briefwise.job=news-classification-eval
+
+      - name: Results summary
+        if: always() && hashFiles('evals/results/news-classification/latest.md') != ''
+        run: cat evals/results/news-classification/latest.md >> "$GITHUB_STEP_SUMMARY"
+
+      # One comment per PR, updated on every run.
+      - name: Comment on the PR
+        if: always() && github.event_name == 'pull_request' && hashFiles('evals/results/news-classification/latest.md') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh pr comment "${{ github.event.pull_request.number }}"
+          --body-file evals/results/news-classification/latest.md --edit-last --create-if-none
+
+      # Metrics only (no news text). Commit latest.json as baseline.json when a run should become the reference.
+      - name: Upload the results
+        if: always() && hashFiles('evals/results/news-classification/latest.json') != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: classification-eval
+          path: |
+            evals/results/news-classification/latest.json
+            evals/results/news-classification/latest.md
+          retention-days: 30
+
+      - name: Remove the clear-text golden set
+        if: always()
+        run: rm -f evals/sentiment_golden.csv

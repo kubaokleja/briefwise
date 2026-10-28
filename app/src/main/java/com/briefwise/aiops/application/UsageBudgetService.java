@@ -7,6 +7,7 @@ import com.briefwise.aiops.domain.model.DailyUsage;
 import com.briefwise.aiops.domain.model.PriceList;
 import com.briefwise.aiops.domain.port.DailyUsageRepository;
 import com.briefwise.aiops.domain.port.UsageBudget;
+import com.briefwise.shared.domain.model.PricingTier;
 import com.briefwise.shared.domain.model.TokenCount;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -38,11 +39,16 @@ class UsageBudgetService implements UsageBudget {
     }
 
     @Override
-    public BudgetStatus recordUsage(String feature, String model, TokenCount tokens) {
+    public BudgetStatus recordUsage(String feature, String model, TokenCount tokens, PricingTier tier) {
         BigDecimal limit = budgets.limitFor(feature);
-        BigDecimal cost = prices.priceOf(model).costOf(tokens);
+        BigDecimal cost = costOf(model, tokens, tier);
         DailyUsage totals = usage.add(today(), feature, tokens, cost);
         return new BudgetStatus(feature, totals.date(), totals.costUsd(), limit);
+    }
+
+    @Override
+    public BigDecimal costOf(String model, TokenCount tokens, PricingTier tier) {
+        return prices.priceOf(model).costOf(tokens, tier);
     }
 
     @Override

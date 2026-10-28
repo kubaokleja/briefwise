@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.briefwise.jobs.domain.model.EvalResult;
 import com.briefwise.jobs.domain.model.JobName;
 import com.briefwise.jobs.domain.model.JobRun;
 import com.briefwise.jobs.domain.model.JobStatus;
@@ -172,6 +173,39 @@ class JobServiceTest {
         JobRun run = service.run(JobName.NEWS_CLASSIFY, JobTrigger.RUNNER);
 
         assertThat(run.status()).isEqualTo(JobStatus.SKIPPED);
+    }
+
+    @Test
+    void a_passing_eval_succeeds_and_reports_its_figures() {
+        when(news.evaluateClassification()).thenReturn(new EvalResult(true, "no baseline yet",
+                Map.of("status", "PASSED", "sentimentMacroF1", 0.71)));
+
+        JobRun run = service.run(JobName.NEWS_CLASSIFICATION_EVAL, JobTrigger.RUNNER);
+
+        assertThat(run.status()).isEqualTo(JobStatus.SUCCEEDED);
+        assertThat(run.steps()).extracting(JobStep::name).containsExactly("evaluate");
+        assertThat(step(run, "evaluate").result()).containsEntry("sentimentMacroF1", 0.71);
+        verify(news, never()).ingest();
+    }
+
+    @Test
+    void a_regressed_refused_or_unfinished_eval_fails_the_run() {
+        when(news.evaluateClassification()).thenReturn(new EvalResult(false, "budget used up",
+                Map.of("status", "REFUSED")));
+
+        JobRun run = service.run(JobName.NEWS_CLASSIFICATION_EVAL, JobTrigger.RUNNER);
+
+        assertThat(run.status()).isEqualTo(JobStatus.FAILED);
+        assertThat(step(run, "evaluate").message()).contains("budget used up");
+    }
+
+    @Test
+    void a_missing_golden_set_fails_the_run() {
+        when(news.evaluateClassification()).thenThrow(new IllegalStateException("No golden set"));
+
+        JobRun run = service.run(JobName.NEWS_CLASSIFICATION_EVAL, JobTrigger.RUNNER);
+
+        assertThat(run.status()).isEqualTo(JobStatus.FAILED);
     }
 
     /** A clock the test moves forward, so a timeout needs no real waiting. */

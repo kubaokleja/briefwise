@@ -13,6 +13,7 @@ import com.briefwise.aiops.domain.model.NewGeneration;
 import com.briefwise.aiops.domain.model.PriceList;
 import com.briefwise.aiops.domain.model.UnpricedModelException;
 import com.briefwise.aiops.domain.port.GenerationRepository;
+import com.briefwise.shared.domain.model.PricingTier;
 import com.briefwise.shared.domain.model.TokenCount;
 import com.briefwise.shared.infrastructure.web.CorrelationIdFilter;
 import java.math.BigDecimal;
@@ -47,7 +48,7 @@ class GenerationLogServiceTest {
         NewGeneration generation = generation("claude-haiku-5-5");
         when(repository.save(any(), any(), any())).thenReturn(id);
 
-        assertThat(service.record(generation)).isEqualTo(id);
+        assertThat(service.record(generation, PricingTier.STANDARD)).isEqualTo(id);
         verify(repository).save(generation, new BigDecimal("0.00022000"), Optional.of("corr-1"));
     }
 
@@ -55,14 +56,14 @@ class GenerationLogServiceTest {
     void no_correlation_id_outside_a_request_or_job() {
         NewGeneration generation = generation("claude-haiku-5-5");
 
-        service.record(generation);
+        service.record(generation, PricingTier.STANDARD);
 
         verify(repository).save(generation, new BigDecimal("0.00022000"), Optional.empty());
     }
 
     @Test
     void unpriced_model_is_not_stored() {
-        assertThatThrownBy(() -> service.record(generation("other-model")))
+        assertThatThrownBy(() -> service.record(generation("other-model"), PricingTier.STANDARD))
                 .isInstanceOf(UnpricedModelException.class);
         verifyNoInteractions(repository);
     }

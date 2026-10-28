@@ -1,8 +1,10 @@
 package com.briefwise.jobs.infrastructure.news;
 
+import com.briefwise.jobs.domain.model.EvalResult;
 import com.briefwise.jobs.domain.model.PublishResult;
 import com.briefwise.jobs.domain.port.NewsPipeline;
 import com.briefwise.news.NewsFacade;
+import com.briefwise.news.NewsFacade.ClassificationEvalView;
 import com.briefwise.news.NewsFacade.ClassifyPendingView;
 import com.briefwise.news.NewsFacade.IngestSummaryView;
 import com.briefwise.news.NewsFacade.PublishSummaryView;
@@ -78,6 +80,20 @@ class FacadeNewsPipeline implements NewsPipeline {
         result.put("failed", s.failed());
         result.put("stoppedOnDeferral", s.stoppedOnDeferral());
         return result;
+    }
+
+    @Override
+    public EvalResult evaluateClassification() {
+        ClassificationEvalView e = news.evaluateClassification();
+        Map<String, Object> figures = new LinkedHashMap<>();
+        figures.put("status", e.status().name());
+        figures.put("cases", e.cases());
+        figures.put("invalid", e.invalid());
+        e.sentimentMacroF1().ifPresent(f1 -> figures.put("sentimentMacroF1", f1));
+        e.baselineSentimentMacroF1().ifPresent(f1 -> figures.put("baselineSentimentMacroF1", f1));
+        e.costUsd().ifPresent(cost -> figures.put("costUsd", cost));
+        e.batchId().ifPresent(id -> figures.put("batchId", id));
+        return new EvalResult(e.passed(), e.message(), figures);
     }
 
     private static List<String> symbols(List<Ticker> tickers) {

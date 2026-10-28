@@ -8,6 +8,7 @@ import com.briefwise.aiops.domain.model.ReplayKey;
 import com.briefwise.aiops.domain.port.GenerationLog;
 import com.briefwise.aiops.domain.port.Replays;
 import com.briefwise.aiops.domain.port.UsageBudget;
+import com.briefwise.shared.domain.model.PricingTier;
 import com.briefwise.shared.domain.model.TokenCount;
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -80,9 +81,14 @@ public class AiopsFacade {
      * @throws com.briefwise.aiops.domain.model.UnpricedModelException if the model has no configured price
      */
     public UUID recordGeneration(GenerationEntry entry) {
+        return recordGeneration(entry, PricingTier.STANDARD);
+    }
+
+    /** {@link #recordGeneration(GenerationEntry)} for a call billed at {@code tier}'s price (e.g. a batch request). */
+    public UUID recordGeneration(GenerationEntry entry, PricingTier tier) {
         return generationLog.record(new NewGeneration(entry.feature(), entry.model(), entry.promptVersion(),
                 entry.prompt(), entry.response(), entry.tokens(), entry.latency(), entry.fallback(),
-                entry.subjectId(), entry.replay().map(ReplayRequest::key)));
+                entry.subjectId(), entry.replay().map(ReplayRequest::key)), tier);
     }
 
     /**
@@ -103,7 +109,21 @@ public class AiopsFacade {
      * @throws com.briefwise.aiops.domain.model.NoBudgetConfiguredException if the feature has no budget
      */
     public BudgetView checkAndRecordUsage(String feature, String model, TokenCount tokens) {
-        return toView(usageBudget.recordUsage(feature, model, tokens));
+        return checkAndRecordUsage(feature, model, tokens, PricingTier.STANDARD);
+    }
+
+    /** {@link #checkAndRecordUsage(String, String, TokenCount)} for a call billed at {@code tier}'s price. */
+    public BudgetView checkAndRecordUsage(String feature, String model, TokenCount tokens, PricingTier tier) {
+        return toView(usageBudget.recordUsage(feature, model, tokens, tier));
+    }
+
+    /**
+     * What the tokens would cost on the model, without recording anything: the pre-flight estimate before a batch.
+     *
+     * @throws com.briefwise.aiops.domain.model.UnpricedModelException if the model has no configured price
+     */
+    public BigDecimal costOf(String model, TokenCount tokens, PricingTier tier) {
+        return usageBudget.costOf(model, tokens, tier);
     }
 
     /**

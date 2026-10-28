@@ -54,6 +54,10 @@ X-Correlation-ID: manual-job-001
 ### Ingest + publish + sweep + portfolio summaries - 200 (needs FINNHUB_API_KEY and Kafka)
 POST {{host}}/api/admin/jobs/news-ingest/run
 
+### Classification eval - 200 (ADR 0018). PAID: one Message Batch on Anthropic (~0.02 USD). Needs the decrypted
+### golden set, ANTHROPIC_API_KEY and spring.ai.model.chat=anthropic; otherwise the step reports REFUSED / FAILED
+POST {{host}}/api/admin/jobs/news-classification-eval/run
+
 ### Unknown job - 404
 POST {{host}}/api/admin/jobs/risk-alerts/run
 

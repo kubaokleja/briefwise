@@ -25,6 +25,7 @@ output exists for these items, so the model's answers cannot shape the labels.
 3. Export (repo root):
 
    ```powershell
+   [Console]::OutputEncoding = [Text.Encoding]::UTF8   # else PowerShell 5.1 garbles curly quotes (2026-10-23 export)
    Get-Content evals/labelling/export_headlines.sql | docker compose exec -T postgres psql -U briefwise -d briefwise --csv -q -f - | Select-Object -Skip 2 | Set-Content -Encoding utf8 evals/labelling/headlines_to_label.csv
    ```
 
@@ -46,8 +47,20 @@ output exists for these items, so the model's answers cannot shape the labels.
 - Fill `sentiment`, `relevance`, `event_type`; mark `duplicate_of_id` when two rows report the same event (this
   checks the D1 threshold, [ADR 0009](../../docs/decisions/0009-news-dedup-and-etf-news.md)).
 - `golden` rows are for the eval only, `fewshot` rows only for prompt examples. Never move a row between them.
-- **Licence:** these are Finnhub headlines (personal use, no redistribution). The CSV files here are git-ignored
-  until we decide how the golden set may be published (Domain Questions Log, 2026-10-21).
+- **Licence:** these are Finnhub headlines (personal use, no redistribution). The CSV files here are git-ignored;
+  the golden set is committed only encrypted ([ADR 0018](../../docs/decisions/0018-classification-eval.md)).
+
+## Golden set for the eval
+
+Build `evals/sentiment_golden.csv` (golden rows, eval columns, mojibake repaired, few-shot leakage check), then
+encrypt it for CI (repo root, Git Bash; `EVAL_DATA_PASSPHRASE` = the GitHub Secret):
+
+```bash
+python evals/labelling/build_golden.py evals/labelling/headlines_to_label.csv prompts/news-classification/system.md evals/sentiment_golden.csv
+bash evals/scripts/encrypt-golden.sh   # writes evals/sentiment_golden.csv.gpg, the only committed copy
+```
+
+`evals/scripts/decrypt-golden.sh` restores the clear CSV (used by `evals.yml`).
 
 ## Label definitions
 
@@ -74,4 +87,9 @@ the golden set, a human reviews them (at least a random sample of golden rows) a
 - 2026-10-23: maintainer spot-checked about 40 rows; no disagreements (agreement ~100% on that sample).
 - 2026-10-24: 22 rows relabelled `OTHER` -> `ANALYST` (notes named a sell-side downgrade, upgrade, target change or
   reiteration; 14 golden, 8 few-shot). Left `OTHER`: 4 contributor ratings, 1 opinion on an analyst call, 1
-  partnership with a target raise, 1 target vs export-ban mix. Needs a human spot-check before slice 8.
+  partnership with a target raise, 1 target vs export-ban mix.
+- 2026-10-28: maintainer reviewed the 14 golden `ANALYST` rows and accepted all 14 (agreement 14/14). Borderline
+  rows kept as labelled: an analyst-forecast roundup led by Meta tagged JPM (`POSITIVE`/`LOW`), a contributor "sell"
+  piece on NVDA (`ANALYST`, not `OTHER`), target raises after Q3 results (`ANALYST`, not `EARNINGS`).
+- 2026-10-28: 3 summaries repaired by `build_golden.py` (UTF-8 read as Latin-1 in the export: `’`, `—`); labels
+  unchanged.

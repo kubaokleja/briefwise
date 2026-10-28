@@ -3,6 +3,7 @@ package com.briefwise.aiops.domain.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.briefwise.shared.domain.model.PricingTier;
 import com.briefwise.shared.domain.model.TokenCount;
 import java.math.BigDecimal;
 import java.util.Map;
@@ -38,6 +39,16 @@ class ModelPriceTest {
     void without_explicit_cache_prices_the_standard_multipliers_apply() {
         assertThat(haiku.cacheWriteUsdPerMTok()).isEqualByComparingTo("0.125");
         assertThat(haiku.cacheReadUsdPerMTok()).isEqualByComparingTo("0.01");
+    }
+
+    @Test
+    void a_batch_request_costs_half_of_every_token_kind() {
+        TokenCount tokens = new TokenCount(100, 50, 800, 800);
+
+        // (10 + 25 + 100 + 8) / 1M = 0.000143 at list price, half in a batch
+        assertThat(haiku.costOf(tokens, PricingTier.STANDARD)).isEqualByComparingTo("0.000143");
+        assertThat(haiku.costOf(tokens, PricingTier.BATCH)).isEqualByComparingTo("0.0000715");
+        assertThat(haiku.costOf(tokens)).isEqualByComparingTo(haiku.costOf(tokens, PricingTier.STANDARD));
     }
 
     @Test

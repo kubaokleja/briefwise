@@ -15,6 +15,7 @@ import com.briefwise.aiops.domain.model.NoBudgetConfiguredException;
 import com.briefwise.aiops.domain.model.PriceList;
 import com.briefwise.aiops.domain.port.DailyUsageRepository;
 import com.briefwise.shared.domain.exception.UsageLimitExceededException;
+import com.briefwise.shared.domain.model.PricingTier;
 import com.briefwise.shared.domain.model.TokenCount;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -73,7 +74,7 @@ class UsageBudgetServiceTest {
         BigDecimal cost = new BigDecimal("0.00022000");
         when(usage.add(utcToday, FEATURE, tokens, cost)).thenReturn(spent("0.10010"));
 
-        BudgetStatus status = service.recordUsage(FEATURE, MODEL, tokens);
+        BudgetStatus status = service.recordUsage(FEATURE, MODEL, tokens, PricingTier.STANDARD);
 
         verify(usage).add(utcToday, FEATURE, tokens, cost);
         assertThat(status.exhausted()).isTrue();

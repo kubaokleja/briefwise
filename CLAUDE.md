@@ -120,4 +120,5 @@ Run the `session-wrap-up` skill:
 
 ## Skills
 
-`.claude/skills/`: `new-bounded-context`, `flyway-migration`, `adr`, `session-wrap-up`, `kafka-consumer`, `llm-adapter`.
+`.claude/skills/`: `new-bounded-context`, `flyway-migration`, `adr`, `session-wrap-up`, `kafka-consumer`, `llm-adapter`,
+`new-eval-case`.

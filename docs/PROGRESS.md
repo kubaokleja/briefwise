@@ -34,6 +34,68 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 14 — 2026-10-28 — M1 slice 8: classification eval
+
+**Phase:** M1 / slice 8
+**Goal:** Measure news classification against the golden set (macro F1, confusion matrix, cost per 1,000) through the
+Message Batches API, with a regression gate in CI, without publishing the licensed headlines.
+
+**Done**
+- Data: 14 golden `ANALYST` relabels accepted (14/14); `build_golden.py` (258 golden rows, 2 summaries repaired from
+  UTF-8-as-Latin-1 mojibake, label and few-shot leakage checks); `encrypt-golden.sh` / `decrypt-golden.sh` (gpg
+  AES-256, round trip tested); export command fixed for UTF-8; clear CSV git-ignored.
+- `news` domain: `GoldenCase`, `EvalLabels`, `EvalPrediction`, `ConfusionMatrix` (with an invalid column),
+  `ClassMetrics`, `LabelScores` (macro F1, accuracy, "too few" below 10), `EvalScores`, `EvalReport` (all + random
+  rows, invalid rate, cost per 1,000), `EvalBaseline`, `RegressionGate`, `BatchOutcome`, `EvalRun`.
+- Ports `GoldenSet`, `BatchClassifier`, `EvalReports`, `ClassificationEvals`; `ClassificationEvalService`;
+  `NewsFacade.evaluateClassification`.
+- `AnthropicBatchClassifier`: one Message Batch with the production system prompt (cache marker), rendered data
+  block, model, max tokens and the `OutputConfig` Spring AI builds from the same schema; leakage and worst-case
+  budget pre-flight; polling; every result logged and counted at the batch price. `NoBatchClassifier`,
+  `EvalBatchConfig` (SDK client via `AnthropicSetup`). `CsvGoldenSet` (RFC 4180), `FileEvalReports` + `EvalMarkdown`.
+- `aiops`: `PricingTier` (shared kernel), `ModelPrice.costOf(tokens, tier)` (batch = half), tier overloads on
+  `recordGeneration` / `checkAndRecordUsage`, `AiopsFacade.costOf`; budget `news-classification-eval` 0.50 USD/day.
+- `jobs`: `news-classification-eval` (step `evaluate`, FAILED unless `PASSED`); `application-eval.yml`;
+  `docs/api.http`; `.github/workflows/evals.yml`; `evals/results/news-classification/README.md`; skill
+  `new-eval-case`; DESIGN 10, 13, 14, 16, 17 and CLAUDE.md skills updated.
+- Smoke run of the jar (`job,eval`, real golden set, Anthropic URL pointed at a closed port): 258 cases loaded,
+  worst-case estimate 0.085 USD, step FAILED, exit 1 as designed; nothing sent.
+- Tests: `LabelScoresTest`, `RegressionGateTest`, `EvalReportTest`, `ModelPriceTest` (+1),
+  `ClassificationEvalServiceTest`, `CsvGoldenSetTest`, `FileEvalReportsTest`, `JobServiceTest` (+3),
+  `AnthropicBatchClassifierIT`, `NewsEvalFacadeIT`. `./mvnw verify`: 319 unit + 126 IT green (incl.
+  `ArchitectureTest`).
+
+**Decisions** ([ADR 0018](decisions/0018-classification-eval.md))
+- E1: all three labels reported (all + random rows), only sentiment macro F1 gated, -3 pp vs `baseline.json`.
+- E2: Java runner reusing the production prompt and schema; batches through the Anthropic SDK.
+- Golden set committed only gpg-encrypted (resolves the 2026-10-21 licence question); results hold metrics only.
+- First run: Haiku 5.5 as is; Sonnet, few-shot ablation and Alpha Vantage to the backlog.
+- Not in the plan: `anthropic-java-core` stays transitive. Declaring it made Maven pick the SDK's victools 4.38.0
+  over Spring AI's 5.0.0 and broke Spring AI's schema generator.
+
+**AI concepts introduced / explained**
+- What an eval harness does; golden set labelled before model output; label bias from Claude-drafted labels.
+- Accuracy vs macro F1 on imbalanced classes (an all-NEUTRAL model: 78% accuracy, macro F1 ~0.29); confusion matrix.
+- Few-shot leakage; Message Batches (half price, asynchronous, cache hits best effort); relative regression gate
+  and run-to-run noise.
+
+**Domain questions added**
+- None.
+
+**Open questions / blockers**
+- You: passphrase + secret `EVAL_DATA_PASSPHRASE`, encrypt and commit the `.gpg`; `ANTHROPIC_API_KEY` secret (also
+  slice 6); first live run (~0.02 USD), commit its `latest.json` as `baseline.json`; then the L2 ADR.
+- With 19 NEGATIVE rows, run-to-run noise is close to the 3 pp gate; revisit after a few runs.
+- Recording runs (slices 5 and 7) and the Neon setup are still open.
+
+**Next session**
+- After your first eval run: L2 ADR from its numbers. Then M1 slice 9 (UI: News).
+
+**Proposed commit message**
+> feat(news): classification eval over an encrypted golden set via the Message Batches API, with a regression gate in evals.yml
+
+---
+
 ## Session 13 — 2026-10-28 — M1 slice 7: daily portfolio summary
 
 **Phase:** M1 / slice 7
