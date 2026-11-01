@@ -379,7 +379,7 @@ Per the rule in CLAUDE.md, none of these is decided silently. Each one is settle
 | Temperature | 0 for classification · 0.3–0.5 for commentary | As listed; models without temperature (e.g. Haiku 5.5) use `effort` instead: `low` for classification ([ADR 0012](decisions/0012-news-classification-llm-call.md)) | Stability across runs |
 | Brief: workflow vs agent | Fixed sequence · agent with tools · hybrid | Hybrid | Task success, cost, latency, trajectory eval |
 | Agent framework | Spring AI · Embabel · LangGraph (comparison) | Spring AI | Comparison table after F5 |
-| Resilience | Resilience4j · native `@Retryable` from Spring Framework 7 | Resilience4j | Decide at bootstrap; record in an ADR |
+| Resilience | Resilience4j · native `@Retryable` from Spring Framework 7 | Decided: Spring Framework retry, no circuit breaker ([ADR 0005](decisions/0005-resilience-spring-retryable.md), R1 in [ADR 0012](decisions/0012-news-classification-llm-call.md)) | Revisit with a circuit breaker if pipeline runs time out in practice |
 | Few-shot | None · 2–3 static examples · dynamically selected (similarity) | 3 static | F1 with and without; **examples never from the golden set** (otherwise eval leakage) |
 | LLM observability | Langfuse Cloud · self-hosted Langfuse · Micrometer only | Langfuse Cloud (free tier) | Self-hosted Langfuse needs ClickHouse, Redis and S3 — not worth it here |
 | MLflow storage | Local file store · backend in a separate Neon project + artifacts as GitHub release assets | Local during research; decide at F4 week 6 | Model size and how the job loads it |
@@ -479,7 +479,7 @@ in the README and the model card (M5).
 |---|---|
 | Cost | **≤ 5 CHF per month in steady state** (infrastructure + LLM). Development bursts allowed within the daily token budget. See section 13 |
 | Latency | News classification < 3 s; RAG answer < 10 s (streamed); brief < 60 s |
-| Resilience | Every LLM and HTTP call behind circuit breaker + retry + time limiter + fallback; parameters in `application.yml` |
+| Resilience | Every LLM and HTTP call has a timeout, bounded retries and a fallback (`UNCLASSIFIED`, template summary, item left for the sweep); the job's `max-duration` bounds a whole run; parameters in `application.yml`. No circuit breaker until runs time out in practice ([ADR 0005](decisions/0005-resilience-spring-retryable.md), [ADR 0012](decisions/0012-news-classification-llm-call.md)) |
 | Token budgeting | Explicit `maxTokens` on every call; system prompt ≤ 500 tokens; RAG max 5 passages; daily token budget per feature; exceeding it → `UsageLimitExceededException` → HTTP 429 (or job step marked skipped) |
 | Storage | Neon free tier: 0.5 GB per project. Retention policy for `ai_generation_log` (section 13.6) |
 | Access security | Spring Security + JWT (RS256), roles `RM` and `ADMIN`; brief approval records the approver's identity |
@@ -703,7 +703,7 @@ Principles:
 | Security | Spring Security, JWT (RS256), roles RM / ADMIN |
 | Persistence | PostgreSQL 16+ with pgvector and pg_trgm, Flyway, MapStruct; Neon in the cloud |
 | Messaging | Apache Kafka (KRaft), Spring Kafka, transactional outbox |
-| Resilience | Resilience4j |
+| Resilience | Spring Framework 7 retry (`RetryTemplate`), SDK timeouts and retries ([ADR 0005](decisions/0005-resilience-spring-retryable.md)) |
 | Testing | JUnit 5, Mockito, Testcontainers (Postgres, Kafka), WireMock (LLM mocks), ArchUnit |
 | Logging | Logback: JSON in `cloud`/`job` (LogstashEncoder), correlation ID in MDC |
 | LLM | Claude API (Haiku 5.5 for classification, Sonnet 5.5 for commentary), Ollama locally |

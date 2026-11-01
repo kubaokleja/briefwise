@@ -233,6 +233,12 @@ every screen has loading, empty and error states. Contingency cut order (nothing
   - Security and compliance: identity (SSO/OIDC, RBAC for RMs), secrets management, audit trail, encryption,
     pen-test, FINMA / GDPR / model-risk rules, vendor risk for LLM providers (data leaves the bank?).
   - AI specifics: private/self-hosted or enterprise LLM contract, eval gating, drift monitoring, human-approval audit.
+  - Observability, performance and quality (gaps found 2026-11-01): metrics beyond `health` (Micrometer/Prometheus:
+    classification latency, fallback rate, consumer lag, budget use), alerting and SLOs (today only GitHub's email on
+    a failed run), measuring the DESIGN 12 latency targets (nothing measures them) and load tests, resilience beyond
+    timeout + retry (circuit breaker, ADR 0005/0012), coverage (JaCoCo), static analysis (Checkstyle/Spotless,
+    SpotBugs/Error Prone, Sonar), security scans in CI (CodeQL, dependency scan, secret scan, SBOM), DB backups and
+    restore drills (Neon), migration rollback strategy, API rate limiting.
   - Tools and technologies: re-check each choice (Postgres+pgvector vs dedicated vector DB, Resilience4j, MLflow,
     observability stack, CI/CD, Spring Boot upgrade policy) and cost at real volume.
   - Output: a table of decisions to revisit, risks and an estimated effort; do not change DESIGN without asking.
