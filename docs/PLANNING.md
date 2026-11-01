@@ -215,6 +215,8 @@ every screen has loading, empty and error states. Contingency cut order (nothing
   - [ ] Role `ADMIN` on `POST /api/admin/jobs/{job}/run` (open until login exists, ADR 0016)
   - [ ] UI: Login (httpOnly cookie + CSRF), route guard, role-based nav, 401/403 states; Brief screen (SSE progress, sections + citations, violations, edit, Approve disabled while violations open, Reject with reason, `isFallback` banner, change history); briefs awaiting approval on Dashboard; Playwright smoke (local); reassess server-state library
 - [ ] **M5 (F6)** Red-team, guardrails, MODEL_CARD / AI_RISK_ASSESSMENT / SECURITY
+  - [ ] MODEL_CARD + README: eval labels drafted by Claude, maintainer as stand-in domain expert, label bias
+    ([DESIGN 10](DESIGN.md#10-evaluation-strategy) "Domain expert in the loop")
   - [ ] UI: "suspected injection, content withheld" state + test; UI section in `SECURITY.md` (XSS rule, cookie auth)
 - [ ] **M6 (F7)** Hardened pipeline, eval gating in CI, observability, demo video
   - [ ] `ai_generation_log` retention ([DESIGN 13.6](DESIGN.md#136-storage-retention)): full text 30 days, then hash + metrics only
