@@ -30,15 +30,24 @@ interface ProblemDetail {
   status?: number;
 }
 
-export async function apiGet<T>(path: string, init: { signal?: AbortSignal } = {}): Promise<T> {
+export function apiGet<T>(path: string, init: { signal?: AbortSignal } = {}): Promise<T> {
+  return request<T>('GET', path, init.signal);
+}
+
+/** A POST without a body (e.g. "run a job now"). Returns the JSON answer. */
+export function apiPost<T>(path: string, init: { signal?: AbortSignal } = {}): Promise<T> {
+  return request<T>('POST', path, init.signal);
+}
+
+async function request<T>(method: 'GET' | 'POST', path: string, signal: AbortSignal | undefined): Promise<T> {
   const correlationId = crypto.randomUUID();
 
   let response: Response;
   try {
     response = await fetch(path, {
-      method: 'GET',
+      method,
       headers: { Accept: 'application/json', [CORRELATION_HEADER]: correlationId },
-      signal: init.signal,
+      signal,
     });
   } catch (error) {
     // Cancelling is not a failure; let the caller see the AbortError and ignore it.

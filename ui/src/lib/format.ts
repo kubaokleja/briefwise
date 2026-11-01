@@ -25,3 +25,26 @@ export function formatPercent(points: number, options: { signed?: boolean; fract
   }).format(points);
   return `${number}%`;
 }
+
+/**
+ * A timestamp for people: `"28 Oct 2026, 05:00"` in the reader's time zone (pass `timeZone` for a fixed one, e.g. in
+ * tests). The API sends ISO-8601 UTC instants.
+ */
+export function formatDateTime(iso: string, timeZone?: string): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+    timeZone,
+  }).format(new Date(iso));
+}
+
+/** A calendar date from the API (`"2026-10-27"`) as `"27 Oct 2026"`; no time zone shift, it is a date, not an instant. */
+export function formatDate(isoDate: string): string {
+  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(
+    new Date(`${isoDate}T00:00:00Z`),
+  );
+}

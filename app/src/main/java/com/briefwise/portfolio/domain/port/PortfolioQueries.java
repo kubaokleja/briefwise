@@ -1,6 +1,7 @@
 package com.briefwise.portfolio.domain.port;
 
 import com.briefwise.portfolio.domain.model.Portfolio;
+import com.briefwise.portfolio.domain.model.PortfolioDailyMove;
 import com.briefwise.portfolio.domain.model.Position;
 import java.util.List;
 import java.util.UUID;
@@ -15,4 +16,7 @@ public interface PortfolioQueries {
 
     /** @throws com.briefwise.portfolio.domain.model.PortfolioNotFoundException if the portfolio does not exist */
     List<Position> getHoldings(UUID portfolioId);
+
+    /** @throws com.briefwise.portfolio.domain.model.PortfolioNotFoundException if the portfolio does not exist */
+    PortfolioDailyMove getDailyMove(UUID portfolioId);
 }

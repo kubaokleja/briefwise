@@ -9,6 +9,7 @@ import com.briefwise.news.domain.model.DedupPolicy;
 import com.briefwise.news.domain.model.EventType;
 import com.briefwise.news.domain.model.FetchedNews;
 import com.briefwise.news.domain.model.NewsClassification;
+import com.briefwise.news.domain.model.NewsFeedItem;
 import com.briefwise.news.domain.model.NewsItem;
 import com.briefwise.news.domain.model.NewsItemNotFoundException;
 import com.briefwise.news.domain.model.NewsStatus;
@@ -317,5 +318,42 @@ class NewsRepositoryAdapterIT extends AbstractIntegrationTest {
                 Set.of(Relevance.MEDIUM), 1);
 
         assertThat(found).extracting(ClassifiedNews::id).containsExactly(newest);
+    }
+
+    // --- feed (M1 slice 9)
+
+    @Test
+    void feed_shows_every_visible_status_newest_first_without_skipped_items() {
+        UUID received = store(AAPL, "Apple received", T0, Optional.empty());
+        UUID classified = classified("Apple classified", T0.minusSeconds(60), Relevance.LOW, Set.of(AAPL));
+        UUID unclassified = store(MSFT, "Microsoft unclassified", T0.minusSeconds(120), Optional.empty());
+        repository.markUnclassifiedFromReceived(unclassified, UnclassifiedReason.INVALID_OUTPUT, T0);
+        store(AAPL, "Apple received again", T0.minusSeconds(180), Optional.of(received)); // SKIPPED
+
+        List<NewsFeedItem> feed = repository.findFeed(Optional.empty(), 50);
+
+        assertThat(feed).extracting(NewsFeedItem::id).containsExactly(received, classified, unclassified);
+        assertThat(feed.get(0).status()).isEqualTo(NewsStatus.RECEIVED);
+        assertThat(feed.get(0).labels()).isEmpty();
+        assertThat(feed.get(1).labels()).hasValueSatisfying(l -> {
+            assertThat(l.relevance()).isEqualTo(Relevance.LOW);
+            assertThat(l.rationale()).isEqualTo("Synthetic rationale.");
+        });
+        assertThat(feed.get(2).unclassifiedReason()).contains(UnclassifiedReason.INVALID_OUTPUT);
+    }
+
+    @Test
+    void feed_for_tickers_keeps_items_fetched_for_one_of_them_with_all_their_tickers() {
+        UUID both = store(MSFT, "Microsoft and Apple", T0, Optional.empty());
+        repository.addTicker(both, AAPL);
+        store(MSFT, "Microsoft only", T0, Optional.empty());
+        UUID older = store(AAPL, "Apple older", T0.minusSeconds(60), Optional.empty());
+
+        List<NewsFeedItem> feed = repository.findFeed(Optional.of(Set.of(AAPL)), 50);
+
+        assertThat(feed).extracting(NewsFeedItem::id).containsExactly(both, older);
+        assertThat(feed.get(0).tickers()).containsExactlyInAnyOrder(AAPL, MSFT);
+        assertThat(repository.findFeed(Optional.of(Set.of(AAPL)), 1)).extracting(NewsFeedItem::id)
+                .containsExactly(both);
     }
 }

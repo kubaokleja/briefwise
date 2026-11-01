@@ -7,6 +7,7 @@ import com.briefwise.news.NewsFacade.SummaryPointView;
 import com.briefwise.news.domain.model.SummaryNotFoundException;
 import com.briefwise.shared.domain.model.Citation;
 import com.briefwise.shared.domain.model.Ticker;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -71,8 +72,10 @@ class PortfolioNewsController {
      * the "nothing relevant" state. {@code model}/{@code promptVersion} are null unless {@code aiGenerated}.
      */
     record SummaryResponse(UUID portfolioId, LocalDate summaryDate, Instant generatedAt, List<PointResponse> points,
-                           String disclaimer, boolean aiGenerated, boolean fallback, boolean empty, String model,
-                           String promptVersion, List<ViolationResponse> violations) {
+                           String disclaimer, boolean aiGenerated, boolean fallback, boolean empty,
+                           @Schema(types = {"string", "null"}) String model,
+                           @Schema(types = {"string", "null"}) String promptVersion,
+                           List<ViolationResponse> violations) {
         static SummaryResponse from(PortfolioSummaryView v) {
             return new SummaryResponse(v.portfolioId(), v.summaryDate(), v.generatedAt(),
                     v.points().stream().map(PointResponse::from).toList(), v.disclaimer(), v.aiGenerated(),

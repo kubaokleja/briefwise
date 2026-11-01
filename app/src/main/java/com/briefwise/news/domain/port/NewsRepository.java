@@ -3,6 +3,7 @@ package com.briefwise.news.domain.port;
 import com.briefwise.news.domain.model.ClassifiedNews;
 import com.briefwise.news.domain.model.DedupPolicy;
 import com.briefwise.news.domain.model.NewsClassification;
+import com.briefwise.news.domain.model.NewsFeedItem;
 import com.briefwise.news.domain.model.NewsItem;
 import com.briefwise.news.domain.model.Relevance;
 import com.briefwise.news.domain.model.UnclassifiedReason;
@@ -83,4 +84,10 @@ public interface NewsRepository {
      */
     List<ClassifiedNews> findClassified(Set<Ticker> tickers, Instant publishedSince, Set<Relevance> relevances,
                                         int limit);
+
+    /**
+     * The newest {@code RECEIVED}, {@code CLASSIFIED} and {@code UNCLASSIFIED} items, each with all its tickers;
+     * with {@code tickers}, only items fetched for at least one of them. Newest first, at most {@code limit}.
+     */
+    List<NewsFeedItem> findFeed(Optional<Set<Ticker>> tickers, int limit);
 }

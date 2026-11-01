@@ -27,7 +27,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["dailyMove"];
+        get: operations["dailyMove_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -44,6 +44,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["prices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/news": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["feed"];
         put?: never;
         post?: never;
         delete?: never;
@@ -76,6 +92,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/portfolios/{portfolioId}/daily-move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["dailyMove"];
         put?: never;
         post?: never;
         delete?: never;
@@ -172,9 +204,40 @@ export interface components {
             /** @enum {string} */
             status: "SUCCEEDED" | "SKIPPED" | "FAILED" | "TIMED_OUT";
         };
+        NewsFeedItemResponse: {
+            /** @enum {string|null} */
+            eventType: "EARNINGS" | "GUIDANCE" | "M_AND_A" | "REGULATORY" | "LITIGATION" | "MANAGEMENT" | "MACRO" | "PRODUCT" | "ANALYST" | "OTHER" | null;
+            headline: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            publishedAt: string;
+            rationale: string | null;
+            /** @enum {string|null} */
+            relevance: "LOW" | "MEDIUM" | "HIGH" | null;
+            /** @enum {string|null} */
+            sentiment: "NEGATIVE" | "NEUTRAL" | "POSITIVE" | null;
+            source: string;
+            /** @enum {string} */
+            status: "RECEIVED" | "CLASSIFIED" | "UNCLASSIFIED";
+            tickers: string[];
+            /** @enum {string|null} */
+            unclassifiedReason: "INVALID_OUTPUT" | "PROVIDER_ERROR" | "INJECTION_SUSPECTED" | "RETRIES_EXHAUSTED" | null;
+            url: string;
+        };
         PointResponse: {
             citations: components["schemas"]["CitationResponse"][];
             text: string;
+        };
+        PortfolioDailyMoveResponse: {
+            /** Format: date */
+            asOf: string | null;
+            changePercent: number | null;
+            /** Format: uuid */
+            portfolioId: string;
+            positions: components["schemas"]["PositionMoveResponse"][];
+            pricedWeight: number;
+            unpriced: string[];
         };
         PortfolioResponse: {
             /** Format: uuid */
@@ -184,6 +247,15 @@ export interface components {
             name: string;
             positions: components["schemas"]["PositionResponse"][];
             riskProfile: string;
+        };
+        PositionMoveResponse: {
+            changePercent: number;
+            close: number;
+            contribution: number;
+            /** Format: date */
+            date: string;
+            ticker: string;
+            weight: number;
         };
         PositionResponse: {
             quantity: number;
@@ -219,11 +291,11 @@ export interface components {
             fallback: boolean;
             /** Format: date-time */
             generatedAt: string;
-            model: string;
+            model: string | null;
             points: components["schemas"]["PointResponse"][];
             /** Format: uuid */
             portfolioId: string;
-            promptVersion: string;
+            promptVersion: string | null;
             /** Format: date */
             summaryDate: string;
             violations: components["schemas"]["ViolationResponse"][];
@@ -263,7 +335,7 @@ export interface operations {
             };
         };
     };
-    dailyMove: {
+    dailyMove_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -310,6 +382,29 @@ export interface operations {
             };
         };
     };
+    feed: {
+        parameters: {
+            query?: {
+                portfolioId?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NewsFeedItemResponse"][];
+                };
+            };
+        };
+    };
     list: {
         parameters: {
             query?: never;
@@ -348,6 +443,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PortfolioResponse"];
+                };
+            };
+        };
+    };
+    dailyMove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                portfolioId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PortfolioDailyMoveResponse"];
                 };
             };
         };

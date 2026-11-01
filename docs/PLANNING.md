@@ -147,7 +147,7 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
   `ReplayNewsSummaryIT`, `SummaryRepositoryAdapterIT`, `NewsSummaryFacadeIT`, `PortfolioNewsControllerIT`;
   DESIGN 6.2, 6.3, 7.1, 13.7 updated
 - [ ] Recording run for `news-summary` (you, with the slice 5 recording run; procedure in `evals/replay/README.md`)
-- [ ] Slice 10: `model` / `promptVersion` of the summary response are nullable, but the generated TS types say
+- [x] Slice 10: `model` / `promptVersion` of the summary response are nullable, but the generated TS types say
   `string`; mark them nullable in the spec (or handle `null` in the UI)
 
 ### Slice 8 — Classification eval
@@ -177,13 +177,26 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
   that do not trigger it)
 
 ### Slice 9 — UI: News
-- [ ] react-router 8.4.0 (ADR 0007); router + nav in `AppShell`
-- [ ] `AiMarker` component (+ Vitest)
-- [ ] News feed: sentiment icon + label, relevance, event type, expandable rationale, `UNCLASSIFIED`, headline + link only; loading / empty / error
-- [ ] "Run news now" button -> admin endpoint; 429 state
+- [x] Feed source: new `GET /api/news` (all visible statuses, optional portfolio filter) instead of the per-portfolio
+  `relevant` list, which never contains `UNCLASSIFIED` items: `NewsFeedItem`, port `NewsFeed`, `NewsFeedService`,
+  `NewsRepository.findFeed` (JDBC), `NewsFacade.getNewsFeed`, `NewsController`; `NewsFeedItemTest`,
+  `NewsFeedServiceTest`, `NewsRepositoryAdapterIT` (+2), `NewsControllerIT`; `docs/api.http`
+- [x] react-router 8.5.1 (ADR 0007 named 8.4.0; 8.5.1 current, declarative mode); router + nav in `AppShell`
+- [x] `AiMarker` component (all ADR 0007 states) + Vitest
+- [x] News feed: sentiment icon + label, relevance, event type, expandable rationale, `UNCLASSIFIED` (with reason),
+  `RECEIVED`, headline + link only (http(s) only, `safeHref`); loading / empty / error; portfolio filter in the URL
+- [x] "Run news now" button -> admin endpoint; step list, SKIPPED messages, 429 state
 
 ### Slice 10 — UI: Portfolio v0 and Dashboard v0
-- [ ] OpenAPI spec + generated types updated; `ui-verify` green
+- [x] Portfolio daily move: `GET /api/portfolios/{id}/daily-move` (weight x daily change per priced position, summed;
+  unpriced positions listed with the covered weight): `PortfolioDailyMove`, `InstrumentMove`, port `InstrumentMoves`
+  + `FacadeInstrumentMoves` (market facade), `PortfolioFacade.getDailyMove`; `PortfolioDailyMoveTest`,
+  `PortfolioQueryServiceTest` (+2), `PortfolioControllerIT` (+3)
+- [x] Portfolio v0: positions, daily move, daily AI summary with AI marker, numbered sources, disclaimer, violations,
+  template / empty / "no summary yet" states
+- [x] Dashboard v0: portfolio tiles (daily performance, relevant news count)
+- [x] Summary `model` / `promptVersion` nullable in the spec (`@Schema(types = {"string", "null"})`); OpenAPI spec +
+  generated types updated; `ui-verify` green
 
 ## Backlog (one line each)
 

@@ -4,8 +4,10 @@ import com.briefwise.news.domain.model.ClassifiedNews;
 import com.briefwise.news.domain.model.DedupPolicy;
 import com.briefwise.news.domain.model.EventType;
 import com.briefwise.news.domain.model.NewsClassification;
+import com.briefwise.news.domain.model.NewsFeedItem;
 import com.briefwise.news.domain.model.NewsItem;
 import com.briefwise.news.domain.model.NewsItemNotFoundException;
+import com.briefwise.news.domain.model.NewsStatus;
 import com.briefwise.news.domain.model.Relevance;
 import com.briefwise.news.domain.model.Sentiment;
 import com.briefwise.news.domain.model.UnclassifiedReason;
@@ -147,5 +149,39 @@ class NewsRepositoryAdapter implements NewsRepository {
                         .collect(Collectors.toSet()),
                 Sentiment.valueOf(rs.getString("sentiment")), Relevance.valueOf(rs.getString("relevance")),
                 EventType.valueOf(rs.getString("event_type")), rs.getString("rationale")));
+    }
+
+    @Override
+    public List<NewsFeedItem> findFeed(Optional<Set<Ticker>> tickers, int limit) {
+        MapSqlParameterSource params = new MapSqlParameterSource().addValue("limit", limit);
+        String tickerFilter = "";
+        if (tickers.isPresent()) {
+            params.addValue("tickers", tickers.get().stream().map(Ticker::symbol).toList());
+            tickerFilter = " AND EXISTS (SELECT 1 FROM news_item_tickers h"
+                    + " WHERE h.news_item_id = n.id AND h.ticker IN (:tickers))";
+        }
+        return jdbc.query("""
+                SELECT n.id, n.headline, n.url, n.source, n.published_at, n.status, n.sentiment, n.relevance,
+                       n.event_type, n.rationale, n.unclassified_reason,
+                       array_agg(t.ticker ORDER BY t.ticker) AS tickers
+                FROM news_items n
+                JOIN news_item_tickers t ON t.news_item_id = n.id
+                WHERE n.status IN ('RECEIVED', 'CLASSIFIED', 'UNCLASSIFIED')""" + tickerFilter + """
+
+                GROUP BY n.id
+                ORDER BY n.published_at DESC, n.id
+                LIMIT :limit""", params, (rs, row) -> {
+            NewsStatus status = NewsStatus.valueOf(rs.getString("status"));
+            Optional<NewsFeedItem.Labels> labels = status == NewsStatus.CLASSIFIED
+                    ? Optional.of(new NewsFeedItem.Labels(Sentiment.valueOf(rs.getString("sentiment")),
+                            Relevance.valueOf(rs.getString("relevance")), EventType.valueOf(rs.getString("event_type")),
+                            rs.getString("rationale")))
+                    : Optional.empty();
+            return new NewsFeedItem(rs.getObject("id", UUID.class), rs.getString("headline"), rs.getString("url"),
+                    rs.getString("source"), rs.getTimestamp("published_at").toInstant(), status,
+                    Arrays.stream((String[]) rs.getArray("tickers").getArray()).map(Ticker::new)
+                            .collect(Collectors.toSet()),
+                    labels, Optional.ofNullable(rs.getString("unclassified_reason")).map(UnclassifiedReason::valueOf));
+        });
     }
 }

@@ -178,9 +178,9 @@ ArchUnit rules (checked on every build): domain purity, no access to another con
 
 | Context | Responsibility | Facade (proposal) |
 |---|---|---|
-| `portfolio` | Synthetic clients, portfolios, positions, weights | `getPortfolio`, `listPortfolios`, `getHoldings` |
+| `portfolio` | Synthetic clients, portfolios, positions, weights | `getPortfolio`, `listPortfolios`, `getHoldings`, `getDailyMove` (weighted, via `market`) |
 | `market` | Instruments, price history, returns | `getPriceHistory`, `getDailyMove` |
-| `news` | News pipeline and classification | `ingest`, `publishPending`, `processIngested`, `classifyPending`, `consumerLag`, `getRelevantNews`, `summarizeForPortfolio`, `summarizePortfolios`, `getLatestSummary` |
+| `news` | News pipeline and classification | `ingest`, `publishPending`, `processIngested`, `classifyPending`, `consumerLag`, `getNewsFeed`, `getRelevantNews`, `summarizeForPortfolio`, `summarizePortfolios`, `getLatestSummary` |
 | `research` | RAG over filings | `ask`, `searchFilings`, `ingestFiling` |
 | `risk` | Forecasts and alerts | `getForecast`, `getAlerts`, `evaluateAlerts` |
 | `brief` | Brief and client commentary | `generateBrief`, `approve`, `reject`, `edit` |
