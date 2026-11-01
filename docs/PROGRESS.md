@@ -82,8 +82,10 @@ and the daily AI summary, and a dashboard of portfolio tiles.
 **Open questions / blockers**
 - Still yours: recording runs (`news-classification`, `news-summary`), encrypt + commit the golden set
   (`EVAL_DATA_PASSPHRASE`), first live eval + `baseline.json`, Neon project + secrets. Then the L2 ADR.
-- Gaps found in the review: DESIGN 12 asks for circuit breaker + time limiter, ADR 0005/0012 chose retry only;
-  no metrics beyond health, no latency measurement, no coverage / static analysis / security scans in CI.
+- Gaps found in the review: DESIGN 12 asked for circuit breaker + time limiter while ADR 0005/0012 chose retry only:
+  resolved by aligning DESIGN 8, 12, 16 and CLAUDE.md with the ADRs (your decision; no new ADR, the ADRs already
+  record it). No metrics beyond health, no latency measurement, no coverage / static analysis / security scans in
+  CI: kept for the Production-readiness review (PLANNING backlog), nothing pulled earlier.
 - The demo shows no news (no Finnhub key, no fixtures yet; 2026-10-27 question).
 
 **Next session**

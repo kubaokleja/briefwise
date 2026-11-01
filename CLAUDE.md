@@ -14,7 +14,7 @@ Synthetic data only, no recommendations, no order execution, no auto-sending
 ([scope](docs/DESIGN.md#4-scope)). Budget: <= 5 CHF/month.
 
 Stack ([full table](docs/DESIGN.md#16-technology-stack)): Java 25, Spring Boot 4, Spring AI 2.0.x, Maven,
-PostgreSQL + pgvector + pg_trgm, Flyway, MapStruct, Kafka (KRaft), Resilience4j (pending ADR),
+PostgreSQL + pgvector + pg_trgm, Flyway, MapStruct, Kafka (KRaft), Spring Framework retry (ADR 0005),
 JUnit 5, Mockito, Testcontainers, WireMock, ArchUnit; Python 3.12+/uv for `quant/`; React + Vite for `ui/`.
 Versions in DESIGN are hints: verify current GA versions before using them.
 
