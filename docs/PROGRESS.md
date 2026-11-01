@@ -34,6 +34,67 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 15 — 2026-11-01 — M1 slices 9 and 10: UI News, Portfolio v0, Dashboard v0
+
+**Phase:** M1 / slices 9 and 10 (the last M1 slices; built 2026-10-28, verified and logged today)
+**Goal:** Show the news pipeline in the UI: a news feed with AI labels and "run now", a portfolio page with daily move
+and the daily AI summary, and a dashboard of portfolio tiles.
+
+**Done**
+- `news`: `GET /api/news` (newest `RECEIVED` / `CLASSIFIED` / `UNCLASSIFIED` items, optional `portfolioId`, `limit`
+  1..200) because the per-portfolio `relevant` list never contains `UNCLASSIFIED` items: `NewsFeedItem`, port
+  `NewsFeed`, `NewsFeedService`, `NewsRepository.findFeed` (JDBC), `NewsFacade.getNewsFeed`, `NewsController`.
+- `portfolio`: `GET /api/portfolios/{id}/daily-move` (weight x daily change per priced position, summed; unpriced
+  positions listed with the covered weight): `PortfolioDailyMove`, `InstrumentMove`, port `InstrumentMoves` +
+  `FacadeInstrumentMoves` (calls `MarketFacade`), `PortfolioFacade.getDailyMove`.
+- Summary `model` / `promptVersion` nullable in the OpenAPI spec; `docs/openapi.json` + `ui/src/api/schema.d.ts`
+  regenerated; `docs/api.http` (feed 200/404/400, daily move 200/404); DESIGN 6.2 facade table.
+- UI: react-router 8.5.1 (declarative mode) with nav in `AppShell`; `AiMarker` (all ADR 0007 states); News page
+  (sentiment icon + label, relevance, event type, expandable rationale, `UNCLASSIFIED` with reason, `RECEIVED`,
+  headline + `safeHref` link, portfolio filter in the URL, "Run news now" with step list, SKIPPED and 429 states);
+  Portfolio v0 (positions, daily move, AI summary with numbered sources, disclaimer, violations, template / empty /
+  no-summary states); Dashboard v0 (daily move, relevant news count).
+- Tests: `NewsFeedItemTest`, `NewsFeedServiceTest`, `PortfolioDailyMoveTest`, `PortfolioQueryServiceTest` (+2),
+  `NewsRepositoryAdapterIT` (+2), `NewsControllerIT`, `PortfolioControllerIT` (+3); Vitest for `AiMarker`, `links`,
+  `news`, `format`, the API client and the News / Portfolio / Dashboard / Status pages (10 files, 39 tests).
+- Verified today: `./mvnw verify` 331 unit + 135 IT green (incl. `ArchitectureTest`); UI lint, typecheck, API types up to date, 39 Vitest tests, build
+  green.
+- DESIGN 10: "Domain expert in the loop" (who defines labels, error costs, acceptance criteria and the M4 brief
+  rubric; the maintainer as stand-in; label bias and the human review required by ADR 0010); M5 backlog item to
+  state it in MODEL_CARD and README.
+- Walkthrough for the owner: milestones and where AI sits, profiles (`replay` is a provider, not a profile;
+  `cloud,job` in GitHub Actions is the "production" run), backend reading path through the M1 use cases.
+
+**Decisions**
+- react-router 8.5.1 instead of the 8.4.0 named in ADR 0007 (current release; ADR 0007 amended in place).
+- Feed endpoint added beside `relevant` (the plan assumed the UI could reuse `relevant`).
+
+**AI concepts introduced / explained**
+- The AI marker (transparency, EU AI Act Art. 50): every model-written text shows its review state (draft, template
+  fallback, approved, rejected), model and prompt version and a link to its sources, so a reader can tell generated
+  from computed content and trace it.
+- Evals as the test oracle for probabilistic output; label bias from model-drafted labels and the role of a domain
+  expert (BA / RM) in labelling and acceptance criteria.
+
+**Domain questions added**
+- None (the daily move uses stored weights, already covered by the 2026-10-16 stale-weight question).
+
+**Open questions / blockers**
+- Still yours: recording runs (`news-classification`, `news-summary`), encrypt + commit the golden set
+  (`EVAL_DATA_PASSPHRASE`), first live eval + `baseline.json`, Neon project + secrets. Then the L2 ADR.
+- Gaps found in the review: DESIGN 12 asks for circuit breaker + time limiter, ADR 0005/0012 chose retry only;
+  no metrics beyond health, no latency measurement, no coverage / static analysis / security scans in CI.
+- The demo shows no news (no Finnhub key, no fixtures yet; 2026-10-27 question).
+
+**Next session**
+- Close the remaining M1 items with you and merge
+  `feat/m1-news-pipeline`; split M2 into slices.
+
+**Proposed commit message**
+> feat(ui): news feed, portfolio v0 and dashboard v0 over new feed and daily-move endpoints
+
+---
+
 ## Session 14 — 2026-10-28 — M1 slice 8: classification eval
 
 **Phase:** M1 / slice 8

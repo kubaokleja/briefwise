@@ -420,6 +420,23 @@ Evaluations are the backbone of the project and the main talking point in interv
 
 **LLM-as-judge calibration:** compare the judge's scores with your own on 30–50 examples. Without that, the judge is just another model you trust blindly.
 
+**Domain expert in the loop.** An eval measures the model against labels and criteria that a person defined. In a bank
+these come from a domain expert (business analyst, RM or investment analyst), not from the developer:
+- **Label definitions:** what "HIGH relevance" means to an RM, where NEUTRAL ends and NEGATIVE starts, which event
+  type an analyst rating belongs to. Written down before labelling (ADR 0010).
+- **Cost of errors:** which mistakes are expensive (a missed negative item is worse than a false alarm), which decides
+  the metric, the per-class view and the gate.
+- **Acceptance criteria:** the threshold a model must reach before it is used, agreed with the business, not chosen
+  after seeing the numbers.
+- **Brief rubric (M4):** what a good brief covers, and the human scores the LLM judge is calibrated against.
+
+Briefwise has no such expert: the maintainer plays the role, and the classification labels were drafted by Claude and
+spot-checked ([ADR 0010](decisions/0010-golden-set-labelling.md)). Agreement with model-drafted labels can overstate
+a Claude classifier's quality (label bias), so before a model decision relies on an eval, a recorded human review
+(sample size + agreement rate) is required. With a second labeller, inter-annotator agreement (e.g. Cohen's kappa)
+would show how much of the remaining error is ambiguity in the task rather than the model. This limitation is stated
+in the README and the model card (M5).
+
 **When evals run (cost control):**
 - Deterministic evals (number grounding, structure, ArchUnit): every PR.
 - LLM evals: manually (`workflow_dispatch`) or automatically when `prompts/**` or `evals/**` change; submitted through the Message Batches API.
