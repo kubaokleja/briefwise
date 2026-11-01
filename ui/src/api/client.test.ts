@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { ApiError, apiGet, CORRELATION_HEADER } from './client';
+import { ApiError, apiGet, apiPost, CORRELATION_HEADER } from './client';
 
 function stubFetch(response: Response | Error) {
   return vi.spyOn(globalThis, 'fetch').mockImplementation(async () => {
@@ -50,5 +50,29 @@ describe('apiGet', () => {
     stubFetch(new TypeError('Failed to fetch'));
 
     await expect(apiGet('/api/portfolios')).rejects.toMatchObject({ status: 0, title: 'Server not reachable' });
+  });
+});
+
+describe('apiPost', () => {
+  it('posts with a correlation ID and returns the JSON body', async () => {
+    const fetchMock = stubFetch(Response.json({ status: 'SUCCEEDED' }));
+
+    const data = await apiPost<{ status: string }>('/api/admin/jobs/news-ingest/run');
+
+    expect(data).toEqual({ status: 'SUCCEEDED' });
+    expect(fetchMock.mock.calls[0]?.[1]?.method).toBe('POST');
+    const headers = new Headers(fetchMock.mock.calls[0]?.[1]?.headers);
+    expect(headers.get(CORRELATION_HEADER)).toMatch(/^[0-9a-f-]{36}$/);
+  });
+
+  it('keeps the HTTP status of a budget refusal (429)', async () => {
+    stubFetch(
+      new Response(JSON.stringify({ title: 'Too Many Requests', status: 429, detail: 'Daily budget used up' }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/problem+json' },
+      }),
+    );
+
+    await expect(apiPost('/api/admin/jobs/news-ingest/run')).rejects.toMatchObject({ status: 429 });
   });
 });

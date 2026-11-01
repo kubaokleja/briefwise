@@ -5,6 +5,7 @@ import com.briefwise.news.domain.model.EvalBaseline;
 import com.briefwise.news.domain.model.EvalReport;
 import com.briefwise.news.domain.model.EvalRun;
 import com.briefwise.news.domain.model.IngestSummary;
+import com.briefwise.news.domain.model.NewsFeedItem;
 import com.briefwise.news.domain.model.NewsItemNotFoundException;
 import com.briefwise.news.domain.model.PortfolioSummary;
 import com.briefwise.news.domain.model.RegressionGate.GateResult;
@@ -14,6 +15,7 @@ import com.briefwise.news.domain.model.SummaryRun;
 import com.briefwise.news.domain.model.SweepSummary;
 import com.briefwise.news.domain.port.ClassificationEvals;
 import com.briefwise.news.domain.port.NewsConsumerLag;
+import com.briefwise.news.domain.port.NewsFeed;
 import com.briefwise.news.domain.port.NewsIngest;
 import com.briefwise.news.domain.port.NewsProcessing;
 import com.briefwise.news.domain.port.OutboxRelay;
@@ -46,10 +48,11 @@ public class NewsFacade {
     private final RelevantNewsQuery relevantNews;
     private final PortfolioSummaries summaries;
     private final ClassificationEvals evals;
+    private final NewsFeed feed;
 
     NewsFacade(NewsIngest ingest, OutboxRelay relay, NewsProcessing processing, PendingClassification pending,
                NewsConsumerLag consumerLag, RelevantNewsQuery relevantNews, PortfolioSummaries summaries,
-               ClassificationEvals evals) {
+               ClassificationEvals evals, NewsFeed feed) {
         this.ingest = ingest;
         this.relay = relay;
         this.processing = processing;
@@ -58,6 +61,7 @@ public class NewsFacade {
         this.relevantNews = relevantNews;
         this.summaries = summaries;
         this.evals = evals;
+        this.feed = feed;
     }
 
     /**
@@ -127,6 +131,17 @@ public class NewsFacade {
     }
 
     /**
+     * The news feed (M1 slice 9): newest {@code RECEIVED}, {@code CLASSIFIED} and {@code UNCLASSIFIED} items, at most
+     * {@code limit}; with a portfolio, only items fetched for one of its held tickers. Never calls the LLM.
+     *
+     * @throws IllegalArgumentException if {@code limit} is not between 1 and {@link #FEED_MAX_LIMIT}
+     * @throws com.briefwise.shared.domain.exception.ResourceNotFoundException if the portfolio does not exist
+     */
+    public List<NewsFeedItemView> getNewsFeed(Optional<UUID> portfolioId, int limit) {
+        return feed.latest(portfolioId, limit).stream().map(NewsFacade::toView).toList();
+    }
+
+    /**
      * Makes the portfolio's daily news summary if the regeneration gate allows it (no summary today; today's is a
      * template or empty and news arrived; or a new HIGH item), then the compliance check, one re-ask and the
      * template fallback (ADR 0017). The LLM is called only past the gate.
@@ -177,6 +192,18 @@ public class NewsFacade {
                 EventTypeView.valueOf(n.eventType().name()), n.rationale());
     }
 
+    private static NewsFeedItemView toView(NewsFeedItem n) {
+        Optional<NewsFeedItem.Labels> labels = n.labels();
+        return new NewsFeedItemView(n.id(), n.headline(), n.url(), n.source(), n.publishedAt(),
+                NewsStatusView.valueOf(n.status().name()),
+                n.tickers().stream().sorted(Comparator.comparing(Ticker::symbol)).toList(),
+                labels.map(l -> SentimentView.valueOf(l.sentiment().name())),
+                labels.map(l -> RelevanceView.valueOf(l.relevance().name())),
+                labels.map(l -> EventTypeView.valueOf(l.eventType().name())),
+                labels.map(NewsFeedItem.Labels::rationale),
+                n.unclassifiedReason().map(r -> UnclassifiedReasonView.valueOf(r.name())));
+    }
+
     private static PortfolioSummaryView toView(PortfolioSummary s) {
         return new PortfolioSummaryView(s.portfolioId(), s.summaryDate(), s.generatedAt(),
                 s.points().stream().map(p -> new SummaryPointView(p.text(), p.citations())).toList(),
@@ -208,6 +235,24 @@ public class NewsFacade {
     public record RelevantNewsView(UUID id, String headline, String url, String source, Instant publishedAt,
                                    List<Ticker> heldTickers, BigDecimal weight, SentimentView sentiment,
                                    RelevanceView relevance, EventTypeView eventType, String rationale) {}
+
+    /** Largest {@code limit} of {@link #getNewsFeed}. */
+    public static final int FEED_MAX_LIMIT = NewsFeed.MAX_LIMIT;
+
+    /** Feed statuses; {@code SKIPPED} near-duplicates are never in the feed. */
+    public enum NewsStatusView { RECEIVED, CLASSIFIED, UNCLASSIFIED }
+
+    /** See {@link com.briefwise.news.domain.model.UnclassifiedReason}. */
+    public enum UnclassifiedReasonView { INVALID_OUTPUT, PROVIDER_ERROR, INJECTION_SUSPECTED, RETRIES_EXHAUSTED }
+
+    /**
+     * Labels are present only for {@code CLASSIFIED}; {@code unclassifiedReason} only for {@code UNCLASSIFIED}.
+     * {@code tickers}: every ticker the item was fetched for.
+     */
+    public record NewsFeedItemView(UUID id, String headline, String url, String source, Instant publishedAt,
+                                   NewsStatusView status, List<Ticker> tickers, Optional<SentimentView> sentiment,
+                                   Optional<RelevanceView> relevance, Optional<EventTypeView> eventType,
+                                   Optional<String> rationale, Optional<UnclassifiedReasonView> unclassifiedReason) {}
 
     /** What {@link #summarizeForPortfolio} did. */
     public enum SummaryOutcomeView { GENERATED, FALLBACK, EMPTY, UNCHANGED, DEFERRED }

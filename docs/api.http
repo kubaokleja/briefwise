@@ -1,6 +1,6 @@
 ### Briefwise API: happy path, 404, 400 per context. Run the app (`local` profile) and use IntelliJ / VS Code REST Client.
-### These cases are verified automatically by PortfolioControllerIT, MarketControllerIT, AdminJobControllerIT and
-### PortfolioNewsControllerIT.
+### These cases are verified automatically by PortfolioControllerIT, MarketControllerIT, AdminJobControllerIT,
+### PortfolioNewsControllerIT and NewsControllerIT.
 @host = http://localhost:8080
 @corePortfolio = b0000000-0000-4000-8000-000000000002
 
@@ -15,6 +15,13 @@ GET {{host}}/api/portfolios/{{corePortfolio}}
 
 ### Holdings only - 200
 GET {{host}}/api/portfolios/{{corePortfolio}}/holdings
+
+### Daily move: weight x daily change per priced position, summed; unpriced positions listed - 200
+### (changePercent and asOf are null until prices exist)
+GET {{host}}/api/portfolios/{{corePortfolio}}/daily-move
+
+### Daily move of an unknown portfolio - 404
+GET {{host}}/api/portfolios/00000000-0000-4000-8000-0000000000ff/daily-move
 
 ### Unknown portfolio - 404
 GET {{host}}/api/portfolios/00000000-0000-4000-8000-0000000000ff
@@ -65,7 +72,19 @@ POST {{host}}/api/admin/jobs/risk-alerts/run
 POST {{host}}/api/admin/jobs/News_Ingest/run
 
 ################################################################ news
-### Per portfolio (ADR 0017). Reading never calls the LLM; the news-ingest job makes the summary.
+### Reading never calls the LLM; the news-ingest job classifies items and makes the summary (ADR 0017).
+
+### Feed: newest RECEIVED / CLASSIFIED / UNCLASSIFIED items, labels null unless CLASSIFIED - 200
+GET {{host}}/api/news?limit=20
+
+### Feed for one portfolio's holdings - 200
+GET {{host}}/api/news?portfolioId={{corePortfolio}}
+
+### Feed for an unknown portfolio - 404
+GET {{host}}/api/news?portfolioId=00000000-0000-4000-8000-0000000000ff
+
+### Limit out of range (1..200) - 400
+GET {{host}}/api/news?limit=0
 
 ### Relevant news: HIGH/MEDIUM, last 24 h, held affected tickers, by relevance then weight - 200
 GET {{host}}/api/portfolios/{{corePortfolio}}/news/relevant

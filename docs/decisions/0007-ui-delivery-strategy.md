@@ -84,7 +84,7 @@ The owner is a Java developer learning frontend.
   tailwindcss + @tailwindcss/vite 4.3.3, @fontsource/inter + ibm-plex-mono 5.3.0 (self-hosted fonts), eslint 10.13.0,
   typescript-eslint 8.71.2, eslint-plugin-react-hooks 7.1.1, vitest 5.0.5, jsdom 30.1.3, @testing-library/react
   16.3.3, @testing-library/dom 10.4.2, @testing-library/jest-dom 7.0.1, openapi-typescript 7.13.0;
-  M1 react-router 8.4.0; M3 recharts 3.10.1 (+ react-is 19.3.1); M4 zustand 5.0.15, @testing-library/user-event
+  M1 react-router 8.4.0 (installed as 8.5.1, the current release on 2026-10-28, declarative mode); M3 recharts 3.10.1 (+ react-is 19.3.1); M4 zustand 5.0.15, @testing-library/user-event
   14.6.8, @playwright/test 1.64.1. TypeScript is pinned to 5.9.3 because openapi-typescript requires `^5.x` and
   typescript-eslint `<6.1`. Node 24 in `ui/.nvmrc`.
 - **Testing**: `tsc --noEmit`; ESLint; Vitest + Testing Library (jsdom) for pure functions (formatters, SSE parser,

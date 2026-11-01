@@ -8,7 +8,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.briefwise.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Mirrors the cases in docs/api.http: happy path, 404, 400. */
 class PortfolioControllerIT extends AbstractIntegrationTest {
@@ -17,6 +19,16 @@ class PortfolioControllerIT extends AbstractIntegrationTest {
 
     @Autowired
     MockMvc mvc;
+
+    @Autowired
+    JdbcTemplate jdbc;
+
+    private void insertClose(String ticker, String date, String close) {
+        jdbc.update("""
+                INSERT INTO daily_prices (instrument_id, trade_date, close, volume)
+                SELECT id, ?::date, ?::numeric, 1000 FROM instruments WHERE ticker = ?
+                """, date, close, ticker);
+    }
 
     @Test
     void lists_portfolios() throws Exception {
@@ -53,5 +65,39 @@ class PortfolioControllerIT extends AbstractIntegrationTest {
     void malformed_id_is_400() throws Exception {
         mvc.perform(get("/api/portfolios/not-a-uuid"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Transactional
+    void daily_move_weights_each_priced_position_and_lists_the_unpriced_ones() throws Exception {
+        insertClose("AAPL", "2026-10-26", "100");
+        insertClose("AAPL", "2026-10-27", "102.5");
+        insertClose("MSFT", "2026-10-26", "200");
+        insertClose("MSFT", "2026-10-27", "198");
+
+        // 0.15 x 2.5 + 0.15 x -1 = 0.225
+        mvc.perform(get("/api/portfolios/" + CORE_BALANCED + "/daily-move"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.changePercent").value(0.225))
+                .andExpect(jsonPath("$.pricedWeight").value(0.3))
+                .andExpect(jsonPath("$.asOf").value("2026-10-27"))
+                .andExpect(jsonPath("$.positions.length()").value(2))
+                .andExpect(jsonPath("$.positions[0].ticker").value("AAPL"))
+                .andExpect(jsonPath("$.positions[0].contribution").value(0.375))
+                .andExpect(jsonPath("$.unpriced.length()").value(4));
+    }
+
+    @Test
+    void daily_move_without_prices_has_no_change() throws Exception {
+        mvc.perform(get("/api/portfolios/" + CORE_BALANCED + "/daily-move"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.changePercent").doesNotExist())
+                .andExpect(jsonPath("$.unpriced.length()").value(6));
+    }
+
+    @Test
+    void daily_move_of_an_unknown_portfolio_is_404() throws Exception {
+        mvc.perform(get("/api/portfolios/00000000-0000-4000-8000-0000000000ff/daily-move"))
+                .andExpect(status().isNotFound());
     }
 }

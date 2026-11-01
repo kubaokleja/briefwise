@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { Portfolio } from '../api/types';
+import { stubApi } from '../test/stubApi';
 import { StatusPage } from './StatusPage';
 
 const PORTFOLIO: Portfolio = {
@@ -13,18 +14,6 @@ const PORTFOLIO: Portfolio = {
     { ticker: 'AGG', quantity: 200, weight: 0.25 },
   ],
 };
-
-/** Answers each URL with its own response, like the real backend would. */
-function stubApi(routes: Record<string, () => Response>) {
-  vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
-    const url = String(input);
-    const route = routes[url];
-    if (!route) {
-      throw new Error(`Unexpected request: ${url}`);
-    }
-    return route();
-  });
-}
 
 const healthUp = () => Response.json({ status: 'UP' });
 

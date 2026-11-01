@@ -36,7 +36,7 @@
     },
     "/api/market/instruments/{ticker}/daily-move" : {
       "get" : {
-        "operationId" : "dailyMove",
+        "operationId" : "dailyMove_1",
         "parameters" : [ {
           "in" : "path",
           "name" : "ticker",
@@ -105,6 +105,45 @@
         "tags" : [ "market-controller" ]
       }
     },
+    "/api/news" : {
+      "get" : {
+        "operationId" : "feed",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "portfolioId",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "in" : "query",
+          "name" : "limit",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 50
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/NewsFeedItemResponse"
+                  }
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "news-controller" ]
+      }
+    },
     "/api/portfolios" : {
       "get" : {
         "operationId" : "list",
@@ -144,6 +183,33 @@
               "*/*" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/PortfolioResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "portfolio-controller" ]
+      }
+    },
+    "/api/portfolios/{portfolioId}/daily-move" : {
+      "get" : {
+        "operationId" : "dailyMove",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "portfolioId",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PortfolioDailyMoveResponse"
                 }
               }
             },
@@ -333,6 +399,57 @@
           }
         }
       },
+      "NewsFeedItemResponse" : {
+        "type" : "object",
+        "properties" : {
+          "eventType" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "EARNINGS", "GUIDANCE", "M_AND_A", "REGULATORY", "LITIGATION", "MANAGEMENT", "MACRO", "PRODUCT", "ANALYST", "OTHER" ]
+          },
+          "headline" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "publishedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "rationale" : {
+            "type" : [ "string", "null" ]
+          },
+          "relevance" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "LOW", "MEDIUM", "HIGH" ]
+          },
+          "sentiment" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "NEGATIVE", "NEUTRAL", "POSITIVE" ]
+          },
+          "source" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "RECEIVED", "CLASSIFIED", "UNCLASSIFIED" ]
+          },
+          "tickers" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "unclassifiedReason" : {
+            "type" : [ "string", "null" ],
+            "enum" : [ "INVALID_OUTPUT", "PROVIDER_ERROR", "INJECTION_SUSPECTED", "RETRIES_EXHAUSTED" ]
+          },
+          "url" : {
+            "type" : "string"
+          }
+        }
+      },
       "PointResponse" : {
         "type" : "object",
         "properties" : {
@@ -344,6 +461,37 @@
           },
           "text" : {
             "type" : "string"
+          }
+        }
+      },
+      "PortfolioDailyMoveResponse" : {
+        "type" : "object",
+        "properties" : {
+          "asOf" : {
+            "type" : [ "string", "null" ],
+            "format" : "date"
+          },
+          "changePercent" : {
+            "type" : [ "number", "null" ]
+          },
+          "portfolioId" : {
+            "type" : "string",
+            "format" : "uuid"
+          },
+          "positions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PositionMoveResponse"
+            }
+          },
+          "pricedWeight" : {
+            "type" : "number"
+          },
+          "unpriced" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           }
         }
       },
@@ -369,6 +517,30 @@
           },
           "riskProfile" : {
             "type" : "string"
+          }
+        }
+      },
+      "PositionMoveResponse" : {
+        "type" : "object",
+        "properties" : {
+          "changePercent" : {
+            "type" : "number"
+          },
+          "close" : {
+            "type" : "number"
+          },
+          "contribution" : {
+            "type" : "number"
+          },
+          "date" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "ticker" : {
+            "type" : "string"
+          },
+          "weight" : {
+            "type" : "number"
           }
         }
       },
@@ -465,7 +637,7 @@
             "format" : "date-time"
           },
           "model" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "points" : {
             "type" : "array",
@@ -478,7 +650,7 @@
             "format" : "uuid"
           },
           "promptVersion" : {
-            "type" : "string"
+            "type" : [ "string", "null" ]
           },
           "summaryDate" : {
             "type" : "string",
