@@ -114,6 +114,9 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] Scheduler only when `briefwise.execution.mode=scheduled`, guarded by `jobs.<name>.enabled`
 - [x] Job runner (`--briefwise.job=news-ingest`): waits for consumer lag 0 or `briefwise.job-runner.max-duration` (15m); exit code via `ExitCodeGenerator` + `BriefwiseApplication`; relay scheduler off in `job`
 - [ ] Neon project + secrets `NEON_JDBC_URL`, `NEON_DB_USER`, `NEON_DB_PASSWORD`, `ANTHROPIC_API_KEY`, `FINNHUB_API_KEY` + variable `PIPELINE_ENABLED` (you); run `cloud,job` locally once against Neon
+- [ ] Load the price snapshot into Neon once: `import-on-startup` is on only in `local`/`demo`, so `daily_prices` in
+  `cloud` is empty and the daily move shows nothing (one-off run with the import enabled, or a documented command);
+  note in the UI/docs that the daily move is the last snapshot day (2026-10-16) until M3 refreshes prices daily
 - [x] `.github/workflows/morning-pipeline.yml`: news ingest + classification, Kafka service container, gated by `PIPELINE_ENABLED` (first `workflow_dispatch` after merge to `master`)
 - [x] Sweep of old `RECEIVED` items: Flyway V14 (`sweep_attempts`, `RETRIES_EXHAUSTED`, partial indexes); `NewsSweepService`; repository + Kafka ITs (DLT'd item swept)
 - [x] `NewsFacade.classifyPending`, `consumerLag`; stopgap `NewsStartupIngest` removed (labelling README uses the admin endpoint)
@@ -208,6 +211,9 @@ every screen has loading, empty and error states. Contingency cut order (nothing
 
 - [ ] **M1 (F2)** News pipeline: see the [M1 section](#m1-f2--news-pipeline) above
 - [ ] **M2 (F3)** RAG over SEC filings: pgvector + HNSW, hybrid search, citations, SSE, RAG eval
+  - [ ] Revisit D1 headline dedup with embeddings (the embedding model and pgvector arrive here anyway): measure
+    semantic similarity on the 7 labelled same-event pairs in `evals/labelling/` and a sample of distinct pairs,
+    decide threshold and place (ingest vs classification) -> ADR (Domain Questions Log 2026-10-23)
   - [ ] UI: Research chat over `fetch` streaming (own SSE parser, Stop), citation side panel with highlighted excerpt, "I don't know" / confidence / 429 states; parser unit tests
 - [ ] **M3 (F4)** Volatility/VaR forecast, risk alerts, backtest, MLflow
   - [ ] UI: forecast vs realised volatility chart (Recharts), VaR with model name/version, alerts list, alert count on Dashboard, position heatmap; mapper unit tests
@@ -220,6 +226,10 @@ every screen has loading, empty and error states. Contingency cut order (nothing
   - [ ] UI: "suspected injection, content withheld" state + test; UI section in `SECURITY.md` (XSS rule, cookie auth)
 - [ ] **M6 (F7)** Hardened pipeline, eval gating in CI, observability, demo video
   - [ ] `ai_generation_log` retention ([DESIGN 13.6](DESIGN.md#136-storage-retention)): full text 30 days, then hash + metrics only
+  - [ ] Retention for the rest of the data (today nothing is ever deleted): decide what `news_items` (+ tickers,
+    classifications), `news_outbox` (published rows), `news_portfolio_summaries`, `ai_daily_usage` and eval results
+    keep and for how long (audit needs vs Neon free tier 0.5 GB); a scheduled cleanup job step; a storage-size check
+    (warn before the Neon limit) -> ADR
   - [ ] Classification eval matrix (ADR 0018 backlog): Sonnet 5.5 comparison, Haiku without few-shot, Alpha Vantage baseline
   - [ ] UI: Admin (run now per job, token usage vs budget, cost summary + chart), last pipeline run on Dashboard, multi-stage Dockerfile serving the UI from Spring + `demo` Compose profile, Playwright in CI against `demo`, light mode, Evals screen
 - [ ] **Production-readiness review (after M6, before calling the project done)** Briefwise is a one-person learning
@@ -260,7 +270,7 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-10-19 | ETFs (6 of 36 instruments) likely have no company news on Finnhub. Do held ETFs get news (e.g. via top holdings or macro news), or none? | None for now ([ADR 0009](decisions/0009-news-dedup-and-etf-news.md)); strategy (general news as `MACRO` first) to decide at M4 |
 | 2026-10-21 | Finnhub licence forbids redistributing data "or derived results". May the hand-labelled golden set (real headlines) be committed once the repo is public, or only IDs/hashes plus labels, or synthetic headlines? Exports are git-ignored until then | Decided: committed only gpg-encrypted, results hold metrics only ([ADR 0018](decisions/0018-classification-eval.md)) |
 | 2026-10-21 | A near-duplicate is linked to one ticker's original. If its URL is later fetched for a second ticker it stays `SKIPPED` even though the original may not concern that ticker. Acceptable? | Open (check on the labelled sample) |
-| 2026-10-23 | Same-event duplicates (e.g. "KFC switches from Pepsi to Coke" vs "KFC plans a massive soda change") score 0.09–0.49 on headline trigram similarity, far below 0.6. Trigram dedup only catches re-syndication. Do we need semantic (embedding) dedup, and where: ingest or classification? | Open (revisit D1 after the eval; 7 labelled pairs in `evals/labelling/`) |
+| 2026-10-23 | Same-event duplicates (e.g. "KFC switches from Pepsi to Coke" vs "KFC plans a massive soda change") score 0.09–0.49 on headline trigram similarity, far below 0.6. Trigram dedup only catches re-syndication. Do we need semantic (embedding) dedup, and where: ingest or classification? | Open (task in M2; 7 labelled pairs in `evals/labelling/`) |
 | 2026-10-23 | `EventType` has no value for analyst rating / price-target changes (~20 labelled rows) or customer contracts (KFC/Coke). Add `ANALYST` and `CONTRACT`, or keep them in `OTHER`? | Decided: `ANALYST` added, contracts `PRODUCT`; 22 rows relabelled ([ADR 0014](decisions/0014-classification-output-shape.md)) |
 | 2026-10-23 | Relevance is labelled per ticker ("would an RM whose client holds it want to see it?"), multi-ticker items once for the most affected ticker. Does the classifier output per ticker or per item? | Decided: per item + affected tickers ([ADR 0014](decisions/0014-classification-output-shape.md)) |
 | 2026-10-24 | An item whose message ends in `news.raw.DLT` stays `RECEIVED` with its outbox row published, so nothing re-sends it. Who picks it up: a sweep of old `RECEIVED` items (e.g. in `classifyPending` or the job runner), a DLT replay tool, or both? | Decided: sweep in `classifyPending`, min-age 10m, cap 3 ([ADR 0016](decisions/0016-jobs-sweep-and-job-runner.md)) |
