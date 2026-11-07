@@ -38,7 +38,7 @@ record NewsProperties(@Valid @DefaultValue Ingest ingest, @Valid @DefaultValue D
     record Sweep(@DefaultValue("10m") @NotNull Duration minAge,
                  @DefaultValue("200") @Positive int batchSize,
                  @DefaultValue("3") @Positive int maxAttempts,
-                 @DefaultValue("48h") @NotNull Duration providerErrorRetryWindow) {}
+                 @DefaultValue("96h") @NotNull Duration providerErrorRetryWindow) {}
 
     record Selection(@DefaultValue("24h") @NotNull Duration window,
                      @DefaultValue("15") @Positive int maxItems,

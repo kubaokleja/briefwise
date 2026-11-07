@@ -128,17 +128,15 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
   note in the UI/docs that the daily move is the last snapshot day (2026-10-16) until M3 refreshes prices daily
 - [x] `.github/workflows/morning-pipeline.yml`: news ingest + classification, Kafka service container, gated by `PIPELINE_ENABLED` (first `workflow_dispatch` after merge to `master`)
 - [x] Sweep of old `RECEIVED` items: Flyway V14 (`sweep_attempts`, `RETRIES_EXHAUSTED`, partial indexes); `NewsSweepService`; repository + Kafka ITs (DLT'd item swept)
-- [ ] Sweep follow-ups (found 2026-11-07, explain-context news sweep): DESIGN 7.1 says swept items end
-  `RETRIES_EXHAUSTED` after 3 attempts, but a `PROVIDER_ERROR` item stays `PROVIDER_ERROR` (reopen needs
-  `sweep_attempts < max-attempts`); only `RECEIVED` items give up, on the 4th pick. Fix the DESIGN wording. Missing
-  tests: the multi-run provider-error chain, the multi-day budget deferral (one attempt burnt per run on the oldest
-  item), two concurrent sweeps (no `SKIP LOCKED`: same ids picked, attempts counted twice). After the first Neon runs,
-  check `gaveUp` / `failed` / `stoppedOnDeferral` in the runner output (ADR 0016 thresholds)
-- [ ] Jobs follow-ups (found 2026-11-07, explain-context jobs): `max-duration` bounds only publish and drain;
-  ingest, sweep and summarize run without a deadline, so the workflow's `timeout-minutes: 25` is the real limit and
-  kills the run without the app's exit 1 (ADR 0016 reads as a bound on the whole run: fix the wording or the code,
-  see Domain Questions Log). No in-app guard against two overlapping runs (admin + admin, admin + scheduler); GitHub
-  serialises only its own runs. Minor: `JobsFacade` exposes the domain enums `JobTrigger` / `JobStatus` instead of view
+- [x] Sweep and jobs follow-ups (found 2026-11-07) -> [ADR 0021](decisions/0021-job-run-limits-status-and-lock.md):
+  provider-error window 96h; `sweep` step `FAILED` when at least half the picked items failed, `SKIPPED` on deferral,
+  `TIMED_OUT` at the deadline; `max-duration` is the deadline of publish, drain, sweep and summaries (between items;
+  ingest unbounded); `JobLock` (`PostgresJobLock`, advisory lock, `news-ingest` + `news-classify` share
+  `news-pipeline`). DESIGN 7.1 wording fixed. Tests: `NewsSweepIT` (provider-error chain, multi-day budget deferral,
+  deadline), `PostgresJobLockIT`, `JobServiceTest` (+8), `NewsSweepServiceTest` (+1), `PortfolioSummaryServiceTest` (+1)
+- [ ] After the first Neon runs, check `gaveUp` / `failed` / `stoppedOnDeferral` / `stoppedOnDeadline` in the runner
+  output (ADR 0016 / 0021 thresholds)
+- [ ] Jobs minor (found 2026-11-07): `JobsFacade` exposes the domain enums `JobTrigger` / `JobStatus` instead of view
   types (ADR 0006 1a); `briefwise.jobs.risk-alerts` / `brief` exist in config but not in `JobName` (until M3/M4)
 - [x] `NewsFacade.classifyPending`, `consumerLag`; stopgap `NewsStartupIngest` removed (labelling README uses the admin endpoint)
 
@@ -334,12 +332,12 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-11-07 | Idempotency guarantees one stored result, not one LLM call: two concurrent deliveries (consumer + sweep, or a redelivery while the first call runs) can both pass `status = RECEIVED` and both pay. Accept (sweep min-age 10m), or claim the item first (e.g. a `CLASSIFYING` status or `SELECT … FOR UPDATE SKIP LOCKED`)? | Open (watch generation-log duplicates per `subject_id`) |
 | 2026-11-07 | The budget gate runs before the replay advisor, so a replay hit (free) still needs a budget entry and is deferred when the budget is used up. Check the budget only for live calls? | Open (minor; revisit with the next LLM adapter in M2) |
 | 2026-11-07 | The code gate calls `listPortfolios()` + `getInstrument()` per held ticker for every message, to compute COMPANY/FUND it does not need (N+1 per message). A held-tickers-only port, or a per-run cache? | Open (performance; revisit with M6 metrics or the production review) |
-| 2026-11-07 | The only scheduled sweep is the weekday 04:30 UTC runner, but `provider-error-retry-window` is 48h: a Friday `PROVIDER_ERROR` is ~72h old on Monday and is never retried. Widen the window (e.g. 96h), count it in runs instead of hours, or accept? | Open (decide before enabling `PIPELINE_ENABLED`) |
+| 2026-11-07 | The only scheduled sweep is the weekday 04:30 UTC runner, but `provider-error-retry-window` is 48h: a Friday `PROVIDER_ERROR` is ~72h old on Monday and is never retried. Widen the window (e.g. 96h), count it in runs instead of hours, or accept? | Decided: window 96h ([ADR 0021](decisions/0021-job-run-limits-status-and-lock.md)) |
 | 2026-11-07 | Items DLT'd or deferred in a run are younger than `min-age` when the sweep runs after the drain, so with one run a day they wait ~24h (72h over a weekend) and then fall outside the summary's 24h published window: they reach the feed but never a summary. Acceptable, a second sweep later in the run (after `min-age`), or a shorter `min-age` in the runner (lag is already 0 there)? | Open (watch the first pipeline runs) |
-| 2026-11-07 | The `sweep` job step is `SUCCEEDED` even when every picked item `failed` (per-item exceptions are caught), so the runner exits 0 and GitHub sends no email (ADR 0016 promises failed runs are visible). A sweep stopped on deferral also stays `SUCCEEDED`, while `summarize` maps that to `SKIPPED`. Fail the step above a failure threshold, and map `stoppedOnDeferral` to `SKIPPED` like the summary? | Open (decide with the first Neon runs) |
+| 2026-11-07 | The `sweep` job step is `SUCCEEDED` even when every picked item `failed` (per-item exceptions are caught), so the runner exits 0 and GitHub sends no email (ADR 0016 promises failed runs are visible). A sweep stopped on deferral also stays `SUCCEEDED`, while `summarize` maps that to `SKIPPED`. Fail the step above a failure threshold, and map `stoppedOnDeferral` to `SKIPPED` like the summary? | Decided: `FAILED` when at least half the picked items failed, deferral `SKIPPED` ([ADR 0021](decisions/0021-job-run-limits-status-and-lock.md)) |
 | 2026-11-07 | A failed regeneration overwrites a good summary: today's compliant summary is replaced by the template when a new HIGH item triggers a regeneration and the first call fails, or the re-ask still violates / defers (same UTC-date upsert). It heals on the next run, but the RM loses the compliant text in between. Keep today's compliant summary when the regeneration falls back, or accept (ADR 0017: a non-compliant draft must never be shown)? | Open (decide before M4 reuses summaries) |
 | 2026-11-07 | "Run news now" (admin trigger) has no drain step, so `summarize` runs while the listener is still classifying the items just ingested. Today's summary is built without them, and the gate reopens it only for a HIGH item, so new MEDIUM news never reaches today's summary. Drain for the admin trigger too, skip `summarize` for admin runs, or accept? | Open (decide before the UI demo) |
-| 2026-11-07 | `briefwise.job-runner.max-duration` (15m) bounds only publish and drain. A slow ingest, sweep (up to 200 sequential LLM calls) or summary can run until the workflow's 25-min timeout kills it, with no exit 1 from the app and no "leftovers for the next run" message. Give every step the deadline (stop between items), or treat max-duration as a wait limit only and document it? | Open (decide with the first Neon runs) |
+| 2026-11-07 | `briefwise.job-runner.max-duration` (15m) bounds only publish and drain. A slow ingest, sweep (up to 200 sequential LLM calls) or summary can run until the workflow's 25-min timeout kills it, with no exit 1 from the app and no "leftovers for the next run" message. Give every step the deadline (stop between items), or treat max-duration as a wait limit only and document it? | Decided: deadline for sweep and summaries between items, ingest unbounded ([ADR 0021](decisions/0021-job-run-limits-status-and-lock.md)) |
 
 ## Open questions from DESIGN
 

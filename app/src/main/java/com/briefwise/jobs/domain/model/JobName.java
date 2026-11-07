@@ -10,20 +10,30 @@ import java.util.regex.Pattern;
  * {@code news-classification-eval}: the classification eval against the golden set (ADR 0018); never scheduled.
  */
 public enum JobName {
-    NEWS_INGEST("news-ingest"),
-    NEWS_CLASSIFY("news-classify"),
-    NEWS_CLASSIFICATION_EVAL("news-classification-eval");
+    NEWS_INGEST("news-ingest", "news-pipeline"),
+    NEWS_CLASSIFY("news-classify", "news-pipeline"),
+    NEWS_CLASSIFICATION_EVAL("news-classification-eval", "news-classification-eval");
 
     private static final Pattern ID = Pattern.compile("[a-z][a-z0-9-]{0,63}");
 
     private final String id;
+    private final String lockGroup;
 
-    JobName(String id) {
+    JobName(String id, String lockGroup) {
         this.id = id;
+        this.lockGroup = lockGroup;
     }
 
     public String id() {
         return id;
+    }
+
+    /**
+     * Jobs in the same group never run at the same time: {@code news-ingest} and {@code news-classify} both sweep,
+     * and two sweeps would pick the same items and count their attempts twice.
+     */
+    public String lockGroup() {
+        return lockGroup;
     }
 
     /**

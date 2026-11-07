@@ -10,6 +10,7 @@ import com.briefwise.news.NewsFacade.IngestSummaryView;
 import com.briefwise.news.NewsFacade.PublishSummaryView;
 import com.briefwise.news.NewsFacade.SummaryRunView;
 import com.briefwise.shared.domain.model.Ticker;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +52,8 @@ class FacadeNewsPipeline implements NewsPipeline {
     }
 
     @Override
-    public Map<String, Object> classifyPending() {
-        ClassifyPendingView s = news.classifyPending();
+    public Map<String, Object> classifyPending(Instant deadline) {
+        ClassifyPendingView s = news.classifyPending(deadline);
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("reopened", s.reopened());
         result.put("picked", s.picked());
@@ -64,12 +65,13 @@ class FacadeNewsPipeline implements NewsPipeline {
         result.put("gaveUp", s.gaveUp());
         result.put("failed", s.failed());
         result.put("stoppedOnDeferral", s.stoppedOnDeferral());
+        result.put("stoppedOnDeadline", s.stoppedOnDeadline());
         return result;
     }
 
     @Override
-    public Map<String, Object> summarizePortfolios() {
-        SummaryRunView s = news.summarizePortfolios();
+    public Map<String, Object> summarizePortfolios(Instant deadline) {
+        SummaryRunView s = news.summarizePortfolios(deadline);
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("portfolios", s.portfolios());
         result.put("generated", s.generated());
@@ -79,6 +81,7 @@ class FacadeNewsPipeline implements NewsPipeline {
         result.put("deferred", s.deferred());
         result.put("failed", s.failed());
         result.put("stoppedOnDeferral", s.stoppedOnDeferral());
+        result.put("stoppedOnDeadline", s.stoppedOnDeadline());
         return result;
     }
 

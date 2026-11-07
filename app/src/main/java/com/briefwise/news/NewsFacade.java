@@ -102,12 +102,14 @@ public class NewsFacade {
      * Sweep of items stuck in {@code RECEIVED} (ADR 0016): reopens recent {@code PROVIDER_ERROR} items, then
      * classifies old {@code RECEIVED} items (DLT'd, never delivered, deferred on budget) through the same code gate
      * as {@link #processIngested}. An item that fails {@code max-attempts} sweeps becomes {@code UNCLASSIFIED}
-     * ({@code RETRIES_EXHAUSTED}). Stops at the first deferral. Safe to run next to the consumer.
+     * ({@code RETRIES_EXHAUSTED}). Stops at the first deferral, or before the next item once {@code deadline} has
+     * passed. Safe to run next to the consumer.
      */
-    public ClassifyPendingView classifyPending() {
-        SweepSummary s = pending.classifyPending();
+    public ClassifyPendingView classifyPending(Instant deadline) {
+        SweepSummary s = pending.classifyPending(deadline);
         return new ClassifyPendingView(s.reopened(), s.picked(), s.classified(), s.unclassified(), s.skipped(),
-                s.alreadyProcessed(), s.pending(), s.gaveUp(), s.failed(), s.stoppedOnDeferral());
+                s.alreadyProcessed(), s.pending(), s.gaveUp(), s.failed(), s.stoppedOnDeferral(),
+                s.stoppedOnDeadline());
     }
 
     /**
@@ -152,11 +154,14 @@ public class NewsFacade {
         return SummaryOutcomeView.valueOf(summaries.summarize(portfolioId).name());
     }
 
-    /** {@link #summarizeForPortfolio} for every portfolio; stops at the first deferral (budget used up). */
-    public SummaryRunView summarizePortfolios() {
-        SummaryRun r = summaries.summarizeAll();
+    /**
+     * {@link #summarizeForPortfolio} for every portfolio; stops at the first deferral (budget used up), or before the
+     * next portfolio once {@code deadline} has passed.
+     */
+    public SummaryRunView summarizePortfolios(Instant deadline) {
+        SummaryRun r = summaries.summarizeAll(deadline);
         return new SummaryRunView(r.portfolios(), r.generated(), r.fallback(), r.empty(), r.unchanged(),
-                r.deferred(), r.failed(), r.stoppedOnDeferral());
+                r.deferred(), r.failed(), r.stoppedOnDeferral(), r.stoppedOnDeadline());
     }
 
     /**
@@ -221,7 +226,7 @@ public class NewsFacade {
     /** See {@link SweepSummary}. */
     public record ClassifyPendingView(int reopened, int picked, int classified, int unclassified, int skipped,
                                       int alreadyProcessed, int pending, int gaveUp, int failed,
-                                      boolean stoppedOnDeferral) {}
+                                      boolean stoppedOnDeferral, boolean stoppedOnDeadline) {}
 
     public enum SentimentView { NEGATIVE, NEUTRAL, POSITIVE }
 
@@ -259,7 +264,7 @@ public class NewsFacade {
 
     /** See {@link SummaryRun}. */
     public record SummaryRunView(int portfolios, int generated, int fallback, int empty, int unchanged, int deferred,
-                                 int failed, boolean stoppedOnDeferral) {}
+                                 int failed, boolean stoppedOnDeferral, boolean stoppedOnDeadline) {}
 
     /**
      * {@code aiGenerated}: a model wrote the points (show the AI marker); false for a template {@code fallback}

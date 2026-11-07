@@ -99,7 +99,7 @@ class PortfolioSummaryService implements PortfolioSummaries {
     }
 
     @Override
-    public SummaryRun summarizeAll() {
+    public SummaryRun summarizeAll(Instant deadline) {
         List<UUID> ids = holdings.portfolioIds();
         int generated = 0;
         int fallback = 0;
@@ -108,7 +108,12 @@ class PortfolioSummaryService implements PortfolioSummaries {
         int deferred = 0;
         int failed = 0;
         boolean stopped = false;
+        boolean stoppedOnDeadline = false;
         for (UUID id : ids) {
+            if (!clock.instant().isBefore(deadline)) {
+                stoppedOnDeadline = true;
+                break;
+            }
             SummaryOutcome outcome;
             try {
                 outcome = summarize(id);
@@ -129,7 +134,8 @@ class PortfolioSummaryService implements PortfolioSummaries {
                 break;
             }
         }
-        SummaryRun run = new SummaryRun(ids.size(), generated, fallback, empty, unchanged, deferred, failed, stopped);
+        SummaryRun run = new SummaryRun(ids.size(), generated, fallback, empty, unchanged, deferred, failed, stopped,
+                stoppedOnDeadline);
         log.info("Portfolio summaries: {}", run);
         return run;
     }
