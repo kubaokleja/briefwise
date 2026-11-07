@@ -155,6 +155,8 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
 
     @Test
     void cost_summary_totals_calls_tokens_and_cost_per_feature() {
+        // The summary spans every feature: start from no usage at all, whatever other ITs left today.
+        jdbc.update("DELETE FROM ai_daily_usage");
         facade.checkAndRecordUsage(FEATURE, MODEL, new TokenCount(1_000, 0));
         facade.checkAndRecordUsage(FEATURE, MODEL, new TokenCount(2_000, 500));
 
