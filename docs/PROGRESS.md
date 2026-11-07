@@ -34,6 +34,81 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 16 — 2026-11-07 — M1 close-out: cost fixes, recordings, first eval, Neon, job hardening
+
+**Phase:** M1 / close-out (steps 1–8 agreed at session start; M1 is complete except the post-merge items)
+**Goal:** Finish and run M1: fix what the walkthroughs found, make the first paid runs (recordings, eval, Neon) and
+prepare the merge of `feat/m1-news-pipeline`.
+
+**Done**
+- Step 1, pricing escape (`17d2ea1`): LLM calls are priced by the configured model; the echoed model ID goes to
+  `ai_generation_log.response_model` (V16); `AiopsFacade.ensureConfigured` in every adapter constructor (missing
+  price/budget stops startup); recording after a paid call logs instead of throwing.
+- Step 2, evals (`f974fa9`): a batch past `max-wait` is cancelled and its billed results recorded (`cancel-wait` 5m);
+  `evals.yml` runs only on the classification prompt, the encrypted golden set and `evals/scripts/**`; DESIGN 13.4 /
+  14.2 updated.
+- Step 3, recordings (`e729f19`, 0.0020 USD, throwaway DB): `evals/replay/news-classification.jsonl` (10) and
+  `news-summary.jsonl` (3); `classification-recorded.json` (+1 IT); prompt cache confirmed (2,058 tokens written once,
+  read by the other 9). Anthropic echoes `claude-haiku-5-5`. Fixed on the way: `fixtures-dir` broke `local`/`demo`
+  startup (bound as `String` now); the export missed summaries; the recording procedure uses a throwaway database
+  (the dev DB holds 1,908 real `RECEIVED` items the sweep would have sent to the model).
+- Step 4, eval (`527f7b2`, 0.0118 USD): golden set encrypted (round trip checked), secret `EVAL_DATA_PASSPHRASE`;
+  first run on Haiku 5.5, prompt v1: sentiment macro F1 0.785 (random 0.853), relevance 0.676, event type 0.572,
+  5/258 unusable (empty `affectedTickers`); committed as `baseline.json`; `*.gpg binary`.
+- Step 5, jobs (`3c33fb0`): provider-error window 96h; sweep `FAILED` at >= half failed, `SKIPPED` on deferral,
+  `TIMED_OUT` at the deadline; sweep and summaries take the run deadline; `JobLock` / `PostgresJobLock` (advisory lock,
+  news jobs share `news-pipeline`); `NewsSweepIT`, `PostgresJobLockIT`; DESIGN 7.1 wording.
+- Step 6, Neon: EU (Frankfurt) project, Postgres 16, direct endpoint; 16 migrations, price snapshot (45,180 rows)
+  loaded; GitHub secrets set (`NEON_*`, `ANTHROPIC_API_KEY`, `FINNHUB_API_KEY`). First `cloud,job` `news-ingest`
+  against Neon (backfill, max-duration 40m): 825 inserted, 801 classified, 24 unusable (2.9%), 3 summaries,
+  0.080 USD, 33 min, exit 0. `.env` `NEON_JDBC_URL` converted to JDBC form.
+- Step 7 (`62268c7`): a summary draft rejected by compliance and replaced by the template is flagged in the generation
+  log (`GenerationAudit` -> `AiopsFacade.markFallback`, replay key cleared); `generatedAt` = selection time; admin runs
+  skip `summarize`; UI budget notice from `SKIPPED` steps (429 branch kept).
+- Step 8: open M1 items moved to M2 (prompt v2, baseline comparability), M4 (summary ids, jobs minor), M6 (demo
+  Compose profile, required eval check).
+- Verified: `./mvnw verify` 347 unit + 145 IT green (incl. `ArchitectureTest`); UI lint, typecheck, 41 Vitest tests.
+- Total live spend this session: about 0.094 USD.
+
+**Decisions**
+- [ADR 0019](decisions/0019-price-by-configured-model-and-startup-check.md): price by configured model, audit the echoed
+  ID, startup check, never throw after a paid call.
+- [ADR 0020](decisions/0020-classification-model-from-first-eval.md): Haiku 5.5 kept for classification (L2); first
+  run is the baseline.
+- [ADR 0021](decisions/0021-job-run-limits-status-and-lock.md): 96h window, threshold sweep status, run deadline for
+  sweep and summaries, advisory lock (amends ADR 0016).
+- Without an ADR (small, recorded in PLANNING / DESIGN): narrower `evals.yml` trigger; recorded body as an extra
+  fixture instead of replacing the hand-written one; summary fallback flag in the log; `generatedAt` at selection;
+  admin runs skip summaries; UI budget notice from step statuses plus the 429 branch; backfill run with a 40m
+  `max-duration`.
+
+**AI concepts introduced / explained**
+- Model alias vs dated snapshot: price and budget by what we chose to call, keep the served ID for audit and evals.
+- Batch billing: finished requests are billed even when the batch is cancelled; record them or the budget under-counts.
+- Prompt caching economics: one cache write (1.25x), then reads at 0.1x; works because the stable prefix comes first.
+- Macro F1 vs accuracy on an imbalanced golden set; reading a confusion matrix (errors towards `NEUTRAL`, `HIGH` and
+  `PRODUCT` over-predicted); label bias from Claude-drafted labels.
+- Postgres advisory locks: a session-scoped lock on a chosen key, released when the session ends.
+
+**Domain questions added**
+- None new; three 2026-11-07 questions decided (ADR 0021) and the admin-drain question decided (admin runs skip
+  summaries).
+
+**Open questions / blockers**
+- After merge (you): first `workflow_dispatch` of `morning-pipeline` on `master`, then `PIPELINE_ENABLED=true`; watch
+  `failed` / `gaveUp` / `stoppedOnDeadline` in the first scheduled runs.
+- One Kafka consumer classifies about 1.9 s per item: a heavy news day (> ~450 items) will hit the 15m
+  `max-duration`; leftovers go to the next run. Consumer concurrency is a candidate if it happens often.
+- Live unusable rate 2.9% vs 1.9% in the eval (empty `affectedTickers`): prompt v2 in M2.
+
+**Next session**
+- Merge `feat/m1-news-pipeline` (after CI), the first GitHub pipeline run, then split M2 into slices.
+
+**Proposed commit message**
+> docs: close out M1 (progress log, move open items to M2/M4/M6)
+
+---
+
 ## Session 15 — 2026-11-01 — M1 slices 9 and 10: UI News, Portfolio v0, Dashboard v0
 
 **Phase:** M1 / slices 9 and 10 (the last M1 slices; built 2026-10-28, verified and logged today)
