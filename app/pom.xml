@@ -194,12 +194,39 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <!-- Two executions, each in its own forked JVM ("default" merges with the execution the Spring Boot
+                     parent declares, so it is not run twice). JsonLoggingIT checks the JSON log format of the job
+                     profile, which logback sets up once per JVM: since Spring Boot 4.1.2 a later test context no
+                     longer re-initialises it, so after other ITs the test would see the human-readable format. In its
+                     own JVM it starts like a real job run. failIfNoSpecifiedTests=false: -Dit.test=... may match only
+                     one of the two executions. -->
                 <executions>
                     <execution>
+                        <id>default</id>
                         <goals>
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/JsonLoggingIT.java</exclude>
+                            </excludes>
+                            <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>json-logging-it</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/JsonLoggingIT.java</include>
+                            </includes>
+                            <summaryFile>${project.build.directory}/failsafe-reports/failsafe-summary-json-logging.xml</summaryFile>
+                            <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
