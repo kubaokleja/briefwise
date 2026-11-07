@@ -44,7 +44,6 @@ Goal: bounded contexts, synthetic portfolios, market data, CI from the first com
 - [x] Python `quant/` with uv + ruff + pytest and a `quant-verify` CI job (7 offline tests; green on GitHub)
 - [x] UI delivery strategy -> [ADR 0007](decisions/0007-ui-delivery-strategy.md)
 - [x] `server.address=127.0.0.1` in `local` (admin endpoint is open until M4 auth)
-- [ ] `docker-compose.yml` `demo` profile does not exist yet (the line above was ticked too early); app image + UI come in M6
 
 ### UI skeleton ([ADR 0007](decisions/0007-ui-delivery-strategy.md))
 - [x] `ui/`: Vite + React + TypeScript 5.9.3, Node 24 in `.nvmrc`, Vite proxy `/api` + `/actuator` -> :8080
@@ -130,7 +129,7 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
   passed (you)
 - [x] Load the price snapshot into Neon once (2026-11-07): one-off `cloud,job` run with
   `--briefwise.market.price-snapshot.import-on-startup=true` (45,180 rows, 2021-10-18..2026-10-16; Neon 18 MB)
-- [ ] Note in the UI/docs that the daily move is the last snapshot day (2026-10-16) until M3 refreshes prices daily
+- [x] Daily move shows its date: Portfolio and Dashboard print "as of <last close>" (2026-10-16 until M3 refreshes prices daily)
 - [x] `.github/workflows/morning-pipeline.yml`: news ingest + classification, Kafka service container, gated by `PIPELINE_ENABLED` (first `workflow_dispatch` after merge to `master`)
 - [x] Sweep of old `RECEIVED` items: Flyway V14 (`sweep_attempts`, `RETRIES_EXHAUSTED`, partial indexes); `NewsSweepService`; repository + Kafka ITs (DLT'd item swept)
 - [x] Sweep and jobs follow-ups (found 2026-11-07) -> [ADR 0021](decisions/0021-job-run-limits-status-and-lock.md):
@@ -141,8 +140,6 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
   deadline), `PostgresJobLockIT`, `JobServiceTest` (+8), `NewsSweepServiceTest` (+1), `PortfolioSummaryServiceTest` (+1)
 - [ ] After the first Neon runs, check `gaveUp` / `failed` / `stoppedOnDeferral` / `stoppedOnDeadline` in the runner
   output (ADR 0016 / 0021 thresholds)
-- [ ] Jobs minor (found 2026-11-07): `JobsFacade` exposes the domain enums `JobTrigger` / `JobStatus` instead of view
-  types (ADR 0006 1a); `briefwise.jobs.risk-alerts` / `brief` exist in config but not in `JobName` (until M3/M4)
 - [x] `NewsFacade.classifyPending`, `consumerLag`; stopgap `NewsStartupIngest` removed (labelling README uses the admin endpoint)
 
 ### Slice 7 — Daily portfolio summary
@@ -178,8 +175,6 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
   in the generation log too (`Drafted.generationId`, port `GenerationAudit`, `AiopsFacade.markFallback`, which also
   clears the replay key); `generatedAt` is the selection time. Tests: `PortfolioSummaryServiceTest` (+5),
   `AiopsFacadeIT` (+1), `LlmNewsSummarizerIT`
-- [ ] Summary follow-up (3), moved to M4: the upsert keeps the first row `id` while the domain makes a new UUID per
-  save; decide when briefs start referencing summary ids
 - [x] Slice 10: `model` / `promptVersion` of the summary response are nullable, but the generated TS types say
   `string`; mark them nullable in the spec (or handle `null` in the UI)
 
@@ -205,20 +200,11 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] First live run (2026-11-07, 0.0118 USD, throwaway DB): sentiment macro F1 0.785 (random 0.853), relevance
   0.676, event type 0.572, 5/258 unusable; committed as `baseline.json`
 - [x] ADR: classification model choice from the eval (L2) -> [ADR 0020](decisions/0020-classification-model-from-first-eval.md) (Haiku 5.5 kept)
-- [ ] Prompt v2 follow-ups from the first eval (ADR 0020): (1) 5 answers with empty `affectedTickers` on generic
-  items are unusable: allow none for `OTHER`/`LOW` items, or enforce at least one in the schema; (2) `PRODUCT` is
-  over-predicted (38 `OTHER` items): sharpen the boundary in the prompt. Then a new baseline run (M2 or with M6).
-  Seen live too: 24 of 825 unusable (2.9%) on the first Neon backfill
 - [x] Skill `new-eval-case`
-- [ ] You: optionally make `classification-eval` a required check (path-filtered: required checks stay pending on PRs
-  that do not trigger it)
 - [x] Eval follow-ups (1) and (3) (found 2026-11-07): a batch past `max-wait` is cancelled, then after
   `cancel-wait` (5m) its finished, billed requests are recorded in the generation log and `ai_daily_usage`; still
   `INCOMPLETE`, not scored (`AnthropicBatchClassifierIT` +1). `evals.yml` runs only on
   `prompts/news-classification/**`, `evals/sentiment_golden.csv.gpg`, `evals/scripts/**`; timeout 80 min
-- [ ] Eval follow-up (2): `RegressionGate` compares only F1: a changed model, prompt version or golden set (row
-  count) is compared with the old baseline without a warning; refuse or flag a non-comparable baseline (`cases` is
-  not in `EvalBaseline` yet)
 
 ### Slice 9 — UI: News
 - [x] Feed source: new `GET /api/news` (all visible statuses, optional portfolio filter) instead of the per-portfolio
@@ -259,6 +245,13 @@ every screen has loading, empty and error states. Contingency cut order (nothing
     semantic similarity on the 7 labelled same-event pairs in `evals/labelling/` and a sample of distinct pairs,
     decide threshold and place (ingest vs classification) -> ADR (Domain Questions Log 2026-10-23)
   - [ ] UI: Research chat over `fetch` streaming (own SSE parser, Stop), citation side panel with highlighted excerpt, "I don't know" / confidence / 429 states; parser unit tests
+  - [ ] Prompt v2 follow-ups from the first eval (ADR 0020): (1) 5 answers with empty `affectedTickers` on generic
+    items are unusable: allow none for `OTHER`/`LOW` items, or enforce at least one in the schema; (2) `PRODUCT` is
+    over-predicted (38 `OTHER` items): sharpen the boundary in the prompt. Then a new baseline run (here, before the RAG eval).
+    Seen live too: 24 of 825 unusable (2.9%) on the first Neon backfill
+  - [ ] Eval follow-up (2), before the prompt v2 re-baseline: `RegressionGate` compares only F1: a changed model, prompt version or golden set (row
+    count) is compared with the old baseline without a warning; refuse or flag a non-comparable baseline (`cases` is
+    not in `EvalBaseline` yet)
 - [ ] **M3 (F4)** Volatility/VaR forecast, risk alerts, backtest, MLflow
   - [ ] Portfolio data rules before risk uses weights: stored vs derived weight (Domain Questions Log 2026-10-16),
     weights-sum invariant, rounding of the daily move, one policy for an unknown held instrument (2026-11-07) -> ADR
@@ -266,6 +259,10 @@ every screen has loading, empty and error states. Contingency cut order (nothing
 - [ ] **M4 (F5)** Morning brief, approval workflow, MCP server, trajectory eval
   - [ ] Role `ADMIN` on `POST /api/admin/jobs/{job}/run` (open until login exists, ADR 0016)
   - [ ] UI: Login (httpOnly cookie + CSRF), route guard, role-based nav, 401/403 states; Brief screen (SSE progress, sections + citations, violations, edit, Approve disabled while violations open, Reject with reason, `isFallback` banner, change history); briefs awaiting approval on Dashboard; Playwright smoke (local); reassess server-state library
+  - [ ] Summary ids (M1 follow-up 3): the upsert keeps the first row `id` while the domain makes a new UUID per
+    save; decide when briefs start referencing summary ids
+  - [ ] Jobs minor (found 2026-11-07): `JobsFacade` exposes the domain enums `JobTrigger` / `JobStatus` instead of view
+    types (ADR 0006 1a); `briefwise.jobs.risk-alerts` / `brief` exist in config but not in `JobName` (until M3/M4)
 - [ ] **M5 (F6)** Red-team, guardrails, MODEL_CARD / AI_RISK_ASSESSMENT / SECURITY
   - [ ] MODEL_CARD + README: eval labels drafted by Claude, maintainer as stand-in domain expert, label bias
     ([DESIGN 10](DESIGN.md#10-evaluation-strategy) "Domain expert in the loop")
@@ -278,6 +275,9 @@ every screen has loading, empty and error states. Contingency cut order (nothing
     (warn before the Neon limit) -> ADR
   - [ ] Classification eval matrix (ADR 0018 backlog): Sonnet 5.5 comparison, Haiku without few-shot, Alpha Vantage baseline
   - [ ] UI: Admin (run now per job, token usage vs budget, cost summary + chart), last pipeline run on Dashboard, multi-stage Dockerfile serving the UI from Spring + `demo` Compose profile, Playwright in CI against `demo`, light mode, Evals screen
+  - [ ] `docker-compose.yml` `demo` profile (M0 line ticked too early): app image + UI, with the UI item below
+  - [ ] Optionally make `classification-eval` a required check (path-filtered: required checks stay pending on PRs
+    that do not trigger it)
 - [ ] **Production-readiness review (after M6, before calling the project done)** Briefwise is a one-person learning
   and portfolio project (GitHub Actions + Neon, <= 5 CHF/month, synthetic data). Write a full analysis (an ADR plus
   a doc, e.g. `docs/PRODUCTION_GAP.md`) of what would change for real use in a bank, comparing "today" vs
