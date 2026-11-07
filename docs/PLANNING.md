@@ -106,6 +106,12 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] `ChatClient` advisor instead of a `ChatModel` decorator (ADR 0015); `AiopsFacade.findReplay`, `replay`, `isReplayed`; `on-miss: fail | fallback` (`ReplayMissException` -> item stays `RECEIVED`); Flyway V13 `replay_key`
 - [x] `test` and `demo` use `replay` + `fail` (demo: dummy key, discard port); fixture store for `evals/replay/*.jsonl`; `synthetic_news.sql`, `export_replay.sql`, recording procedure in `evals/replay/README.md`
 - [ ] Recording run (you: `ANTHROPIC_API_KEY`, < 0.01 USD): export `evals/replay/news-classification.jsonl`, replace `classification-valid.json` with the recorded body, confirm cache read tokens
+- [ ] With the recording run, check the model name Anthropic echoes back (found 2026-11-07, explain-context news classification):
+  `LlmNewsClassifier.record` prices the echoed name, and `PriceList.priceOf` matches exactly, so a dated ID would throw
+  `UnpricedModelException` after the call was billed -> Kafka redelivery x3 -> DLT -> sweep x3 (up to ~6 paid calls per
+  item, nothing stored). Same escape route for `NoBudgetConfiguredException` (only `UsageLimitExceededException` is
+  caught) and `ResourceNotFoundException` from `FacadeHeldInstruments`, against the port contract "does not throw"
+  (ADR 0012 R1). Decide: price by the configured model name, and/or catch these in the adapter / service
 - [x] Skill `llm-adapter` (pattern now implemented once)
 
 ### Slice 6 — Inbound adapters and daily pipeline
@@ -288,6 +294,11 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-11-07 | `Portfolio` does not enforce "weights sum to 1"; only the V5 seed comment and `PortfolioFacadeIT` assume it, so a future write path could store 0.8 or 1.3. Enforce it in the domain (with a tolerance), in the DB, or not at all (e.g. allow cash as the remainder)? Ties to the stored-weight row (2026-10-16) | Open (decide at start of M3) |
 | 2026-11-07 | `PortfolioDailyMove` rounds each contribution to 4 decimals before summing, so the total can differ from the exact weighted sum in the last digit. Keep per-position rounding (contributions add up to the shown total) or round only the total (more exact)? Matters once VaR / briefs quote portfolio numbers (number grounding) | Open (decide at start of M3) |
 | 2026-11-07 | Unknown held instrument is handled two ways: `FacadeInstrumentMoves` treats it as "unpriced" (fail-soft, a data bug stays silent), `FacadeHeldInstruments` throws (fail-loud, ingest stops). One policy for both, e.g. fail-soft plus a warning / health check? | Open (decide at start of M3, before `risk` adds a third consumer) |
+| 2026-11-07 | The classification `rationale` is AI text shown to the RM (feed, relevant news) but never goes through `compliance.checkText`; only the prompt asks for "no advice", and the 25-word limit is not enforced. Check it like the summary (rule 8 in CLAUDE.md), or accept it as RM-internal text that never reaches a client? | Open (decide before M4 brief reuses the labels) |
+| 2026-11-07 | `NewsClassified` is published (`NewsProcessingService`) but nothing listens; the summary finds new HIGH items by DB query (`RegenerationGate`). Keep the event for a future consumer (M4 brief, M6 metrics), or drop it until one exists? | Open (decide at M4) |
+| 2026-11-07 | Idempotency guarantees one stored result, not one LLM call: two concurrent deliveries (consumer + sweep, or a redelivery while the first call runs) can both pass `status = RECEIVED` and both pay. Accept (sweep min-age 10m), or claim the item first (e.g. a `CLASSIFYING` status or `SELECT … FOR UPDATE SKIP LOCKED`)? | Open (watch generation-log duplicates per `subject_id`) |
+| 2026-11-07 | The budget gate runs before the replay advisor, so a replay hit (free) still needs a budget entry and is deferred when the budget is used up. Check the budget only for live calls? | Open (minor; revisit with the next LLM adapter in M2) |
+| 2026-11-07 | The code gate calls `listPortfolios()` + `getInstrument()` per held ticker for every message, to compute COMPANY/FUND it does not need (N+1 per message). A held-tickers-only port, or a per-run cache? | Open (performance; revisit with M6 metrics or the production review) |
 
 ## Open questions from DESIGN
 
