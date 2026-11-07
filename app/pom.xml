@@ -25,7 +25,7 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
         <!-- Verified on Maven Central 2026-10-18; 3.1.1 is built against Spring Boot 4.1.0 -->
-        <springdoc.version>3.1.1</springdoc.version>
+        <springdoc.version>3.2.0</springdoc.version>
         <!-- Verified on Maven Central 2026-10-21; latest stable (4.0 is still beta). Shaded jar: no Jetty clash -->
         <wiremock.version>3.13.2</wiremock.version>
         <!-- Verified on Maven Central 2026-10-24; latest GA (2.1.0 is still RC). Not managed by the Boot BOM -->
