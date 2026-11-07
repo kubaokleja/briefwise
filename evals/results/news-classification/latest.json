@@ -1,0 +1,470 @@
+{
+  "model" : "claude-haiku-5-5",
+  "promptVersion" : "v1",
+  "batchId" : "msgbatch_01NEYjzTSHdRuxTG8jWRDVHU",
+  "ranAt" : "2026-11-07T18:29:20.103206400Z",
+  "cases" : 258,
+  "randomCases" : 150,
+  "invalid" : 5,
+  "invalidRate" : 0.0194,
+  "costUsd" : 0.011802,
+  "costPer1000Usd" : 0.0457,
+  "gate" : {
+    "passed" : true,
+    "message" : "no baseline yet; commit this run as baseline.json to start gating"
+  },
+  "all" : {
+    "sentiment" : {
+      "cases" : 258,
+      "macroF1" : 0.7853,
+      "accuracy" : 0.8605,
+      "perClass" : {
+        "NEGATIVE" : {
+          "support" : 19,
+          "predicted" : 17,
+          "precision" : 0.8235,
+          "recall" : 0.7368,
+          "f1" : 0.7778,
+          "reliable" : true
+        },
+        "NEUTRAL" : {
+          "support" : 201,
+          "predicted" : 205,
+          "precision" : 0.9024,
+          "recall" : 0.9204,
+          "f1" : 0.9113,
+          "reliable" : true
+        },
+        "POSITIVE" : {
+          "support" : 38,
+          "predicted" : 31,
+          "precision" : 0.7419,
+          "recall" : 0.6053,
+          "f1" : 0.6667,
+          "reliable" : true
+        }
+      },
+      "confusion" : {
+        "NEGATIVE" : {
+          "NEGATIVE" : 14,
+          "NEUTRAL" : 5
+        },
+        "NEUTRAL" : {
+          "NEGATIVE" : 3,
+          "NEUTRAL" : 185,
+          "POSITIVE" : 8,
+          "INVALID" : 5
+        },
+        "POSITIVE" : {
+          "NEUTRAL" : 15,
+          "POSITIVE" : 23
+        }
+      }
+    },
+    "relevance" : {
+      "cases" : 258,
+      "macroF1" : 0.6763,
+      "accuracy" : 0.7481,
+      "perClass" : {
+        "LOW" : {
+          "support" : 182,
+          "predicted" : 157,
+          "precision" : 0.9236,
+          "recall" : 0.7967,
+          "f1" : 0.8555,
+          "reliable" : true
+        },
+        "MEDIUM" : {
+          "support" : 58,
+          "predicted" : 65,
+          "precision" : 0.4923,
+          "recall" : 0.5517,
+          "f1" : 0.5203,
+          "reliable" : true
+        },
+        "HIGH" : {
+          "support" : 18,
+          "predicted" : 31,
+          "precision" : 0.5161,
+          "recall" : 0.8889,
+          "f1" : 0.6531,
+          "reliable" : true
+        }
+      },
+      "confusion" : {
+        "LOW" : {
+          "LOW" : 145,
+          "MEDIUM" : 32,
+          "INVALID" : 5
+        },
+        "MEDIUM" : {
+          "LOW" : 11,
+          "MEDIUM" : 32,
+          "HIGH" : 15
+        },
+        "HIGH" : {
+          "LOW" : 1,
+          "MEDIUM" : 1,
+          "HIGH" : 16
+        }
+      }
+    },
+    "eventType" : {
+      "cases" : 258,
+      "macroF1" : 0.5716,
+      "accuracy" : 0.6395,
+      "perClass" : {
+        "EARNINGS" : {
+          "support" : 21,
+          "predicted" : 20,
+          "precision" : 0.6000,
+          "recall" : 0.5714,
+          "f1" : 0.5854,
+          "reliable" : true
+        },
+        "GUIDANCE" : {
+          "support" : 4,
+          "predicted" : 5,
+          "precision" : 0.6000,
+          "recall" : 0.7500,
+          "f1" : 0.6667,
+          "reliable" : false
+        },
+        "M_AND_A" : {
+          "support" : 2,
+          "predicted" : 4,
+          "precision" : 0.5000,
+          "recall" : 1.0000,
+          "f1" : 0.6667,
+          "reliable" : false
+        },
+        "REGULATORY" : {
+          "support" : 3,
+          "predicted" : 4,
+          "precision" : 0.5000,
+          "recall" : 0.6667,
+          "f1" : 0.5714,
+          "reliable" : false
+        },
+        "LITIGATION" : {
+          "support" : 3,
+          "predicted" : 2,
+          "precision" : 1.0000,
+          "recall" : 0.6667,
+          "f1" : 0.8000,
+          "reliable" : false
+        },
+        "MANAGEMENT" : {
+          "support" : 0,
+          "predicted" : 4,
+          "precision" : 0.0000,
+          "recall" : 0.0000,
+          "f1" : 0.0000,
+          "reliable" : false
+        },
+        "MACRO" : {
+          "support" : 16,
+          "predicted" : 25,
+          "precision" : 0.5200,
+          "recall" : 0.8125,
+          "f1" : 0.6341,
+          "reliable" : true
+        },
+        "PRODUCT" : {
+          "support" : 14,
+          "predicted" : 49,
+          "precision" : 0.2245,
+          "recall" : 0.7857,
+          "f1" : 0.3492,
+          "reliable" : true
+        },
+        "ANALYST" : {
+          "support" : 14,
+          "predicted" : 19,
+          "precision" : 0.6316,
+          "recall" : 0.8571,
+          "f1" : 0.7273,
+          "reliable" : true
+        },
+        "OTHER" : {
+          "support" : 181,
+          "predicted" : 121,
+          "precision" : 0.8926,
+          "recall" : 0.5967,
+          "f1" : 0.7152,
+          "reliable" : true
+        }
+      },
+      "confusion" : {
+        "EARNINGS" : {
+          "EARNINGS" : 12,
+          "GUIDANCE" : 2,
+          "MACRO" : 2,
+          "OTHER" : 5
+        },
+        "GUIDANCE" : {
+          "EARNINGS" : 1,
+          "GUIDANCE" : 3
+        },
+        "M_AND_A" : {
+          "M_AND_A" : 2
+        },
+        "REGULATORY" : {
+          "REGULATORY" : 2,
+          "OTHER" : 1
+        },
+        "LITIGATION" : {
+          "LITIGATION" : 2,
+          "OTHER" : 1
+        },
+        "MACRO" : {
+          "MANAGEMENT" : 1,
+          "MACRO" : 13,
+          "OTHER" : 2
+        },
+        "PRODUCT" : {
+          "PRODUCT" : 11,
+          "OTHER" : 3
+        },
+        "ANALYST" : {
+          "EARNINGS" : 1,
+          "ANALYST" : 12,
+          "OTHER" : 1
+        },
+        "OTHER" : {
+          "EARNINGS" : 6,
+          "M_AND_A" : 2,
+          "REGULATORY" : 2,
+          "MANAGEMENT" : 3,
+          "MACRO" : 10,
+          "PRODUCT" : 38,
+          "ANALYST" : 7,
+          "OTHER" : 108,
+          "INVALID" : 5
+        }
+      }
+    }
+  },
+  "random" : {
+    "sentiment" : {
+      "cases" : 150,
+      "macroF1" : 0.8534,
+      "accuracy" : 0.9067,
+      "perClass" : {
+        "NEGATIVE" : {
+          "support" : 9,
+          "predicted" : 7,
+          "precision" : 1.0000,
+          "recall" : 0.7778,
+          "f1" : 0.8750,
+          "reliable" : false
+        },
+        "NEUTRAL" : {
+          "support" : 126,
+          "predicted" : 126,
+          "precision" : 0.9444,
+          "recall" : 0.9444,
+          "f1" : 0.9444,
+          "reliable" : true
+        },
+        "POSITIVE" : {
+          "support" : 15,
+          "predicted" : 12,
+          "precision" : 0.8333,
+          "recall" : 0.6667,
+          "f1" : 0.7407,
+          "reliable" : true
+        }
+      },
+      "confusion" : {
+        "NEGATIVE" : {
+          "NEGATIVE" : 7,
+          "NEUTRAL" : 2
+        },
+        "NEUTRAL" : {
+          "NEUTRAL" : 119,
+          "POSITIVE" : 2,
+          "INVALID" : 5
+        },
+        "POSITIVE" : {
+          "NEUTRAL" : 5,
+          "POSITIVE" : 10
+        }
+      }
+    },
+    "relevance" : {
+      "cases" : 150,
+      "macroF1" : 0.6580,
+      "accuracy" : 0.8133,
+      "perClass" : {
+        "LOW" : {
+          "support" : 116,
+          "predicted" : 108,
+          "precision" : 0.9444,
+          "recall" : 0.8793,
+          "f1" : 0.9107,
+          "reliable" : true
+        },
+        "MEDIUM" : {
+          "support" : 29,
+          "predicted" : 25,
+          "precision" : 0.6400,
+          "recall" : 0.5517,
+          "f1" : 0.5926,
+          "reliable" : true
+        },
+        "HIGH" : {
+          "support" : 5,
+          "predicted" : 12,
+          "precision" : 0.3333,
+          "recall" : 0.8000,
+          "f1" : 0.4706,
+          "reliable" : false
+        }
+      },
+      "confusion" : {
+        "LOW" : {
+          "LOW" : 102,
+          "MEDIUM" : 9,
+          "INVALID" : 5
+        },
+        "MEDIUM" : {
+          "LOW" : 5,
+          "MEDIUM" : 16,
+          "HIGH" : 8
+        },
+        "HIGH" : {
+          "LOW" : 1,
+          "HIGH" : 4
+        }
+      }
+    },
+    "eventType" : {
+      "cases" : 150,
+      "macroF1" : 0.4244,
+      "accuracy" : 0.6400,
+      "perClass" : {
+        "EARNINGS" : {
+          "support" : 7,
+          "predicted" : 11,
+          "precision" : 0.4545,
+          "recall" : 0.7143,
+          "f1" : 0.5556,
+          "reliable" : false
+        },
+        "GUIDANCE" : {
+          "support" : 3,
+          "predicted" : 2,
+          "precision" : 1.0000,
+          "recall" : 0.6667,
+          "f1" : 0.8000,
+          "reliable" : false
+        },
+        "M_AND_A" : {
+          "support" : 0,
+          "predicted" : 1,
+          "precision" : 0.0000,
+          "recall" : 0.0000,
+          "f1" : 0.0000,
+          "reliable" : false
+        },
+        "REGULATORY" : {
+          "support" : 1,
+          "predicted" : 2,
+          "precision" : 0.5000,
+          "recall" : 1.0000,
+          "f1" : 0.6667,
+          "reliable" : false
+        },
+        "LITIGATION" : {
+          "support" : 1,
+          "predicted" : 0,
+          "precision" : 0.0000,
+          "recall" : 0.0000,
+          "f1" : 0.0000,
+          "reliable" : false
+        },
+        "MANAGEMENT" : {
+          "support" : 0,
+          "predicted" : 2,
+          "precision" : 0.0000,
+          "recall" : 0.0000,
+          "f1" : 0.0000,
+          "reliable" : false
+        },
+        "MACRO" : {
+          "support" : 12,
+          "predicted" : 20,
+          "precision" : 0.5000,
+          "recall" : 0.8333,
+          "f1" : 0.6250,
+          "reliable" : true
+        },
+        "PRODUCT" : {
+          "support" : 6,
+          "predicted" : 21,
+          "precision" : 0.1905,
+          "recall" : 0.6667,
+          "f1" : 0.2963,
+          "reliable" : false
+        },
+        "ANALYST" : {
+          "support" : 5,
+          "predicted" : 9,
+          "precision" : 0.4444,
+          "recall" : 0.8000,
+          "f1" : 0.5714,
+          "reliable" : false
+        },
+        "OTHER" : {
+          "support" : 115,
+          "predicted" : 77,
+          "precision" : 0.9091,
+          "recall" : 0.6087,
+          "f1" : 0.7292,
+          "reliable" : true
+        }
+      },
+      "confusion" : {
+        "EARNINGS" : {
+          "EARNINGS" : 5,
+          "MACRO" : 1,
+          "OTHER" : 1
+        },
+        "GUIDANCE" : {
+          "EARNINGS" : 1,
+          "GUIDANCE" : 2
+        },
+        "REGULATORY" : {
+          "REGULATORY" : 1
+        },
+        "LITIGATION" : {
+          "OTHER" : 1
+        },
+        "MACRO" : {
+          "MACRO" : 10,
+          "OTHER" : 2
+        },
+        "PRODUCT" : {
+          "PRODUCT" : 4,
+          "OTHER" : 2
+        },
+        "ANALYST" : {
+          "ANALYST" : 4,
+          "OTHER" : 1
+        },
+        "OTHER" : {
+          "EARNINGS" : 5,
+          "M_AND_A" : 1,
+          "REGULATORY" : 1,
+          "MANAGEMENT" : 2,
+          "MACRO" : 9,
+          "PRODUCT" : 17,
+          "ANALYST" : 5,
+          "OTHER" : 70,
+          "INVALID" : 5
+        }
+      }
+    }
+  }
+}

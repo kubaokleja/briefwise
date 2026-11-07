@@ -188,7 +188,7 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] Human spot-check of the 22 `ANALYST` relabels (14 golden accepted, 14/14; `evals/labelling/README.md`)
 - [x] `evals/labelling/build_golden.py` -> `evals/sentiment_golden.csv` (258 golden rows, mojibake repaired, label and
   few-shot leakage checks); `evals/scripts/{encrypt,decrypt}-golden.sh`; export command fixed for UTF-8
-- [ ] Encrypt and commit `evals/sentiment_golden.csv.gpg` (you: choose the passphrase, secret `EVAL_DATA_PASSPHRASE`)
+- [x] Encrypt and commit `evals/sentiment_golden.csv.gpg` (round trip checked; secret `EVAL_DATA_PASSPHRASE` set 2026-11-07)
 - [x] Domain: `GoldenCase`, `EvalLabels`, `EvalPrediction`, `ConfusionMatrix`, `ClassMetrics`, `LabelScores`,
   `EvalScores`, `EvalReport`, `EvalBaseline`, `RegressionGate`, `BatchOutcome`, `EvalRun`; ports `GoldenSet`,
   `BatchClassifier`, `EvalReports`, `ClassificationEvals`; `ClassificationEvalService`; `NewsFacade.evaluateClassification`
@@ -200,9 +200,12 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
   `ClassificationEvalServiceTest`, `CsvGoldenSetTest`, `FileEvalReportsTest`, `JobServiceTest` (+3);
   `AnthropicBatchClassifierIT` (WireMock), `NewsEvalFacadeIT`
 - [x] `.github/workflows/evals.yml` (`workflow_dispatch` + `prompts/**`, `evals/**`; decrypt, run, PR comment, artifact)
-- [ ] First live run (you, ~0.02 USD; `evals/results/news-classification/README.md`), commit `latest.json` as
-  `baseline.json`
-- [ ] ADR: classification model choice from the eval (L2), from the first run's numbers
+- [x] First live run (2026-11-07, 0.0118 USD, throwaway DB): sentiment macro F1 0.785 (random 0.853), relevance
+  0.676, event type 0.572, 5/258 unusable; committed as `baseline.json`
+- [x] ADR: classification model choice from the eval (L2) -> [ADR 0020](decisions/0020-classification-model-from-first-eval.md) (Haiku 5.5 kept)
+- [ ] Prompt v2 follow-ups from the first eval (ADR 0020): (1) 5 answers with empty `affectedTickers` on generic
+  items are unusable: allow none for `OTHER`/`LOW` items, or enforce at least one in the schema; (2) `PRODUCT` is
+  over-predicted (38 `OTHER` items): sharpen the boundary in the prompt. Then a new baseline run (M2 or with M6)
 - [x] Skill `new-eval-case`
 - [ ] You: optionally make `classification-eval` a required check (path-filtered: required checks stay pending on PRs
   that do not trigger it)
