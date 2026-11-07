@@ -109,6 +109,26 @@ class LlmNewsClassifierIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void recorded_live_response_parses_and_its_cache_write_is_priced_at_the_cache_write_rate() {
+        WIREMOCK.stubFor(post(urlPathEqualTo(MESSAGES)).willReturn(okJson(fixture("classification-recorded.json"))));
+
+        ClassifierResult result = classifier.classify(item);
+
+        assertThat(result).isEqualTo(new ClassifierResult.Classified(new NewsClassification(Sentiment.POSITIVE,
+                Relevance.HIGH, EventType.EARNINGS, Set.of(new Ticker("AAPL")),
+                "Quarterly revenue beat consensus, driven by services growth of 9% year on year.", "v1")));
+        assertThat(logRows()).singleElement().satisfies(row -> assertThat(row)
+                .containsEntry("model", "claude-haiku-5-5")
+                .containsEntry("response_model", "claude-haiku-5-5")
+                .containsEntry("prompt_tokens", 99)
+                .containsEntry("completion_tokens", 93)
+                .containsEntry("cache_write_tokens", 2058)
+                .containsEntry("cache_read_tokens", 0));
+        // 99 x 0.10 + 93 x 0.50 + 2,058 x 0.125 = 9.9 + 46.5 + 257.25 = 313.65 per 1M tokens
+        assertThat((BigDecimal) logRows().getFirst().get("cost_usd")).isEqualByComparingTo("0.00031365");
+    }
+
+    @Test
     void dated_model_id_echoed_by_the_provider_is_audited_but_the_call_is_priced_by_the_configured_name() {
         String dated = fixture("classification-valid.json")
                 .replace("\"model\": \"claude-haiku-5-5\"", "\"model\": \"claude-haiku-5-5-20261001\"");

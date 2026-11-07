@@ -37,7 +37,7 @@ class ReplayFixtureStore implements ReplayStore {
     private final Map<ReplayKey, ReplayEntry> entries;
 
     ReplayFixtureStore(LlmProperties properties, JsonMapper json) {
-        this.entries = load(properties.replay().fixturesDir(), json);
+        this.entries = load(properties.replay().fixturesPath(), json);
     }
 
     @Override

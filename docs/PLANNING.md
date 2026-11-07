@@ -105,13 +105,16 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] Decide L7 normalisation of the replay key -> [ADR 0015](decisions/0015-replay-provider.md) (SHA-256 of feature, model, prompt version, data block; NFC, line endings, whitespace; case kept; hits not logged)
 - [x] `ChatClient` advisor instead of a `ChatModel` decorator (ADR 0015); `AiopsFacade.findReplay`, `replay`, `isReplayed`; `on-miss: fail | fallback` (`ReplayMissException` -> item stays `RECEIVED`); Flyway V13 `replay_key`
 - [x] `test` and `demo` use `replay` + `fail` (demo: dummy key, discard port); fixture store for `evals/replay/*.jsonl`; `synthetic_news.sql`, `export_replay.sql`, recording procedure in `evals/replay/README.md`
-- [ ] Recording run (you: `ANTHROPIC_API_KEY`, < 0.01 USD): export `evals/replay/news-classification.jsonl`, replace `classification-valid.json` with the recorded body, confirm cache read tokens
+- [x] Recording run (2026-11-07, 0.0020 USD, throwaway DB `briefwise_recording`): `evals/replay/news-classification.jsonl`
+  (10) + `news-summary.jsonl` (3); recorded body added as `classification-recorded.json` (+1 IT) beside the
+  hand-written edge-case fixture; cache: 2,058 tokens written once, read by the other 9 calls. Fixed on the way:
+  `fixtures-dir` failed `local` startup (bound as `String` now), export missed summaries (portfolio subjects)
 - [x] Pricing escape after a billed call (found 2026-11-07): adapters priced the echoed model name, so a dated ID
   threw `UnpricedModelException` after billing (up to ~6 paid calls per item) -> [ADR 0019](decisions/0019-price-by-configured-model-and-startup-check.md):
   price by the configured name, echoed ID in `ai_generation_log.response_model` (V16), `AiopsFacade.ensureConfigured`
   at adapter startup, recording failures logged not thrown (classifier, summarizer, batch). `ResourceNotFoundException`
   (pre-call, free) left to the M3 unknown-instrument question
-- [ ] With the recording run, compare `response_model` with `model` in `ai_generation_log`
+- [x] With the recording run, compare `response_model` with `model`: Anthropic echoed `claude-haiku-5-5` (no dated ID)
 - [x] Skill `llm-adapter` (pattern now implemented once)
 
 ### Slice 6 — Inbound adapters and daily pipeline
@@ -167,7 +170,7 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
   `PortfolioSummaryServiceTest`, `NewsSummaryPromptTest`, `SummaryAnswerTest`, `LlmNewsSummarizerIT` (WireMock),
   `ReplayNewsSummaryIT`, `SummaryRepositoryAdapterIT`, `NewsSummaryFacadeIT`, `PortfolioNewsControllerIT`;
   DESIGN 6.2, 6.3, 7.1, 13.7 updated
-- [ ] Recording run for `news-summary` (you, with the slice 5 recording run; procedure in `evals/replay/README.md`)
+- [x] Recording run for `news-summary` (with the slice 5 run, 2026-11-07: 3 summaries, 0 violations, no fallback)
 - [ ] Summary follow-ups (found 2026-11-07, explain-context news summary): (1) `ai_generation_log.fallback` stays
   `false` when the service falls back to the template after a compliance failure (only the adapter's give-up sets it),
   so the log under-reports fallbacks; only `news_portfolio_summaries.is_fallback` is right. (2) Gate race:
