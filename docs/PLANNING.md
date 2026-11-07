@@ -231,6 +231,188 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] Summary `model` / `promptVersion` nullable in the spec (`@Schema(types = {"string", "null"})`); OpenAPI spec +
   generated types updated; `ui-verify` green
 
+## M2 (F3) — Research: cited Q&A over SEC filings and news
+
+Goal: the RM asks "why is X down?" and gets a streamed answer built only from supplied passages (SEC filings, classified
+news, the market move), every claim with a citation, "I don't know" when the sources do not support an answer
+([DESIGN 5](DESIGN.md#5-features-and-milestones), [7.3](DESIGN.md#73-qa-with-citations-m2)). Concepts: embeddings,
+pgvector + HNSW, cosine similarity, chunking, vector baseline -> hybrid, metadata filtering, query rewriting,
+reranking, hallucination control, SSE streaming, RAG eval. Branch `feat/m2-research` from `master` once M1 is merged.
+One slice per session, in this order; each ends with `./mvnw verify` green. Decision IDs below are new to M2 and are
+settled at the start of the slice that lists them (ADR via `adr`). Filing ingest is on demand (local, Ollama
+embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citations-m2)).
+
+### Slice 1 — M1 carry-overs: eval comparability, classification prompt v2
+- [ ] Eval follow-up (2): `EvalBaseline` gains `model`, `promptVersion`, `cases` (golden row count, golden file
+  hash); `RegressionGate` refuses (or flags `NOT_COMPARABLE`) a baseline that differs, with an explicit
+  `--accept-new-baseline` path; `RegressionGateTest`, `EvalReportTest`, `ClassificationEvalServiceTest` (+n)
+- [ ] Decide P1 prompt v2 scope (ADR 0020 follow-ups): (1) empty `affectedTickers` on generic items (allow none for
+  `OTHER`/`LOW`, or require at least one in the schema), (2) `PRODUCT` over-predicted vs `OTHER` (boundary wording,
+  synthetic few-shot change; never from the golden set) -> ADR
+- [ ] `prompts/news-classification/` v2 (version bump + SHA-256 guard), schema / `NewsClassification` mapping if (1)
+  changes it; `NewsClassificationPromptTest`, `LlmNewsClassifierIT` (new fixture for the empty-ticker case)
+- [ ] Re-record the classification replay fixtures for v2 (throwaway DB, `evals/replay/README.md` procedure)
+- [ ] Eval run on v2 (Batch API, `evals.yml`): compare with v1 per label; new `baseline.json` only if accepted (you);
+  result recorded in ADR 0020 or a follow-up ADR
+
+### Slice 2 — Filing source and ETL (no embeddings)
+- [ ] Decide G1 corpus: forms (10-K, 10-Q, 8-K items), how far back, all 30 companies or held ones, ETFs (no 10-K;
+  skip like ADR 0009?), European / Swiss companies ([DESIGN 18](DESIGN.md#18-open-questions), "F3"); storage estimate
+  against Neon 0.5 GB -> ADR
+- [ ] Decide G2 source and snapshot: live EDGAR fetch vs a committed text snapshot (`data/filings/`, like ADR 0004;
+  SEC filings are public domain, check), where ingest runs (local DB, Neon or both), ticker -> CIK mapping (`cik`
+  column on market `instruments` via `MarketFacade`, or a research-owned table) -> ADR
+- [ ] Check current SEC EDGAR fair-access rules (requests per second, `User-Agent` with contact), submissions API
+  and archive URLs; `SEC_USER_AGENT` in `.env.example`
+- [ ] Dependency (ask first): HTML -> text parser for filing documents (e.g. jsoup; alternatives: Spring AI
+  `JsoupDocumentReader` / Tika reader, hand-rolled); verify version on Maven Central
+- [ ] `research` layers via `new-bounded-context` (facade exists): domain `Filing`, `FilingType`, `AccessionNo`,
+  `FilingSection` (item id, title, text), `SectionPolicy` (which items per form); ports `FilingSource`,
+  `FilingRepository`
+- [ ] Flyway V17 `research_filings` (accession unique, ticker, CIK, form, filed_at, period, source URL, content hash,
+  screening result) + `research_filing_sections`
+- [ ] EDGAR adapter (`RestClient`, `User-Agent`, rate limit, `RetryTemplate` on 429/5xx/timeout per ADR 0005);
+  WireMock tests with saved submissions JSON + one trimmed 10-K / 10-Q / 8-K HTML each
+- [ ] Section extraction (10-K Items 1, 1A, 7, 7A; 10-Q Part I Item 2, Part II Item 1A; 8-K Items 2.02, 7.01, 8.01):
+  table of contents skipped, tables kept as text or dropped (decide in G1); `SectionExtractorTest` on the fixtures
+- [ ] `ComplianceFacade.screenUntrustedContent` per section at ingest (ADR 0013 pattern list); suspected sections
+  stored but excluded from retrieval
+- [ ] `ResearchFacade.ingestFiling(ticker, accessionNo)` + `ingestFilings(ticker)` (idempotent by accession /
+  content hash); facade `*IT`; job `filing-ingest` in `JobName` (own lock group; admin endpoint + runner, not in the
+  morning pipeline); `docs/api.http` (happy path, 404 unknown job, 400)
+
+### Slice 3 — Chunking, embeddings, vector store
+- [ ] Decide C1 chunking: by section + size limit (DESIGN 8 proposal) vs fixed size; chunk size and overlap in
+  tokens, how tokens are counted (tokenizer vs char estimate), section title prefixed to each chunk ("contextual"
+  header), minimum chunk size -> ADR
+- [ ] Decide V1 embedding model: Ollama `nomic-embed-text` (DESIGN 8 proposal) vs `mxbai-embed-large` / others
+  (check current Ollama library); dimensions, max input length, task prefixes (`search_document:` /
+  `search_query:` for nomic); finance-model comparison stays an eval experiment (slice 9) -> ADR
+- [ ] Decide V2 embeddings without Ollama: test, CI and `demo` (deterministic fake `EmbeddingModel`, recorded query
+  embeddings in `evals/replay/`, or an Ollama service container in CI) -> ADR (extends ADR 0015)
+- [ ] Decide V3 vector storage: own table + JDBC (Flyway owns the schema) vs Spring AI `PgVectorStore`
+  (`initialize-schema: false`); `vector` vs `halfvec`; HNSW `m`, `ef_construction`, query `ef_search`; cosine
+  distance (`vector_cosine_ops`, `<=>`); embedding model name stored per chunk (vectors from different models are
+  not comparable, re-embed on change) -> ADR
+- [ ] Dependencies (ask first): `spring.ai.model.embedding: ollama` (existing Ollama starter); `com.pgvector:pgvector`
+  if JDBC needs the type, or `?::vector` casts; tokenizer if C1 picks one; versions verified
+- [ ] Domain `FilingChunk`, `Chunker` (pure; section boundaries, size, overlap) + `ChunkerTest`; port
+  `EmbeddingPort` (batch, `TokenCount`); Ollama embedding adapter (timeout, batch size, retry); WireMock tests on the
+  Ollama embed API (valid, wrong dimension, timeout)
+- [ ] Flyway V18 `research_chunks` (filing, section, ordinal, text, token count, `embedding vector(N)`,
+  `embedding_model`), HNSW index; `FlywayBaselineIT`
+- [ ] `ingestFiling` chunks + embeds (embedding usage recorded in `ai_generation_log`? decide in V1: cost 0 locally,
+  but latency and volume are useful); repository IT (insert, HNSW used per `EXPLAIN`)
+- [ ] First local ingest of the G1 corpus: filings, sections, chunks, DB size, ingest time (in PROGRESS); load into
+  Neon per G2
+- [ ] D1 revisit (Domain Questions Log 2026-10-23): embed the 7 labelled same-event pairs in `evals/labelling/` and
+  a sample of distinct pairs; cosine distribution; decide threshold and place (ingest vs classification) or keep
+  trigram only -> ADR (supersedes part of ADR 0009)
+
+### Slice 4 — RAG golden set and vector retrieval baseline
+- [ ] Decide RE1 golden set: 40–50 questions ([DESIGN 10](DESIGN.md#10-evaluation-strategy)) incl. unanswerable ones
+  ("I don't know" expected) and multi-ticker ones; expected sources as stable anchors (accession + item + quoted
+  span, not chunk ids, which change on re-chunking); written before any retrieval output; drafted by Claude and
+  reviewed by you (sample + agreement, as ADR 0010); filings public, so committed plain; news-based questions only
+  via the encrypted path (ADR 0018) or synthetic news -> ADR
+- [ ] Decide RE2 retrieval metrics and gate: recall@5 (DESIGN 10), MRR / nDCG as extra; which run is the baseline;
+  CI gate "recall@5 >= baseline" runs where (every PR with recorded query embeddings per V2, or `workflow_dispatch`)
+  -> ADR
+- [ ] `evals/rag_golden.json` + `evals/labelling/` provenance README; anchor resolver (anchor -> chunk ids at eval
+  time) + test
+- [ ] `ResearchFacade.searchFilings(SearchQuery)`: metadata filters (ticker, form, filed-after), top-k, cosine;
+  `SearchHit` (chunk, score, rank); port `ChunkSearch`; repository IT (filter + order)
+- [ ] Retrieval eval runner (Java, no LLM, cost 0): `research-retrieval-eval` job; report in
+  `evals/results/research-retrieval/` (recall@k per question, misses listed); first run committed as baseline
+- [ ] `GET /api/research/search?q=&ticker=` (debug / UI side panel); `docs/api.http` (200, 400, empty); OpenAPI +
+  UI types regenerated
+- [ ] Update skill `new-eval-case` for the RAG golden set (anchors, unanswerable cases)
+
+### Slice 5 — Hybrid search
+- [ ] Decide H1: Postgres full-text (`tsvector`, `english` config, `ts_rank_cd`; not true BM25) vs a BM25
+  extension (check what Neon supports); fusion: reciprocal rank fusion (k = 60) vs weighted scores; candidates per
+  side; ticker / date filter applied to both sides -> ADR
+- [ ] Flyway V19: generated `tsvector` column on `research_chunks` + GIN index
+- [ ] `HybridRanker` (pure RRF) + `HybridRankerTest`; `searchFilings` mode `VECTOR | KEYWORD | HYBRID`
+  (`briefwise.research.search.*`); repository IT (keyword hit a vector search misses, e.g. a ticker or a number)
+- [ ] Retrieval eval for all three modes; comparison table (recall@5, MRR) in the ADR and README (DESIGN 8 "comparison
+  in README"); new baseline if hybrid wins
+
+### Slice 6 — Query rewriting and reranking
+- [ ] Decide Q1 query rewriting: deterministic (ticker / company-name lookup, relative dates -> range) vs LLM
+  structured output (`RewrittenQuery`: tickers, period, event types, search phrases) vs both; feature
+  `research-rewrite`, model, budget -> ADR
+- [ ] Decide RR1 reranking: none vs LLM reranker (top-20 -> top-5) vs cross-encoder (check Java / Ollama options);
+  kept only if the eval shows a gain worth its cost and latency ([DESIGN 8](DESIGN.md#8-ai-and-engineering-decision-points)) -> ADR
+- [ ] Rewriting via the `llm-adapter` skill if Q1 picks an LLM: `prompts/research-rewrite/` (v1 + hash guard),
+  question in a delimited block after `screenUntrustedContent`, code gate (non-empty, length cap), replay fixtures,
+  WireMock tests; otherwise `QueryRewriter` (pure) + tests
+- [ ] Reranker adapter if RR1 keeps one (same skill, feature `research-rerank`)
+- [ ] Retrieval eval with rewriting / reranking on and off; results in the ADRs; new baseline if adopted
+
+### Slice 7 — Cited answer (non-streaming)
+- [ ] Decide A1 answer model (Haiku 5.5 vs Sonnet 5.5; effort, `maxTokens`), feature `research-answer`, daily budget
+  -> ADR
+- [ ] Decide A2 sources for "why is X down?": filing passages + classified news for the ticker (`NewsFacade`, last N
+  days) + the daily move (`MarketFacade.getDailyMove`, `SourceType.MARKET_DATA`); max 5 passages in total
+  ([DESIGN 12](DESIGN.md#12-non-functional-requirements)) or 5 filing passages + facts; order in the prompt (stable
+  prefix first) -> ADR
+- [ ] Decide A3 output shape and hallucination control: `claims[]` each with passage ids + a short verbatim quote;
+  validator: cited ids subset of supplied ids, quote found in the passage (normalised), numbers in a claim found in
+  its passages (deterministic, as DESIGN 10 number grounding); uncited / failing claims dropped; nothing left ->
+  "I don't know"; one re-ask on invalid structure; `Confidence` derived how (retrieval scores, share of kept claims,
+  model self-report) -> ADR
+- [ ] Decide A4 compliance and audit: `compliance.checkText` on the answer (forecast questions such as "will it
+  recover?" -> refusal, rule 8), disclaimer or not (RM-internal text), store Q&A in `research_answers` for audit and
+  reload; budget check before the replay advisor (Domain Questions Log 2026-11-07, revisit here) -> ADR
+- [ ] Prompt `prompts/research-answer/` via `llm-adapter`: system rules (answer only from passages, cite every claim,
+  say "I don't know"), passages in `<passage id=...>` blocks after screening; `ResearchAnswer`, `Claim`,
+  `AnswerValidator` (pure) + `AnswerValidatorTest` (fabricated id, quote not in passage, ungrounded number, all
+  dropped)
+- [ ] `ResearchFacade.ask(question)`: rewrite -> search -> answer -> validate -> compliance -> store; Flyway V20
+  `research_answers` (if A4); generation log with `subject_id`; facade `*IT` (replay)
+- [ ] `POST /api/research/answers` (JSON) + `GET /api/research/answers/{id}`; `UsageLimitExceededException` -> 429;
+  `docs/api.http` (200, 404, 400, 429 note); OpenAPI + UI types
+- [ ] Tests: `LlmResearchAnswererIT` (WireMock: valid, malformed + re-ask, fabricated citation, timeout, budget),
+  `ReplayResearchAnswerIT`; recording run for `research-answer` (throwaway DB) -> `evals/replay/research-answer.jsonl`
+- [ ] DESIGN 6.2 (`research` facade), 6.3 (`ResearchAnswer`, `Claim`), 7.3, 13.7 (research cost rows) updated
+
+### Slice 8 — SSE streaming
+- [ ] Decide ST1: what streams. Progress events (`step`: rewriting, retrieving, n passages, answering, validating)
+  + one final validated `answer` event, vs streaming answer tokens before validation (faster first token, but
+  unvalidated text reaches the RM); event names and payloads (`step`, `answer`, `done`, `error` with correlation
+  ID); `SseEmitter` (MVC) vs `Flux`; server timeout; client disconnect (cancel the LLM call or let it finish and
+  store); errors after the stream started (budget is checked before, so 429 stays a plain response) -> ADR
+- [ ] `POST /api/research/answers/stream` (`text/event-stream`), calls `ResearchFacade.ask` with a progress
+  listener (port, no web types in `application/`); `X-Correlation-ID` echoed
+- [ ] Tests: `ResearchStreamControllerIT` (event order, final answer equals the stored one, error event, 429 before
+  the stream); latency per step logged (DESIGN 12 target < 10 s)
+- [ ] `docs/api.http` stream request; OpenAPI note for the event payloads (schemas for the UI parser)
+
+### Slice 9 — End-to-end RAG eval
+- [ ] Decide RE3 answer metrics and gate: citation correctness and "I don't know" accuracy (deterministic, from the
+  validator), faithfulness (LLM judge vs claim-level quote check only), judge model; judge calibration on 30–50
+  answers scored by you ([DESIGN 10](DESIGN.md#10-evaluation-strategy)); CI threshold; Batch API -> ADR
+- [ ] Answer eval runner (Java, reuses the production prompt and validator; Batch API like ADR 0018);
+  budget `research-answer-eval`; `research-answer-eval` job; report in `evals/results/research-answer/`
+- [ ] `.github/workflows/rag-eval.yml` (`workflow_dispatch` + path filter on `prompts/research-*/**`,
+  `evals/rag_golden.json`; retrieval eval also on `research` search changes if RE2 says so); PR comment, artifact
+- [ ] First live run; `baseline.json` for retrieval and answers; README section "RAG: vector vs hybrid vs reranked"
+- [ ] Optional experiment (V1): a finance or hosted embedding model vs the chosen one on recall@5 (only if free or
+  within budget; ask first)
+- [ ] Skill for the retrieval / RAG pattern (e.g. `rag-retrieval`), now implemented once
+
+### Slice 10 — UI: Research
+- [ ] SSE parser over `fetch` + `ReadableStream` (ADR 0007, POST, `X-Correlation-ID`) + Vitest (split chunks,
+  multi-line data, `error` event, abort)
+- [ ] Research screen: question box, ticker filter, step progress, Stop (abort), answer with `AiMarker`, numbered
+  citations; states: loading, empty, error (correlation ID), "I don't know", confidence, 429 budget, suspected
+  injection excluded
+- [ ] Citation side panel: filing / news / market source with the cited quote highlighted in the passage (text only,
+  no HTML; `safeHref` for EDGAR links)
+- [ ] Entry points: "Why is X down?" from a Portfolio position and a News item (prefilled question)
+- [ ] Vitest for citation mapping + highlight (pure); `ui-verify` green
+
 ## Backlog (one line each)
 
 Each milestone is split into numbered slices (like [M1](#m1-f2--news-pipeline)) before its first session; see the
@@ -240,18 +422,8 @@ UI slices per milestone follow [ADR 0007](decisions/0007-ui-delivery-strategy.md
 every screen has loading, empty and error states. Contingency cut order (nothing planned to be cut) is in the ADR.
 
 - [ ] **M1 (F2)** News pipeline: see the [M1 section](#m1-f2--news-pipeline) above
-- [ ] **M2 (F3)** RAG over SEC filings: pgvector + HNSW, hybrid search, citations, SSE, RAG eval
-  - [ ] Revisit D1 headline dedup with embeddings (the embedding model and pgvector arrive here anyway): measure
-    semantic similarity on the 7 labelled same-event pairs in `evals/labelling/` and a sample of distinct pairs,
-    decide threshold and place (ingest vs classification) -> ADR (Domain Questions Log 2026-10-23)
-  - [ ] UI: Research chat over `fetch` streaming (own SSE parser, Stop), citation side panel with highlighted excerpt, "I don't know" / confidence / 429 states; parser unit tests
-  - [ ] Prompt v2 follow-ups from the first eval (ADR 0020): (1) 5 answers with empty `affectedTickers` on generic
-    items are unusable: allow none for `OTHER`/`LOW` items, or enforce at least one in the schema; (2) `PRODUCT` is
-    over-predicted (38 `OTHER` items): sharpen the boundary in the prompt. Then a new baseline run (here, before the RAG eval).
-    Seen live too: 24 of 825 unusable (2.9%) on the first Neon backfill
-  - [ ] Eval follow-up (2), before the prompt v2 re-baseline: `RegressionGate` compares only F1: a changed model, prompt version or golden set (row
-    count) is compared with the old baseline without a warning; refuse or flag a non-comparable baseline (`cases` is
-    not in `EvalBaseline` yet)
+- [ ] **M2 (F3)** Research (RAG over SEC filings and news): see the [M2 section](#m2-f3--research-cited-qa-over-sec-filings-and-news) above
+  (D1 embedding revisit -> slice 3, prompt v2 + eval comparability -> slice 1, Research UI -> slice 10)
 - [ ] **M3 (F4)** Volatility/VaR forecast, risk alerts, backtest, MLflow
   - [ ] Portfolio data rules before risk uses weights: stored vs derived weight (Domain Questions Log 2026-10-16),
     weights-sum invariant, rounding of the daily move, one policy for an unknown held instrument (2026-11-07) -> ADR
