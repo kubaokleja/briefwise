@@ -441,7 +441,7 @@ in the README and the model card (M5).
 
 **When evals run (cost control):**
 - Deterministic evals (number grounding, structure, ArchUnit): every PR.
-- LLM evals: manually (`workflow_dispatch`) or automatically when `prompts/**` or `evals/**` change; submitted through the Message Batches API.
+- LLM evals: manually (`workflow_dispatch`) or automatically when what an eval measures changes (its prompt under `prompts/`, its golden set or scripts under `evals/`; one path filter per eval); submitted through the Message Batches API.
 - CI never calls a live LLM for unit or integration tests: it uses WireMock recordings and the `replay` provider.
 
 ---
@@ -637,7 +637,7 @@ Neon free tier: 100 CU-hours of compute per project per month, 0.5 GB storage pe
 | Workflow | Trigger | What it does |
 |---|---|---|
 | `ci.yml` | Every PR and push to `main` | Build, unit tests, ArchUnit, Testcontainers (Postgres + Kafka), deterministic evals, Python lint and tests for `quant/`, UI lint, typecheck, API types up to date, unit tests and build for `ui/` |
-| `evals.yml` | `workflow_dispatch` + path filter `prompts/**`, `evals/**` (not `evals/results/**`) | LLM evals via Batch API (job `news-classification-eval`, profiles `job,eval`, golden set decrypted with `EVAL_DATA_PASSPHRASE`); posts the results table as a PR comment; thresholds from section 10 fail the check |
+| `evals.yml` | `workflow_dispatch` + path filter `prompts/news-classification/**`, `evals/sentiment_golden.csv.gpg`, `evals/scripts/**` (per eval; not `evals/results/**`) | LLM evals via Batch API (job `news-classification-eval`, profiles `job,eval`, golden set decrypted with `EVAL_DATA_PASSPHRASE`); posts the results table as a PR comment; thresholds from section 10 fail the check |
 | `morning-pipeline.yml` | Cron on weekdays (UTC) + `workflow_dispatch`; schedule active only if repo variable `PIPELINE_ENABLED == 'true'` | Quant batch → news ingest + classification → risk alerts, against Neon; Kafka as a service container |
 | `release.yml` | Tag `v*` | Build the app image, publish to GHCR, attach the jar and release notes |
 | Dependabot | Weekly | Maven/Gradle, npm, pip/uv, GitHub Actions |

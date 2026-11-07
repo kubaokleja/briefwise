@@ -1,17 +1,19 @@
 name: Evals
 
 # DESIGN 10 / 14.2, ADR 0018: the news classification eval through the Message Batches API (half price,
-# asynchronous). Runs on demand and on PRs that change prompts/** or evals/**; never on every push (cost rule).
+# asynchronous). Runs on demand and on PRs that change what this eval measures: the classification prompt, the
+# golden set or the scripts that decrypt it; never on every push (cost rule). Other prompts (news-summary) and other
+# evals/ content (replay fixtures, labelling) do not trigger it; add a filter per eval when M2 adds the RAG eval.
 # The golden set holds Finnhub text that may not be published, so only its gpg copy is committed and it is decrypted
 # here. The job's exit code is the gate: sentiment macro F1 at most 3 pp below
 # evals/results/news-classification/baseline.json (no baseline yet: passes and says so).
 on:
   workflow_dispatch:
   pull_request:
-    paths:
-      - 'prompts/**'
-      - 'evals/**'
-      - '!evals/results/**'   # committing a new baseline is not a reason to pay for another run
+    paths:                    # evals/results/** is not listed: a new baseline is not a reason to pay for a run
+      - 'prompts/news-classification/**'
+      - 'evals/sentiment_golden.csv.gpg'
+      - 'evals/scripts/**'
 
 permissions:
   contents: read
@@ -26,8 +28,8 @@ jobs:
   classification-eval:
     name: classification-eval
     runs-on: ubuntu-latest
-    # briefwise.news.eval.batch.max-wait is 60m; the build and startup take a few minutes.
-    timeout-minutes: 75
+    # briefwise.news.eval.batch max-wait 60m + cancel-wait 5m; the build and startup take a few minutes.
+    timeout-minutes: 80
 
     services:
       # Throwaway database for Flyway, the generation log and the eval budget; same image as docker-compose.yml.

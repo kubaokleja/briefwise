@@ -36,3 +36,4 @@ briefwise:
       batch:
         poll-interval: 10ms
         max-wait: 2s
+        cancel-wait: 1s
