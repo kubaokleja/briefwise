@@ -11,16 +11,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
  * The {@code job} (and {@code cloud}) profile switches logback to one JSON object per line. "test" comes last so
  * the replay LLM provider and the Testcontainers database still apply; {@code job} makes the app non-web.
+ * <p>
+ * The profiles are set as {@code spring.profiles.active}, the way the job runner gets them
+ * ({@code SPRING_PROFILES_ACTIVE}): since Spring Boot 4.1.2, profiles from {@code @ActiveProfiles} are not yet active
+ * when logback reads {@code <springProfile>}, so the test would see the human-readable format. It also runs in its own
+ * Failsafe execution (own JVM, see {@code app/pom.xml}): logback is set up once per JVM, and after other ITs it would
+ * already hold the human-readable format.
  */
-@SpringBootTest
-@ActiveProfiles({"job", "test"})
+@SpringBootTest(properties = "spring.profiles.active=job,test")
 @Import(TestcontainersConfig.class)
 @ExtendWith(OutputCaptureExtension.class)
 class JsonLoggingIT {
