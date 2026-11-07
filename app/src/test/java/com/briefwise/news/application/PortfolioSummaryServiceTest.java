@@ -21,6 +21,7 @@ import com.briefwise.news.domain.model.SummaryOutcome;
 import com.briefwise.news.domain.model.SummaryRequest;
 import com.briefwise.news.domain.model.SummaryRun;
 import com.briefwise.news.domain.model.SummaryViolation;
+import com.briefwise.news.domain.port.GenerationAudit;
 import com.briefwise.news.domain.port.NewsSummarizer;
 import com.briefwise.news.domain.port.PortfolioHoldings;
 import com.briefwise.news.domain.port.RelevantNewsQuery;
@@ -47,8 +48,9 @@ class PortfolioSummaryServiceTest {
     private final NewsSummarizer summarizer = mock(NewsSummarizer.class);
     private final SummaryCompliance compliance = mock(SummaryCompliance.class);
     private final SummaryRepository repository = mock(SummaryRepository.class);
+    private final GenerationAudit audit = mock(GenerationAudit.class);
     private final PortfolioSummaryService service = new PortfolioSummaryService(relevantNews, holdings, summarizer,
-            compliance, repository, Clock.fixed(NOW, ZoneOffset.UTC));
+            compliance, repository, audit, Clock.fixed(NOW, ZoneOffset.UTC));
 
     private final RelevantNews apple = relevant("Apple misses estimates", Relevance.HIGH, NOW.minusSeconds(60),
             "AAPL", "0.1");
@@ -62,8 +64,13 @@ class PortfolioSummaryServiceTest {
     }
 
     private SummarizerResult drafted(String text) {
+        return drafted(text, Optional.empty());
+    }
+
+    private SummarizerResult drafted(String text, Optional<UUID> generationId) {
         return new SummarizerResult.Drafted(new SummaryDraft(
-                List.of(new SummaryDraft.Point(text, List.of(apple.news().id()))), "claude-haiku-5-5", "v1"));
+                List.of(new SummaryDraft.Point(text, List.of(apple.news().id()))), "claude-haiku-5-5", "v1"),
+                generationId);
     }
 
     private PortfolioSummary saved() {
@@ -86,6 +93,65 @@ class PortfolioSummaryServiceTest {
         assertThat(summary.points()).singleElement()
                 .satisfies(p -> assertThat(p.citations()).singleElement()
                         .satisfies(c -> assertThat(c.sourceId()).isEqualTo(apple.news().id().toString())));
+    }
+
+    @Test
+    void generated_at_is_the_selection_time_so_an_item_classified_during_the_call_counts_as_new() {
+        Clock moving = mock(Clock.class);
+        when(moving.instant()).thenReturn(NOW, NOW.plusSeconds(30));
+        PortfolioSummaryService timed = new PortfolioSummaryService(relevantNews, holdings, summarizer, compliance,
+                repository, audit, moving);
+        when(summarizer.summarize(any())).thenReturn(drafted("AAPL missed estimates."));
+
+        timed.summarize(PORTFOLIO);
+
+        assertThat(saved().generatedAt()).isEqualTo(NOW);
+    }
+
+    @Test
+    void a_draft_rejected_twice_ends_in_the_template_and_its_log_entry_is_flagged_as_fallback() {
+        UUID firstLog = UUID.randomUUID();
+        UUID secondLog = UUID.randomUUID();
+        when(summarizer.summarize(any())).thenReturn(drafted("AAPL will rise.", Optional.of(firstLog)),
+                drafted("AAPL will surely rise.", Optional.of(secondLog)));
+        when(compliance.check(anyList(), anyString())).thenReturn(FORECAST, FORECAST, List.of());
+
+        assertThat(service.summarize(PORTFOLIO)).isEqualTo(SummaryOutcome.FALLBACK);
+
+        verify(audit).markFallback(secondLog);
+        verify(audit, never()).markFallback(firstLog);
+    }
+
+    @Test
+    void a_rejected_draft_whose_re_ask_is_deferred_is_flagged_as_fallback() {
+        UUID firstLog = UUID.randomUUID();
+        when(summarizer.summarize(any())).thenReturn(drafted("AAPL will rise.", Optional.of(firstLog)),
+                new SummarizerResult.Deferred("budget"));
+        when(compliance.check(anyList(), anyString())).thenReturn(FORECAST, List.of());
+
+        assertThat(service.summarize(PORTFOLIO)).isEqualTo(SummaryOutcome.FALLBACK);
+
+        verify(audit).markFallback(firstLog);
+    }
+
+    @Test
+    void a_re_ask_that_failed_in_the_adapter_flags_its_own_entry_so_nothing_more_is_marked() {
+        when(summarizer.summarize(any())).thenReturn(drafted("AAPL will rise.", Optional.of(UUID.randomUUID())),
+                new SummarizerResult.Failed("INVALID_OUTPUT"));
+        when(compliance.check(anyList(), anyString())).thenReturn(FORECAST, List.of());
+
+        assertThat(service.summarize(PORTFOLIO)).isEqualTo(SummaryOutcome.FALLBACK);
+
+        verify(audit, never()).markFallback(any());
+    }
+
+    @Test
+    void a_compliant_draft_flags_nothing() {
+        when(summarizer.summarize(any())).thenReturn(drafted("AAPL missed estimates.", Optional.of(UUID.randomUUID())));
+
+        service.summarize(PORTFOLIO);
+
+        verify(audit, never()).markFallback(any());
     }
 
     @Test

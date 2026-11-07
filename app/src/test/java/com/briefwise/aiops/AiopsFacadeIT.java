@@ -180,6 +180,24 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void marking_a_usable_answer_as_fallback_flags_it_and_stops_it_being_replayed() {
+        String input = "<news_item>marked</news_item>";
+        ReplayRequest replay = new ReplayRequest(FEATURE, MODEL, "v1", input);
+        UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, Optional.empty(), "v1",
+                "system\n\n---\n\n" + input, Optional.of("{\"points\":[]}"), new TokenCount(10, 5),
+                Duration.ofMillis(100), false, Optional.empty(), Optional.of(replay)));
+        assertThat(facade.findReplay(replay)).isPresent();
+
+        facade.markFallback(id);
+
+        assertThat(jdbc.queryForObject("SELECT is_fallback FROM ai_generation_log WHERE id = ?", Boolean.class, id))
+                .isTrue();
+        assertThat(facade.findReplay(replay)).isEmpty();
+        assertThatThrownBy(() -> facade.markFallback(UUID.randomUUID()))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void startup_check_passes_for_a_configured_pair_and_fails_closed_otherwise() {
         facade.ensureConfigured(FEATURE, MODEL);
         assertThatThrownBy(() -> facade.ensureConfigured(FEATURE, "unpriced-model"))

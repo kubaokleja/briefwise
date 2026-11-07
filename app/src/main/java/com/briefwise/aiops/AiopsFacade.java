@@ -92,6 +92,16 @@ public class AiopsFacade {
     }
 
     /**
+     * Flags a logged call as fallback after the fact: its answer was usable for the adapter but the caller still used
+     * its fallback (e.g. a summary draft that failed the compliance check, ADR 0017). The entry stops being replayable.
+     *
+     * @throws IllegalArgumentException if no entry has this id
+     */
+    public void markFallback(UUID generationId) {
+        generationLog.markFallback(generationId);
+    }
+
+    /**
      * Startup check: call from the LLM adapter's constructor with its feature and configured model, so a missing
      * budget or price stops the app before any call is billed (ADR 0019).
      *

@@ -90,8 +90,8 @@ class LlmNewsSummarizer implements NewsSummarizer {
                 return replayedResult(request, result);
             }
             if (result.draft().isPresent()) {
-                record(request, data, replay, result, false);
-                return new SummarizerResult.Drafted(result.draft().get());
+                Optional<UUID> generationId = record(request, data, replay, result, false);
+                return new SummarizerResult.Drafted(result.draft().get(), generationId);
             }
             reason = result.failure();
             boolean giveUp = lastAttempt || PROVIDER_ERROR.equals(reason);
@@ -160,18 +160,22 @@ class LlmNewsSummarizer implements NewsSummarizer {
      * Every live attempt is logged and counted; only a usable answer carries the replay request (ADR 0015). Priced by
      * the configured model; a failure to record a paid call is logged, never thrown (ADR 0019, as in
      * {@link LlmNewsClassifier}).
+     *
+     * @return the log entry, empty if recording failed
      */
-    private void record(SummaryRequest request, String data, ReplayRequest replay, Attempt attempt,
-                        boolean fallback) {
+    private Optional<UUID> record(SummaryRequest request, String data, ReplayRequest replay, Attempt attempt,
+                                  boolean fallback) {
         Optional<ReplayRequest> replayable = attempt.draft().isPresent() ? Optional.of(replay) : Optional.empty();
         try {
-            aiops.recordGeneration(new GenerationEntry(properties.feature(), defaultModel, attempt.model(),
+            UUID id = aiops.recordGeneration(new GenerationEntry(properties.feature(), defaultModel, attempt.model(),
                     prompt.version(), prompt.system() + LlmNewsClassifier.LOG_SEPARATOR + data, attempt.response(),
                     attempt.tokens(), attempt.latency(), fallback, Optional.of(request.portfolioId()), replayable));
             aiops.checkAndRecordUsage(properties.feature(), defaultModel, attempt.tokens());
+            return Optional.of(id);
         } catch (RuntimeException e) {
             log.error("Could not record the summary call for portfolio {} ({} tokens); the call stays unlogged",
                     request.portfolioId(), attempt.tokens(), e);
+            return Optional.empty();
         }
     }
 

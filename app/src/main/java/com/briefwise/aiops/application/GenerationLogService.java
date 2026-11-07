@@ -29,4 +29,11 @@ class GenerationLogService implements GenerationLog {
         Optional<String> correlationId = Optional.ofNullable(MDC.get(CorrelationIdFilter.MDC_KEY));
         return generations.save(generation, cost, correlationId);
     }
+
+    @Override
+    public void markFallback(UUID id) {
+        if (!generations.markFallback(id)) {
+            throw new IllegalArgumentException("No generation log entry " + id);
+        }
+    }
 }

@@ -122,10 +122,15 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] `jobs` context: `JobsFacade.run`, `JobService` (steps ingest -> publish -> drain -> sweep), `POST /api/admin/jobs/{job}/run`; `docs/api.http` (happy path, 404 unknown job, 400 malformed id)
 - [x] Scheduler only when `briefwise.execution.mode=scheduled`, guarded by `jobs.<name>.enabled`
 - [x] Job runner (`--briefwise.job=news-ingest`): waits for consumer lag 0 or `briefwise.job-runner.max-duration` (15m); exit code via `ExitCodeGenerator` + `BriefwiseApplication`; relay scheduler off in `job`
-- [ ] Neon project + secrets `NEON_JDBC_URL`, `NEON_DB_USER`, `NEON_DB_PASSWORD`, `ANTHROPIC_API_KEY`, `FINNHUB_API_KEY` + variable `PIPELINE_ENABLED` (you); run `cloud,job` locally once against Neon
-- [ ] Load the price snapshot into Neon once: `import-on-startup` is on only in `local`/`demo`, so `daily_prices` in
-  `cloud` is empty and the daily move shows nothing (one-off run with the import enabled, or a documented command);
-  note in the UI/docs that the daily move is the last snapshot day (2026-10-16) until M3 refreshes prices daily
+- [x] Neon project (EU, Frankfurt, Postgres 16, direct endpoint: the advisory lock needs a session) + secrets
+  `NEON_JDBC_URL`, `NEON_DB_USER`, `NEON_DB_PASSWORD`, `ANTHROPIC_API_KEY`, `FINNHUB_API_KEY` (2026-11-07). First local
+  `cloud,job` `news-ingest` against Neon (backfill, `max-duration` 40m): 9 tickers, 825 inserted, 801 `CLASSIFIED`,
+  24 `INVALID_OUTPUT` (2.9%), 3 summaries, 0.080 USD, 33 min (drain ~30 min, ~1.9 s per item, one consumer), exit 0
+- [ ] Variable `PIPELINE_ENABLED=true` only after the first `workflow_dispatch` of `morning-pipeline` on `master`
+  passed (you)
+- [x] Load the price snapshot into Neon once (2026-11-07): one-off `cloud,job` run with
+  `--briefwise.market.price-snapshot.import-on-startup=true` (45,180 rows, 2021-10-18..2026-10-16; Neon 18 MB)
+- [ ] Note in the UI/docs that the daily move is the last snapshot day (2026-10-16) until M3 refreshes prices daily
 - [x] `.github/workflows/morning-pipeline.yml`: news ingest + classification, Kafka service container, gated by `PIPELINE_ENABLED` (first `workflow_dispatch` after merge to `master`)
 - [x] Sweep of old `RECEIVED` items: Flyway V14 (`sweep_attempts`, `RETRIES_EXHAUSTED`, partial indexes); `NewsSweepService`; repository + Kafka ITs (DLT'd item swept)
 - [x] Sweep and jobs follow-ups (found 2026-11-07) -> [ADR 0021](decisions/0021-job-run-limits-status-and-lock.md):
@@ -169,13 +174,12 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
   `ReplayNewsSummaryIT`, `SummaryRepositoryAdapterIT`, `NewsSummaryFacadeIT`, `PortfolioNewsControllerIT`;
   DESIGN 6.2, 6.3, 7.1, 13.7 updated
 - [x] Recording run for `news-summary` (with the slice 5 run, 2026-11-07: 3 summaries, 0 violations, no fallback)
-- [ ] Summary follow-ups (found 2026-11-07, explain-context news summary): (1) `ai_generation_log.fallback` stays
-  `false` when the service falls back to the template after a compliance failure (only the adapter's give-up sets it),
-  so the log under-reports fallbacks; only `news_portfolio_summaries.is_fallback` is right. (2) Gate race:
-  `generatedAt` is taken after the LLM call, so a HIGH item classified during the call is neither in the summary nor
-  seen as new by `RegenerationGate`; take the timestamp at selection time, or accept (needs a test either way).
-  (3) The upsert keeps the first row `id` while the domain makes a new UUID per save; matters once M4 references
-  summary ids
+- [x] Summary follow-ups (1) and (2) (2026-11-07): a draft rejected by compliance that ends in the template is flagged
+  in the generation log too (`Drafted.generationId`, port `GenerationAudit`, `AiopsFacade.markFallback`, which also
+  clears the replay key); `generatedAt` is the selection time. Tests: `PortfolioSummaryServiceTest` (+5),
+  `AiopsFacadeIT` (+1), `LlmNewsSummarizerIT`
+- [ ] Summary follow-up (3), moved to M4: the upsert keeps the first row `id` while the domain makes a new UUID per
+  save; decide when briefs start referencing summary ids
 - [x] Slice 10: `model` / `promptVersion` of the summary response are nullable, but the generated TS types say
   `string`; mark them nullable in the spec (or handle `null` in the UI)
 
@@ -203,7 +207,8 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] ADR: classification model choice from the eval (L2) -> [ADR 0020](decisions/0020-classification-model-from-first-eval.md) (Haiku 5.5 kept)
 - [ ] Prompt v2 follow-ups from the first eval (ADR 0020): (1) 5 answers with empty `affectedTickers` on generic
   items are unusable: allow none for `OTHER`/`LOW` items, or enforce at least one in the schema; (2) `PRODUCT` is
-  over-predicted (38 `OTHER` items): sharpen the boundary in the prompt. Then a new baseline run (M2 or with M6)
+  over-predicted (38 `OTHER` items): sharpen the boundary in the prompt. Then a new baseline run (M2 or with M6).
+  Seen live too: 24 of 825 unusable (2.9%) on the first Neon backfill
 - [x] Skill `new-eval-case`
 - [ ] You: optionally make `classification-eval` a required check (path-filtered: required checks stay pending on PRs
   that do not trigger it)
@@ -225,9 +230,9 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] News feed: sentiment icon + label, relevance, event type, expandable rationale, `UNCLASSIFIED` (with reason),
   `RECEIVED`, headline + link only (http(s) only, `safeHref`); loading / empty / error; portfolio filter in the URL
 - [x] "Run news now" button -> admin endpoint; step list, SKIPPED messages, 429 state
-- [ ] Follow-up (found 2026-11-07, explain-context jobs): the 429 "budget used up" state is unreachable. `JobService`
-  turns `UsageLimitExceededException` into a `SKIPPED` step and the endpoint answers 200, so show the budget state
-  from the step statuses / messages instead (and keep or drop the 429 branch)
+- [x] Budget state for "Run news now" (2026-11-07): shown when a step is `SKIPPED` with a budget message (the
+  endpoint answers 200); the 429 branch is kept for a future endpoint. Admin runs skip `summarize` (no drain). Vitest
+  +2, `JobServiceTest`
 
 ### Slice 10 — UI: Portfolio v0 and Dashboard v0
 - [x] Portfolio daily move: `GET /api/portfolios/{id}/daily-move` (weight x daily change per priced position, summed;
@@ -336,7 +341,7 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-11-07 | Items DLT'd or deferred in a run are younger than `min-age` when the sweep runs after the drain, so with one run a day they wait ~24h (72h over a weekend) and then fall outside the summary's 24h published window: they reach the feed but never a summary. Acceptable, a second sweep later in the run (after `min-age`), or a shorter `min-age` in the runner (lag is already 0 there)? | Open (watch the first pipeline runs) |
 | 2026-11-07 | The `sweep` job step is `SUCCEEDED` even when every picked item `failed` (per-item exceptions are caught), so the runner exits 0 and GitHub sends no email (ADR 0016 promises failed runs are visible). A sweep stopped on deferral also stays `SUCCEEDED`, while `summarize` maps that to `SKIPPED`. Fail the step above a failure threshold, and map `stoppedOnDeferral` to `SKIPPED` like the summary? | Decided: `FAILED` when at least half the picked items failed, deferral `SKIPPED` ([ADR 0021](decisions/0021-job-run-limits-status-and-lock.md)) |
 | 2026-11-07 | A failed regeneration overwrites a good summary: today's compliant summary is replaced by the template when a new HIGH item triggers a regeneration and the first call fails, or the re-ask still violates / defers (same UTC-date upsert). It heals on the next run, but the RM loses the compliant text in between. Keep today's compliant summary when the regeneration falls back, or accept (ADR 0017: a non-compliant draft must never be shown)? | Open (decide before M4 reuses summaries) |
-| 2026-11-07 | "Run news now" (admin trigger) has no drain step, so `summarize` runs while the listener is still classifying the items just ingested. Today's summary is built without them, and the gate reopens it only for a HIGH item, so new MEDIUM news never reaches today's summary. Drain for the admin trigger too, skip `summarize` for admin runs, or accept? | Open (decide before the UI demo) |
+| 2026-11-07 | "Run news now" (admin trigger) has no drain step, so `summarize` runs while the listener is still classifying the items just ingested. Today's summary is built without them, and the gate reopens it only for a HIGH item, so new MEDIUM news never reaches today's summary. Drain for the admin trigger too, skip `summarize` for admin runs, or accept? | Decided (2026-11-07): admin runs skip `summarize`; summaries come from the runner / scheduler |
 | 2026-11-07 | `briefwise.job-runner.max-duration` (15m) bounds only publish and drain. A slow ingest, sweep (up to 200 sequential LLM calls) or summary can run until the workflow's 25-min timeout kills it, with no exit 1 from the app and no "leftovers for the next run" message. Give every step the deadline (stop between items), or treat max-duration as a wait limit only and document it? | Decided: deadline for sweep and summaries between items, ingest unbounded ([ADR 0021](decisions/0021-job-run-limits-status-and-lock.md)) |
 
 ## Open questions from DESIGN

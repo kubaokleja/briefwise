@@ -134,6 +134,67 @@ describe('NewsPage', () => {
     expect(await screen.findByText('Awaiting classification')).toBeInTheDocument();
   });
 
+  it('explains a used-up AI budget from a skipped step (the endpoint answers 200)', async () => {
+    const run: JobRun = {
+      job: 'news-ingest',
+      trigger: 'ADMIN',
+      status: 'SUCCEEDED',
+      startedAt: '2026-10-28T05:00:00Z',
+      endedAt: '2026-10-28T05:00:40Z',
+      steps: [
+        { name: 'ingest', status: 'SUCCEEDED', result: {}, message: '' },
+        {
+          name: 'sweep',
+          status: 'SKIPPED',
+          result: {},
+          message: 'classification deferred (budget used up); the rest waits for the next run',
+        },
+      ],
+    };
+    stubApi({
+      [FEED]: () => Response.json([]),
+      '/api/portfolios': portfolios,
+      'POST /api/admin/jobs/news-ingest/run': () => Response.json(run),
+    });
+
+    renderPage();
+    fireEvent.click(await screen.findByRole('button', { name: 'Run news now' }));
+
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('Daily AI budget used up');
+    expect(alert).not.toHaveTextContent('Reference');
+    expect(screen.getByText(/sweep: skipped/)).toBeInTheDocument();
+  });
+
+  it('shows no budget notice for a step skipped for another reason', async () => {
+    const run: JobRun = {
+      job: 'news-ingest',
+      trigger: 'ADMIN',
+      status: 'SUCCEEDED',
+      startedAt: '2026-10-28T05:00:00Z',
+      endedAt: '2026-10-28T05:00:40Z',
+      steps: [
+        {
+          name: 'summarize',
+          status: 'SKIPPED',
+          result: {},
+          message: 'admin run: summaries are made by the scheduled run, after the consumers caught up',
+        },
+      ],
+    };
+    stubApi({
+      [FEED]: () => Response.json([]),
+      '/api/portfolios': portfolios,
+      'POST /api/admin/jobs/news-ingest/run': () => Response.json(run),
+    });
+
+    renderPage();
+    fireEvent.click(await screen.findByRole('button', { name: 'Run news now' }));
+
+    expect(await screen.findByText(/summarize: skipped/)).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
   it('explains a used-up AI budget (429)', async () => {
     stubApi({
       [FEED]: () => Response.json([]),

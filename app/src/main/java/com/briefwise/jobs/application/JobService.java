@@ -35,7 +35,8 @@ import org.springframework.stereotype.Service;
  * run while one is going returns at once as {@code SKIPPED}.
  * <p>
  * {@code news-ingest}: ingest → publish until no outbox row is pending → (runner only) wait until the consumer lag
- * is 0 → sweep → summarize (portfolio summaries, ADR 0017). {@code news-classify}: sweep.
+ * is 0 → sweep → summarize (portfolio summaries, ADR 0017; not on an admin run, which does not wait for the
+ * consumers). {@code news-classify}: sweep.
  * {@code news-classification-eval}: evaluate (ADR 0018); the step fails unless the eval passed its gate, so the job
  * runner exits 1 and the {@code evals.yml} check goes red.
  */
@@ -97,9 +98,16 @@ class JobService implements Jobs {
         steps.add(timedOut(steps)
                 ? JobStep.of("sweep", JobStatus.SKIPPED, "max-duration reached; the next run sweeps")
                 : sweep(deadline));
-        steps.add(timedOut(steps)
-                ? JobStep.of("summarize", JobStatus.SKIPPED, "max-duration reached; previous summaries stay")
-                : summarize(deadline));
+        if (trigger == JobTrigger.ADMIN) {
+            // No drain on an admin run: the consumer is still classifying what was just ingested, so a summary now
+            // would miss it, and the gate reopens today's summary only for a new HIGH item.
+            steps.add(JobStep.of("summarize", JobStatus.SKIPPED,
+                    "admin run: summaries are made by the scheduled run, after the consumers caught up"));
+        } else {
+            steps.add(timedOut(steps)
+                    ? JobStep.of("summarize", JobStatus.SKIPPED, "max-duration reached; previous summaries stay")
+                    : summarize(deadline));
+        }
         return steps;
     }
 

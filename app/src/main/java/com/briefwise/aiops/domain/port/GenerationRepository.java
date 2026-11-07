@@ -10,4 +10,7 @@ public interface GenerationRepository {
 
     /** @return the ID of the new entry */
     UUID save(NewGeneration generation, BigDecimal costUsd, Optional<String> correlationId);
+
+    /** Sets {@code is_fallback} and clears the replay key. @return false if no entry has this id */
+    boolean markFallback(UUID id);
 }
