@@ -242,6 +242,8 @@ public enum RuleId { NO_RECOMMENDATION, NO_FORECAST, CITATION_REQUIRED, DISCLAIM
 
 > **Domain Questions Log:** could `MorningBrief`, with its sections, citations and status history, become a God object? Candidate split: `BriefDraft` vs `ApprovedCommentary`.
 
+> **Domain Questions Log (portfolio, decide at start of M3):** `Position.weight` is stored, and no invariant says the weights of a `Portfolio` sum to 1; the daily move rounds per position before summing; an unknown held instrument is "unpriced" in the daily move but an error in news. See [PLANNING](PLANNING.md#domain-questions-log) (2026-10-16, 2026-11-07).
+
 ### 6.4 Domain events and Kafka topics
 
 ```java
