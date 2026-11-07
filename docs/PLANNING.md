@@ -216,6 +216,8 @@ every screen has loading, empty and error states. Contingency cut order (nothing
     decide threshold and place (ingest vs classification) -> ADR (Domain Questions Log 2026-10-23)
   - [ ] UI: Research chat over `fetch` streaming (own SSE parser, Stop), citation side panel with highlighted excerpt, "I don't know" / confidence / 429 states; parser unit tests
 - [ ] **M3 (F4)** Volatility/VaR forecast, risk alerts, backtest, MLflow
+  - [ ] Portfolio data rules before risk uses weights: stored vs derived weight (Domain Questions Log 2026-10-16),
+    weights-sum invariant, rounding of the daily move, one policy for an unknown held instrument (2026-11-07) -> ADR
   - [ ] UI: forecast vs realised volatility chart (Recharts), VaR with model name/version, alerts list, alert count on Dashboard, position heatmap; mapper unit tests
 - [ ] **M4 (F5)** Morning brief, approval workflow, MCP server, trajectory eval
   - [ ] Role `ADMIN` on `POST /api/admin/jobs/{job}/run` (open until login exists, ADR 0016)
@@ -283,6 +285,9 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-10-28 | The template fallback quotes third-party headlines verbatim, which can trip the recommendation rules ("Why you should buy Apple"). Violations are stored and shown. Should such points be dropped or reworded instead? | Open (watch real fallbacks) |
 | 2026-10-28 | The summary is per portfolio; a client with several portfolios gets several summaries with overlapping news. Merge per client? Ties to DESIGN 18 "brief per portfolio or per client" | Open (decide at start of M4) |
 | 2026-10-24 | A provider outage turns every item of that run into `UNCLASSIFIED` (`PROVIDER_ERROR`) for good. Should the sweep retry those too (with a cap), or is a visible but unlabelled item acceptable? | Decided: retried by the sweep within 48h, same cap ([ADR 0016](decisions/0016-jobs-sweep-and-job-runner.md)) |
+| 2026-11-07 | `Portfolio` does not enforce "weights sum to 1"; only the V5 seed comment and `PortfolioFacadeIT` assume it, so a future write path could store 0.8 or 1.3. Enforce it in the domain (with a tolerance), in the DB, or not at all (e.g. allow cash as the remainder)? Ties to the stored-weight row (2026-10-16) | Open (decide at start of M3) |
+| 2026-11-07 | `PortfolioDailyMove` rounds each contribution to 4 decimals before summing, so the total can differ from the exact weighted sum in the last digit. Keep per-position rounding (contributions add up to the shown total) or round only the total (more exact)? Matters once VaR / briefs quote portfolio numbers (number grounding) | Open (decide at start of M3) |
+| 2026-11-07 | Unknown held instrument is handled two ways: `FacadeInstrumentMoves` treats it as "unpriced" (fail-soft, a data bug stays silent), `FacadeHeldInstruments` throws (fail-loud, ingest stops). One policy for both, e.g. fail-soft plus a warning / health check? | Open (decide at start of M3, before `risk` adds a third consumer) |
 
 ## Open questions from DESIGN
 
