@@ -31,6 +31,12 @@ class UsageBudgetService implements UsageBudget {
     }
 
     @Override
+    public void requireConfigured(String feature, String model) {
+        budgets.limitFor(feature);
+        prices.priceOf(model);
+    }
+
+    @Override
     public BudgetStatus ensureAvailable(String feature) {
         BigDecimal limit = budgets.limitFor(feature);
         LocalDate today = today();

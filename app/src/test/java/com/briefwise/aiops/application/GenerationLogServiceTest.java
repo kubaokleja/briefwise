@@ -32,7 +32,7 @@ class GenerationLogServiceTest {
             new PriceList(Map.of("claude-haiku-5-5", new ModelPrice(new BigDecimal("0.10"), new BigDecimal("0.50")))));
 
     private static NewGeneration generation(String model) {
-        return new NewGeneration("news-classification", model, "v1", "prompt", Optional.of("{}"),
+        return new NewGeneration("news-classification", model, Optional.empty(), "v1", "prompt", Optional.of("{}"),
                 new TokenCount(1_200, 200), Duration.ofMillis(850), false, Optional.empty(), Optional.empty());
     }
 

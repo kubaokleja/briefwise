@@ -62,6 +62,7 @@ class LlmNewsSummarizer implements NewsSummarizer {
         this.prompt = prompt;
         this.properties = properties;
         this.callOptions = callOptions;
+        aiops.ensureConfigured(properties.feature(), defaultModel);
     }
 
     @Override
@@ -155,15 +156,23 @@ class LlmNewsSummarizer implements NewsSummarizer {
         }
     }
 
-    /** Every live attempt is logged and counted; only a usable answer carries the replay request (ADR 0015). */
+    /**
+     * Every live attempt is logged and counted; only a usable answer carries the replay request (ADR 0015). Priced by
+     * the configured model; a failure to record a paid call is logged, never thrown (ADR 0019, as in
+     * {@link LlmNewsClassifier}).
+     */
     private void record(SummaryRequest request, String data, ReplayRequest replay, Attempt attempt,
                         boolean fallback) {
-        String model = attempt.model().orElse(defaultModel);
         Optional<ReplayRequest> replayable = attempt.draft().isPresent() ? Optional.of(replay) : Optional.empty();
-        aiops.recordGeneration(new GenerationEntry(properties.feature(), model, prompt.version(),
-                prompt.system() + LlmNewsClassifier.LOG_SEPARATOR + data, attempt.response(), attempt.tokens(),
-                attempt.latency(), fallback, Optional.of(request.portfolioId()), replayable));
-        aiops.checkAndRecordUsage(properties.feature(), model, attempt.tokens());
+        try {
+            aiops.recordGeneration(new GenerationEntry(properties.feature(), defaultModel, attempt.model(),
+                    prompt.version(), prompt.system() + LlmNewsClassifier.LOG_SEPARATOR + data, attempt.response(),
+                    attempt.tokens(), attempt.latency(), fallback, Optional.of(request.portfolioId()), replayable));
+            aiops.checkAndRecordUsage(properties.feature(), defaultModel, attempt.tokens());
+        } catch (RuntimeException e) {
+            log.error("Could not record the summary call for portfolio {} ({} tokens); the call stays unlogged",
+                    request.portfolioId(), attempt.tokens(), e);
+        }
     }
 
     private static TokenCount tokensOf(ChatResponse response) {

@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * The only class other contexts may import from {@code aiops}. Every LLM adapter calls, in this order:
- * {@link #ensureBudgetAvailable} before the call, adds {@link #replay} to the call's advisors, then
+ * {@link #ensureConfigured} once at construction, {@link #ensureBudgetAvailable} before the call, adds {@link #replay} to the call's advisors, then
  * {@link #recordGeneration} and {@link #checkAndRecordUsage} after it (ADR 0008), unless {@link #isReplayed} says the
  * answer came from a recording (ADR 0015). No logic here: delegate and map.
  */
@@ -86,9 +86,20 @@ public class AiopsFacade {
 
     /** {@link #recordGeneration(GenerationEntry)} for a call billed at {@code tier}'s price (e.g. a batch request). */
     public UUID recordGeneration(GenerationEntry entry, PricingTier tier) {
-        return generationLog.record(new NewGeneration(entry.feature(), entry.model(), entry.promptVersion(),
-                entry.prompt(), entry.response(), entry.tokens(), entry.latency(), entry.fallback(),
-                entry.subjectId(), entry.replay().map(ReplayRequest::key)), tier);
+        return generationLog.record(new NewGeneration(entry.feature(), entry.model(), entry.responseModel(),
+                entry.promptVersion(), entry.prompt(), entry.response(), entry.tokens(), entry.latency(),
+                entry.fallback(), entry.subjectId(), entry.replay().map(ReplayRequest::key)), tier);
+    }
+
+    /**
+     * Startup check: call from the LLM adapter's constructor with its feature and configured model, so a missing
+     * budget or price stops the app before any call is billed (ADR 0019).
+     *
+     * @throws com.briefwise.aiops.domain.model.NoBudgetConfiguredException if the feature has no budget
+     * @throws com.briefwise.aiops.domain.model.UnpricedModelException if the model has no configured price
+     */
+    public void ensureConfigured(String feature, String model) {
+        usageBudget.requireConfigured(feature, model);
     }
 
     /**
@@ -147,13 +158,15 @@ public class AiopsFacade {
     }
 
     /**
-     * One LLM call. {@code response} is empty when the call failed; {@code fallback} when its fallback was used;
+     * One LLM call. {@code model} is the configured model name: it prices the call and must have passed
+     * {@link #ensureConfigured}. {@code responseModel} is the model ID the provider reported back (audit only, may be a
+     * dated snapshot of the alias; ADR 0019). {@code response} is empty when the call failed; {@code fallback} when its fallback was used;
      * {@code subjectId} is the object the call was made for (e.g. the news item id). {@code replay} is the same
      * {@link ReplayRequest} the call was made with, given only when the answer was usable: the row can then be
      * replayed under exactly the key the lookup computes (ADR 0015).
      */
-    public record GenerationEntry(String feature, String model, String promptVersion, String prompt,
-                                  Optional<String> response, TokenCount tokens, Duration latency,
+    public record GenerationEntry(String feature, String model, Optional<String> responseModel, String promptVersion,
+                                  String prompt, Optional<String> response, TokenCount tokens, Duration latency,
                                   boolean fallback, Optional<UUID> subjectId, Optional<ReplayRequest> replay) {}
 
     /**

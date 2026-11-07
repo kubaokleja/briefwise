@@ -13,6 +13,7 @@ import com.briefwise.aiops.domain.model.DailyUsage;
 import com.briefwise.aiops.domain.model.ModelPrice;
 import com.briefwise.aiops.domain.model.NoBudgetConfiguredException;
 import com.briefwise.aiops.domain.model.PriceList;
+import com.briefwise.aiops.domain.model.UnpricedModelException;
 import com.briefwise.aiops.domain.port.DailyUsageRepository;
 import com.briefwise.shared.domain.exception.UsageLimitExceededException;
 import com.briefwise.shared.domain.model.PricingTier;
@@ -79,6 +80,17 @@ class UsageBudgetServiceTest {
         verify(usage).add(utcToday, FEATURE, tokens, cost);
         assertThat(status.exhausted()).isTrue();
         assertThat(status.spentUsd()).isEqualByComparingTo("0.10010");
+    }
+
+    @Test
+    void startup_check_requires_both_a_budget_and_a_price_without_touching_usage() {
+        service.requireConfigured(FEATURE, MODEL);
+
+        assertThatThrownBy(() -> service.requireConfigured("no-budget-feature", MODEL))
+                .isInstanceOf(NoBudgetConfiguredException.class);
+        assertThatThrownBy(() -> service.requireConfigured(FEATURE, "claude-haiku-5-5-20261001"))
+                .isInstanceOf(UnpricedModelException.class);
+        verifyNoInteractions(usage);
     }
 
     @Test

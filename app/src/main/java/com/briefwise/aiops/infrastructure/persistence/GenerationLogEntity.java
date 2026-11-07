@@ -21,6 +21,9 @@ class GenerationLogEntity {
     @Column(name = "model", nullable = false)
     private String model;
 
+    @Column(name = "response_model")
+    private String responseModel;
+
     @Column(name = "prompt_version", nullable = false)
     private String promptVersion;
 
@@ -63,13 +66,14 @@ class GenerationLogEntity {
     protected GenerationLogEntity() {
     }
 
-    GenerationLogEntity(UUID id, String feature, String model, String promptVersion, String prompt,
-                        String response, int promptTokens, int completionTokens, int cacheWriteTokens,
+    GenerationLogEntity(UUID id, String feature, String model, String responseModel, String promptVersion,
+                        String prompt, String response, int promptTokens, int completionTokens, int cacheWriteTokens,
                         int cacheReadTokens, BigDecimal costUsd, long latencyMs, String correlationId,
                         boolean fallback, UUID subjectId, String replayKey) {
         this.id = id;
         this.feature = feature;
         this.model = model;
+        this.responseModel = responseModel;
         this.promptVersion = promptVersion;
         this.prompt = prompt;
         this.response = response;

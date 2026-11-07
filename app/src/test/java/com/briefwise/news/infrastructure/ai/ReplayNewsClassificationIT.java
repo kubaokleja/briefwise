@@ -66,7 +66,8 @@ class ReplayNewsClassificationIT extends AbstractIntegrationTest {
     /** As a live call with {@code on-miss: fallback} would have recorded it; the configured model is the test model. */
     private void record(NewsItem item, String model) {
         String data = prompt.render(item);
-        aiops.recordGeneration(new GenerationEntry("news-classification", model, prompt.version(), "recorded",
+        aiops.recordGeneration(new GenerationEntry("news-classification", model, Optional.empty(),
+                prompt.version(), "recorded",
                 Optional.of(RECORDED), new TokenCount(100, 50), Duration.ofMillis(800), false, Optional.empty(),
                 Optional.of(new ReplayRequest("news-classification", model, prompt.version(), data))));
     }
