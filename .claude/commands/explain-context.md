@@ -81,19 +81,10 @@ Domain Questions Log, and any mismatch between code and DESIGN/ADRs found in ste
 In: which contexts/jobs/controllers/UI call it. Out: which facades, ports, topics, events it uses.
 A tiny dependency diagram.
 
-### 11. Tests as documentation
-Table: test class | type (unit / `*IT` / WireMock / Kafka / replay) | what behaviour it pins. Point out gaps.
-Give the exact command to run just this context's tests.
-
-### 12. M1 finish and M2 relevance
+### 11. M1 finish and M2 relevance
 Which open M1 items in `docs/PLANNING.md` touch this context, and what M2 (RAG over SEC filings, pgvector,
 embeddings, hybrid search, SSE, RAG eval, embedding dedup) will add to or change in it. Name any AI decision
 points (DESIGN 8 / 18 IDs) that will come up, with options, but do not decide them.
-
-### 13. Check yourself
-6-8 questions I should be able to answer after this session (answers hidden in a collapsed
-`<details>` block), and 1-2 small read-only exercises (run a specific test, follow a request from
-`docs/api.http`, put a breakpoint at `file:line` and predict the value).
 
 ## Style
 - English, concise, learner level: explain every term once the first time it appears.
