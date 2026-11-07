@@ -288,10 +288,12 @@ Trigger: admin "run now" endpoint | in-app scheduler | job runner (GitHub Action
       → persist + generation log (prompt_version, tokens, cost) + NewsClassified event
       → poison message → news.raw.DLT
   → sweep of stuck RECEIVED items (classifyPending)
-  → per portfolio: daily news summary (ADR 0017)
+  → per portfolio: daily news summary (ADR 0017; runner and scheduler only, not on an admin run, which does not
+    wait for the consumers)
       → selection: CLASSIFIED, held affected ticker, HIGH/MEDIUM, last 24 h, by relevance then weight, max 15
       → REGENERATION GATE: none today, today's is template/empty and news arrived, or a new HIGH item
-      → Haiku 5.5, cited points (news ids) → compliance.checkText → 1 re-ask → template fallback (isFallback)
+      → Haiku 5.5, cited points (news ids) → compliance.checkText → 1 re-ask → template fallback (isFallback; the
+        rejected draft's generation log entry is flagged too); generatedAt = selection time
       → fixed disclaimer appended in code; stored per portfolio and UTC date; GET only reads
   → HIGH relevance → input to the morning brief
 ```

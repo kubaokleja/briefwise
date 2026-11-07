@@ -96,9 +96,12 @@ class LlmNewsSummarizerIT extends AbstractIntegrationTest {
 
         SummarizerResult result = summarizer.summarize(request());
 
-        assertThat(result).isEqualTo(new SummarizerResult.Drafted(new SummaryDraft(List.of(new SummaryDraft.Point(
+        assertThat(result).isInstanceOf(SummarizerResult.Drafted.class);
+        SummarizerResult.Drafted drafted = (SummarizerResult.Drafted) result;
+        assertThat(drafted.draft()).isEqualTo(new SummaryDraft(List.of(new SummaryDraft.Point(
                 "AAPL: Apple reported quarterly revenue below analyst estimates.", List.of(ITEM_ID))),
-                "claude-haiku-5-5", "v1")));
+                "claude-haiku-5-5", "v1"));
+        assertThat(drafted.generationId()).contains((UUID) logRows().getFirst().get("id"));
         assertThat(logRows()).singleElement().satisfies(row -> assertThat(row)
                 .containsEntry("feature", "news-summary")
                 .containsEntry("model", "claude-haiku-5-5")
@@ -200,7 +203,9 @@ class LlmNewsSummarizerIT extends AbstractIntegrationTest {
 
         SummarizerResult replayed = summarizer.summarize(request());
 
-        assertThat(replayed).isEqualTo(live);
+        // Same draft; a replayed answer is not logged again, so it carries no generation log entry.
+        assertThat(((SummarizerResult.Drafted) replayed).draft()).isEqualTo(((SummarizerResult.Drafted) live).draft());
+        assertThat(((SummarizerResult.Drafted) replayed).generationId()).isEmpty();
         WIREMOCK.verify(1, postRequestedFor(urlPathEqualTo(MESSAGES)));
         assertThat(logRows()).hasSize(1);
     }

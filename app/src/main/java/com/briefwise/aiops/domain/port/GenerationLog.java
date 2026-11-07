@@ -14,4 +14,12 @@ public interface GenerationLog {
      * @throws com.briefwise.aiops.domain.model.UnpricedModelException if the model has no configured price
      */
     UUID record(NewGeneration generation, PricingTier tier);
+
+    /**
+     * The caller used its fallback after all (e.g. the answer was usable but failed a later check). The entry is
+     * flagged and is no longer replayable: a fallback row never carries a replay key (ADR 0015).
+     *
+     * @throws IllegalArgumentException if no entry has this id
+     */
+    void markFallback(UUID id);
 }

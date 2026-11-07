@@ -54,6 +54,13 @@ class AiopsRepositoryAdapter implements GenerationRepository, DailyUsageReposito
     }
 
     @Override
+    @Transactional
+    public boolean markFallback(UUID id) {
+        return jdbc.update("UPDATE ai_generation_log SET is_fallback = true, replay_key = NULL, updated_at = now() "
+                + "WHERE id = ?", id) == 1;
+    }
+
+    @Override
     public Optional<ReplayEntry> find(ReplayKey key) {
         return jdbc.query("""
                         SELECT model, response, created_at FROM ai_generation_log

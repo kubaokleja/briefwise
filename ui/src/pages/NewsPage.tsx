@@ -186,8 +186,36 @@ const STEP_STATUS: Record<JobRun['status'], { icon: string; className: string }>
 };
 
 /**
+ * A used-up LLM budget arrives as a SKIPPED step whose message names the budget (JobService turns
+ * UsageLimitExceededException and budget deferrals into SKIPPED, ADR 0016 / 0021), not as an HTTP error.
+ */
+const BUDGET_MESSAGE = /budget/i;
+
+function budgetUsedUp(run: JobRun): boolean {
+  return run.steps.some((step) => step.status === 'SKIPPED' && BUDGET_MESSAGE.test(step.message));
+}
+
+function BudgetNotice({ reference }: { reference?: string }) {
+  return (
+    <div role="alert" className="mt-3 rounded border border-warning/40 bg-warning/10 px-4 py-3">
+      <p className="font-medium text-warning">
+        <span aria-hidden="true">▲ </span>Daily AI budget used up
+      </p>
+      <p className="mt-1 text-text">New items stay unclassified until the budget resets at 00:00 UTC.</p>
+      {reference && (
+        <p className="mt-2 text-muted">
+          Reference: <span className="font-mono">{reference}</span>
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
  * "Run news now" (ADR 0007): runs the news-ingest job through the admin endpoint. The request returns after ingest,
- * publish, sweep and summary; classification of new items continues in the background through Kafka.
+ * publish and sweep; classification of new items continues in the background through Kafka, and the daily summaries
+ * are made by the scheduled run. A used-up budget shows as a notice, from the step statuses (the endpoint answers
+ * 200) or, should an endpoint ever refuse with it, from a 429.
  */
 function RunNewsPanel({ onFinished }: { onFinished: () => void }) {
   const [state, setState] = useState<RunState>({ status: 'idle' });
@@ -226,20 +254,13 @@ function RunNewsPanel({ onFinished }: { onFinished: () => void }) {
       )}
       {state.status === 'failed' &&
         (state.error.status === 429 ? (
-          <div role="alert" className="mt-3 rounded border border-warning/40 bg-warning/10 px-4 py-3">
-            <p className="font-medium text-warning">
-              <span aria-hidden="true">▲ </span>Daily AI budget used up
-            </p>
-            <p className="mt-1 text-text">New items stay unclassified until the budget resets at 00:00 UTC.</p>
-            <p className="mt-2 text-muted">
-              Reference: <span className="font-mono">{state.error.correlationId}</span>
-            </p>
-          </div>
+          <BudgetNotice reference={state.error.correlationId} />
         ) : (
           <div className="mt-3">
             <ErrorPanel error={state.error} />
           </div>
         ))}
+      {state.status === 'done' && budgetUsedUp(state.run) && <BudgetNotice />}
       {state.status === 'done' && <RunResult run={state.run} />}
     </section>
   );

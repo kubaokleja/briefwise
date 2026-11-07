@@ -73,11 +73,15 @@ class JobServiceTest {
     }
 
     @Test
-    void admin_run_does_not_wait_for_the_consumers() {
+    void admin_run_does_not_wait_for_the_consumers_and_leaves_the_summaries_to_the_scheduled_run() {
         JobRun run = service.run(JobName.NEWS_INGEST, JobTrigger.ADMIN);
 
         assertThat(run.steps()).extracting(JobStep::name).containsExactly("ingest", "publish", "sweep", "summarize");
+        assertThat(step(run, "summarize").status()).isEqualTo(JobStatus.SKIPPED);
+        assertThat(step(run, "summarize").message().orElseThrow()).contains("scheduled run");
+        assertThat(run.status()).isEqualTo(JobStatus.SUCCEEDED);
         verify(news, never()).consumerLag();
+        verify(news, never()).summarizePortfolios(any());
     }
 
     @Test

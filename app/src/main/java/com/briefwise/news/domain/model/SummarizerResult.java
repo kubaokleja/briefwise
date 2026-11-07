@@ -1,15 +1,26 @@
 package com.briefwise.news.domain.model;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 /** What the summarizer port returns for one portfolio. */
 public sealed interface SummarizerResult {
 
-    /** The model answered with a valid draft (not yet compliance-checked). */
-    record Drafted(SummaryDraft draft) implements SummarizerResult {
+    /**
+     * The model answered with a valid draft (not yet compliance-checked). {@code generationId}: its generation log
+     * entry, so the caller can flag it if the draft ends in the template fallback; empty for a replayed answer (not
+     * logged) or when logging failed.
+     */
+    record Drafted(SummaryDraft draft, Optional<UUID> generationId) implements SummarizerResult {
 
         public Drafted {
             Objects.requireNonNull(draft, "draft");
+            Objects.requireNonNull(generationId, "generationId");
+        }
+
+        public Drafted(SummaryDraft draft) {
+            this(draft, Optional.empty());
         }
     }
 
