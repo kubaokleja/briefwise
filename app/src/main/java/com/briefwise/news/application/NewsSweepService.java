@@ -23,7 +23,8 @@ import org.springframework.stereotype.Service;
  * <p>
  * Every pick counts one attempt before processing, so an item whose processing keeps throwing (a poison item) gives
  * up as {@code RETRIES_EXHAUSTED} instead of being swept forever. The run stops at the first deferral: the budget is
- * per feature and day, so the next items would defer too.
+ * per feature and day, so the next items would defer too. It also stops before the next item once the job's
+ * deadline has passed, so a long sweep ends with the app's own exit code instead of the workflow timeout.
  */
 @Service
 class NewsSweepService implements PendingClassification {
@@ -43,7 +44,7 @@ class NewsSweepService implements PendingClassification {
     }
 
     @Override
-    public SweepSummary classifyPending() {
+    public SweepSummary classifyPending(Instant deadline) {
         Instant now = clock.instant();
         Instant createdBefore = now.minus(policy.minAge());
         int reopened = repository.reopenProviderErrors(createdBefore, now.minus(policy.providerErrorRetryWindow()),
@@ -52,6 +53,10 @@ class NewsSweepService implements PendingClassification {
 
         var counts = new Counts();
         for (UUID id : ids) {
+            if (!clock.instant().isBefore(deadline)) {
+                counts.stoppedOnDeadline = true;
+                break;
+            }
             counts.picked++;
             if (!sweep(id, counts)) {
                 counts.stoppedOnDeferral = true;
@@ -60,7 +65,7 @@ class NewsSweepService implements PendingClassification {
         }
         SweepSummary summary = new SweepSummary(reopened, counts.picked, counts.classified, counts.unclassified,
                 counts.skipped, counts.alreadyProcessed, counts.pending, counts.gaveUp, counts.failed,
-                counts.stoppedOnDeferral);
+                counts.stoppedOnDeferral, counts.stoppedOnDeadline);
         log.info("News sweep: {}", summary);
         return summary;
     }
@@ -107,5 +112,6 @@ class NewsSweepService implements PendingClassification {
         int gaveUp;
         int failed;
         boolean stoppedOnDeferral;
+        boolean stoppedOnDeadline;
     }
 }

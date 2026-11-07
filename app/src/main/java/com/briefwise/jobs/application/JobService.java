@@ -8,6 +8,7 @@ import com.briefwise.jobs.domain.model.JobStep;
 import com.briefwise.jobs.domain.model.JobTrigger;
 import com.briefwise.jobs.domain.model.PublishResult;
 import com.briefwise.jobs.domain.model.RunPolicy;
+import com.briefwise.jobs.domain.port.JobLock;
 import com.briefwise.jobs.domain.port.Jobs;
 import com.briefwise.jobs.domain.port.NewsPipeline;
 import com.briefwise.shared.domain.exception.UsageLimitExceededException;
@@ -26,8 +27,12 @@ import org.springframework.stereotype.Service;
 /**
  * Runs a job as a sequence of steps (DESIGN 7.1, ADR 0016). A failing step is recorded and the run goes on where the
  * next step still makes sense: the sweep only touches items older than its {@code min-age}, so it is safe even after
- * a failed ingest or publish. Only {@code max-duration} stops a run early; the leftovers stay in Postgres for the
- * next run (outbox rows pending, items {@code RECEIVED}).
+ * a failed ingest or publish. Only {@code max-duration} stops a run early: publish, drain, the sweep and the
+ * summaries check it (the sweep and summaries between items); ingest has its own HTTP timeouts. The leftovers stay in
+ * Postgres for the next run (outbox rows pending, items {@code RECEIVED}, previous summaries).
+ * <p>
+ * One run per lock group at a time ({@link JobLock}; {@code news-ingest} and {@code news-classify} share one): a second
+ * run while one is going returns at once as {@code SKIPPED}.
  * <p>
  * {@code news-ingest}: ingest → publish until no outbox row is pending → (runner only) wait until the consumer lag
  * is 0 → sweep → summarize (portfolio summaries, ADR 0017). {@code news-classify}: sweep.
@@ -40,11 +45,13 @@ class JobService implements Jobs {
     private static final Logger log = LoggerFactory.getLogger(JobService.class);
 
     private final NewsPipeline news;
+    private final JobLock locks;
     private final RunPolicy policy;
     private final Clock clock;
 
-    JobService(NewsPipeline news, RunPolicy policy, Clock clock) {
+    JobService(NewsPipeline news, JobLock locks, RunPolicy policy, Clock clock) {
         this.news = news;
+        this.locks = locks;
         this.policy = policy;
         this.clock = clock;
     }
@@ -52,11 +59,23 @@ class JobService implements Jobs {
     @Override
     public JobRun run(JobName job, JobTrigger trigger) {
         Instant startedAt = clock.instant();
+        Optional<JobLock.Held> lock = locks.tryAcquire(job);
+        if (lock.isEmpty()) {
+            log.info("Job {} not started ({}): another {} run is still going", job.id(), trigger, job.lockGroup());
+            return new JobRun(job, trigger, List.of(JobStep.of("lock", JobStatus.SKIPPED,
+                    "another " + job.lockGroup() + " run is still going")), startedAt, clock.instant());
+        }
+        try (JobLock.Held held = lock.get()) {
+            return runLocked(job, trigger, startedAt);
+        }
+    }
+
+    private JobRun runLocked(JobName job, JobTrigger trigger, Instant startedAt) {
         Instant deadline = startedAt.plus(policy.maxDuration());
         log.info("Job {} started ({})", job.id(), trigger);
         List<JobStep> steps = switch (job) {
             case NEWS_INGEST -> newsIngest(trigger, deadline);
-            case NEWS_CLASSIFY -> List.of(step("sweep", news::classifyPending));
+            case NEWS_CLASSIFY -> List.of(sweep(deadline));
             case NEWS_CLASSIFICATION_EVAL -> List.of(evaluate());
         };
         JobRun run = new JobRun(job, trigger, steps, startedAt, clock.instant());
@@ -75,27 +94,74 @@ class JobService implements Jobs {
                     ? JobStep.of("drain", JobStatus.SKIPPED, "publish failed; nothing new to wait for")
                     : drain(deadline));
         }
-        boolean timedOut = steps.stream().anyMatch(s -> s.status() == JobStatus.TIMED_OUT);
-        steps.add(timedOut
+        steps.add(timedOut(steps)
                 ? JobStep.of("sweep", JobStatus.SKIPPED, "max-duration reached; the next run sweeps")
-                : step("sweep", news::classifyPending));
-        steps.add(timedOut
+                : sweep(deadline));
+        steps.add(timedOut(steps)
                 ? JobStep.of("summarize", JobStatus.SKIPPED, "max-duration reached; previous summaries stay")
-                : summarize());
+                : summarize(deadline));
         return steps;
+    }
+
+    private static boolean timedOut(List<JobStep> steps) {
+        return steps.stream().anyMatch(s -> s.status() == JobStatus.TIMED_OUT);
+    }
+
+    /**
+     * The sweep (ADR 0016). Per-item exceptions are counted, not thrown, so the step decides: {@code FAILED} when at
+     * least half of the picked items failed (a systematic fault: the runner exits 1 and GitHub mails); isolated
+     * failures stay in the log and are retried. {@code TIMED_OUT} when it stopped at the deadline, {@code SKIPPED}
+     * when it stopped at a deferral (budget used up), like the summaries.
+     */
+    private JobStep sweep(Instant deadline) {
+        JobStep step = step("sweep", () -> news.classifyPending(deadline));
+        if (step.status() != JobStatus.SUCCEEDED) {
+            return step;
+        }
+        int picked = count(step, "picked");
+        int failed = count(step, "failed");
+        if (failed > 0 && 2 * failed >= picked) {
+            return new JobStep("sweep", JobStatus.FAILED, step.result(),
+                    Optional.of(failed + " of " + picked + " swept items failed; see the log"));
+        }
+        if (flag(step, "stoppedOnDeadline")) {
+            return new JobStep("sweep", JobStatus.TIMED_OUT, step.result(),
+                    Optional.of("max-duration reached; the rest stays RECEIVED for the next run"));
+        }
+        if (flag(step, "stoppedOnDeferral")) {
+            return new JobStep("sweep", JobStatus.SKIPPED, step.result(),
+                    Optional.of("classification deferred (budget used up); the rest waits for the next run"));
+        }
+        return step;
     }
 
     /**
      * Daily portfolio summaries from what is classified now (ADR 0017). A deferral (budget used up, no chat model)
-     * stops the step and marks it {@code SKIPPED}, like a budget stop elsewhere; previous summaries stay.
+     * stops the step and marks it {@code SKIPPED}, like a budget stop elsewhere; the deadline marks it
+     * {@code TIMED_OUT}. Either way the remaining portfolios keep their previous summary.
      */
-    private JobStep summarize() {
-        JobStep step = step("summarize", news::summarizePortfolios);
-        if (step.status() == JobStatus.SUCCEEDED && Boolean.TRUE.equals(step.result().get("stoppedOnDeferral"))) {
+    private JobStep summarize(Instant deadline) {
+        JobStep step = step("summarize", () -> news.summarizePortfolios(deadline));
+        if (step.status() != JobStatus.SUCCEEDED) {
+            return step;
+        }
+        if (flag(step, "stoppedOnDeadline")) {
+            return new JobStep("summarize", JobStatus.TIMED_OUT, step.result(),
+                    Optional.of("max-duration reached; the remaining portfolios keep their previous summary"));
+        }
+        if (flag(step, "stoppedOnDeferral")) {
             return new JobStep("summarize", JobStatus.SKIPPED, step.result(),
                     Optional.of("summary deferred (budget used up or no model); previous summaries stay"));
         }
         return step;
+    }
+
+    private static boolean flag(JobStep step, String key) {
+        return Boolean.TRUE.equals(step.result().get(key));
+    }
+
+    private static int count(JobStep step, String key) {
+        return step.result().get(key) instanceof Number n ? n.intValue() : 0;
     }
 
     /**

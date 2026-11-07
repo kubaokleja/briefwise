@@ -15,6 +15,7 @@ import com.briefwise.news.domain.model.Sentiment;
 import com.briefwise.shared.domain.model.Ticker;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -214,7 +215,7 @@ class NewsKafkaIT extends AbstractIntegrationTest {
         // Next run: the classifier works again and the item is older than the sweep's min-age.
         classifier.answer(item -> new ClassifierResult.Classified(classification(item)));
         jdbc.update("UPDATE news_items SET created_at = now() - interval '1 hour' WHERE id = ?", newsId);
-        ClassifyPendingView sweep = facade.classifyPending();
+        ClassifyPendingView sweep = facade.classifyPending(Instant.now().plusSeconds(600));
 
         assertThat(sweep.picked()).isEqualTo(1);
         assertThat(sweep.classified()).isEqualTo(1);

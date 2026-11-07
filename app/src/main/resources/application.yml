@@ -105,7 +105,7 @@ briefwise:
       min-age: 10m           # never races the relay or a consumer still at work
       batch-size: 200        # oldest first; the run stops at the first deferral (budget used up)
       max-attempts: 3        # then UNCLASSIFIED (RETRIES_EXHAUSTED)
-      provider-error-retry-window: 48h   # PROVIDER_ERROR items this recent are reopened and retried
+      provider-error-retry-window: 96h   # PROVIDER_ERROR items this recent are retried; covers a weekend (runs Mon-Fri)
     classification:          # LLM call per item (ADR 0012); model: spring.ai.<provider>.chat.model
       feature: news-classification
       max-tokens: 1024       # adaptive thinking + ~100 tokens of JSON

@@ -180,9 +180,19 @@ class PortfolioSummaryServiceTest {
         when(relevantNews.relevantFor(broken)).thenThrow(new IllegalStateException("boom"));
         when(summarizer.summarize(any())).thenReturn(new SummarizerResult.Deferred("budget"));
 
-        SummaryRun run = service.summarizeAll();
+        SummaryRun run = service.summarizeAll(NOW.plus(java.time.Duration.ofMinutes(15)));
 
-        assertThat(run).isEqualTo(new SummaryRun(3, 0, 0, 0, 0, 1, 1, true));
+        assertThat(run).isEqualTo(new SummaryRun(3, 0, 0, 0, 0, 1, 1, true, false));
         verify(relevantNews, never()).relevantFor(third);
+    }
+
+    @Test
+    void run_over_all_portfolios_stops_before_the_next_portfolio_once_the_deadline_has_passed() {
+        when(holdings.portfolioIds()).thenReturn(List.of(PORTFOLIO, UUID.randomUUID()));
+
+        SummaryRun run = service.summarizeAll(NOW);
+
+        assertThat(run).isEqualTo(new SummaryRun(2, 0, 0, 0, 0, 0, 0, false, true));
+        verify(summarizer, never()).summarize(any());
     }
 }

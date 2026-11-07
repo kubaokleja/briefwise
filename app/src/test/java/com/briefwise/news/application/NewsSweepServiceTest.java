@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 class NewsSweepServiceTest {
 
     private static final Instant NOW = Instant.parse("2026-10-28T05:00:00Z");
+    private static final Instant DEADLINE = NOW.plus(Duration.ofMinutes(15));
     private static final SweepPolicy POLICY = new SweepPolicy(Duration.ofMinutes(10), 200, 3, Duration.ofHours(48));
 
     private final NewsRepository repository = mock(NewsRepository.class);
@@ -47,9 +48,21 @@ class NewsSweepServiceTest {
         when(processing.process(ids.get(1))).thenReturn(ProcessingOutcome.UNCLASSIFIED);
         when(processing.process(ids.get(2))).thenReturn(ProcessingOutcome.NOT_HELD);
 
-        SweepSummary summary = service.classifyPending();
+        SweepSummary summary = service.classifyPending(DEADLINE);
 
-        assertThat(summary).isEqualTo(new SweepSummary(2, 3, 1, 1, 1, 0, 0, 0, 0, false));
+        assertThat(summary).isEqualTo(new SweepSummary(2, 3, 1, 1, 1, 0, 0, 0, 0, false, false));
+    }
+
+    @Test
+    void stops_before_the_next_item_once_the_deadline_has_passed() {
+        List<UUID> ids = sweepable(2);
+
+        SweepSummary summary = service.classifyPending(NOW);
+
+        assertThat(summary.picked()).isZero();
+        assertThat(summary.stoppedOnDeadline()).isTrue();
+        verify(processing, never()).process(any());
+        verify(repository, never()).incrementSweepAttempts(ids.get(0));
     }
 
     @Test
@@ -58,7 +71,7 @@ class NewsSweepServiceTest {
         when(processing.process(ids.get(0))).thenReturn(ProcessingOutcome.CLASSIFIED);
         when(processing.process(ids.get(1))).thenReturn(ProcessingOutcome.PENDING);
 
-        SweepSummary summary = service.classifyPending();
+        SweepSummary summary = service.classifyPending(DEADLINE);
 
         assertThat(summary.picked()).isEqualTo(2);
         assertThat(summary.pending()).isEqualTo(1);
@@ -75,7 +88,7 @@ class NewsSweepServiceTest {
         when(repository.markUnclassifiedFromReceived(poison, UnclassifiedReason.RETRIES_EXHAUSTED, NOW))
                 .thenReturn(true);
 
-        SweepSummary summary = service.classifyPending();
+        SweepSummary summary = service.classifyPending(DEADLINE);
 
         assertThat(summary.gaveUp()).isEqualTo(1);
         verify(processing, never()).process(any());
@@ -87,7 +100,7 @@ class NewsSweepServiceTest {
         when(repository.incrementSweepAttempts(id)).thenReturn(3);
         when(processing.process(id)).thenReturn(ProcessingOutcome.CLASSIFIED);
 
-        assertThat(service.classifyPending().classified()).isEqualTo(1);
+        assertThat(service.classifyPending(DEADLINE).classified()).isEqualTo(1);
     }
 
     @Test
@@ -96,7 +109,7 @@ class NewsSweepServiceTest {
         when(processing.process(ids.get(0))).thenThrow(new IllegalStateException("poison"));
         when(processing.process(ids.get(1))).thenReturn(ProcessingOutcome.CLASSIFIED);
 
-        SweepSummary summary = service.classifyPending();
+        SweepSummary summary = service.classifyPending(DEADLINE);
 
         assertThat(summary.failed()).isEqualTo(1);
         assertThat(summary.classified()).isEqualTo(1);
@@ -107,6 +120,6 @@ class NewsSweepServiceTest {
         UUID id = sweepable(1).getFirst();
         when(processing.process(id)).thenReturn(ProcessingOutcome.ALREADY_PROCESSED);
 
-        assertThat(service.classifyPending().alreadyProcessed()).isEqualTo(1);
+        assertThat(service.classifyPending(DEADLINE).alreadyProcessed()).isEqualTo(1);
     }
 }
