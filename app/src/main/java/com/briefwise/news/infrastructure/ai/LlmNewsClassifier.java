@@ -67,6 +67,7 @@ class LlmNewsClassifier implements NewsClassifier {
         this.prompt = prompt;
         this.properties = properties;
         this.callOptions = newsClassificationCallOptions;
+        aiops.ensureConfigured(properties.feature(), defaultModel);
         // Structured outputs do not guarantee enum casing (Claude docs), so "Positive" must still parse.
         this.converter = new BeanOutputConverter<>(ClassificationAnswer.class,
                 JsonMapper.builder().enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS).build());
@@ -167,17 +168,23 @@ class LlmNewsClassifier implements NewsClassifier {
 
     /**
      * Every live attempt is logged and counted, including malformed answers (they cost tokens too). Only a usable
-     * answer carries the replay request, so replay never returns a malformed one. The key is built from the same
-     * request as the lookup (configured model name), not from the model ID the provider reports back.
+     * answer carries the replay request, so replay never returns a malformed one. Cost, budget and the replay key use
+     * the configured model name (checked at startup); the model ID the provider reports back is kept for the audit
+     * only (ADR 0019). The call is already paid for, so a failure to record is logged and never thrown: throwing would
+     * send the item round Kafka redelivery and the sweep, paying for the same call again.
      */
     private void record(NewsItem item, String data, ReplayRequest replay, Attempt attempt, boolean fallback) {
-        String model = attempt.model().orElse(defaultModel);
         Optional<ReplayRequest> replayable = attempt.classification().isPresent() ? Optional.of(replay)
                 : Optional.empty();
-        aiops.recordGeneration(new GenerationEntry(properties.feature(), model, prompt.version(),
-                prompt.system() + LOG_SEPARATOR + data, attempt.response(), attempt.tokens(), attempt.latency(),
-                fallback, Optional.of(item.id()), replayable));
-        aiops.checkAndRecordUsage(properties.feature(), model, attempt.tokens());
+        try {
+            aiops.recordGeneration(new GenerationEntry(properties.feature(), defaultModel, attempt.model(),
+                    prompt.version(), prompt.system() + LOG_SEPARATOR + data, attempt.response(), attempt.tokens(),
+                    attempt.latency(), fallback, Optional.of(item.id()), replayable));
+            aiops.checkAndRecordUsage(properties.feature(), defaultModel, attempt.tokens());
+        } catch (RuntimeException e) {
+            log.error("Could not record the classification call for news item {} ({} tokens); the call stays unlogged",
+                    item.id(), attempt.tokens(), e);
+        }
     }
 
     private static TokenCount tokensOf(ChatResponse response) {

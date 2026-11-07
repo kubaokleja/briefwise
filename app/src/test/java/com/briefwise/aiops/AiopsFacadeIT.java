@@ -56,13 +56,15 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
         MDC.put(CorrelationIdFilter.MDC_KEY, "it-corr-1");
 
         UUID subject = UUID.randomUUID();
-        UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "Classify: ...",
+        UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, Optional.of("test-model-20261101"),
+                "v1", "Classify: ...",
                 Optional.of("{\"sentiment\":\"NEUTRAL\"}"), new TokenCount(1_000, 500), Duration.ofMillis(420),
                 false, Optional.of(subject), Optional.empty()));
 
         Map<String, Object> row = jdbc.queryForMap("SELECT * FROM ai_generation_log WHERE id = ?", id);
         assertThat(row).containsEntry("feature", FEATURE)
                 .containsEntry("model", MODEL)
+                .containsEntry("response_model", "test-model-20261101")
                 .containsEntry("prompt_version", "v1")
                 .containsEntry("prompt_tokens", 1_000)
                 .containsEntry("completion_tokens", 500)
@@ -78,10 +80,12 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
     void usable_answer_with_a_replay_request_is_found_again_and_the_newest_row_wins() {
         String input = "<news_item>\nheadline: " + UUID.randomUUID() + "\n</news_item>";
         ReplayRequest replay = new ReplayRequest(FEATURE, MODEL, "v1", input);
-        facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "system\n\n---\n\n" + input,
+        facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, Optional.empty(), "v1",
+                "system\n\n---\n\n" + input,
                 Optional.of("{\"answer\":\"old\"}"), new TokenCount(10, 5), Duration.ofMillis(100), false,
                 Optional.empty(), Optional.of(replay)));
-        UUID newest = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "system\n\n---\n\n" + input,
+        UUID newest = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, Optional.empty(), "v1",
+                "system\n\n---\n\n" + input,
                 Optional.of("{\"answer\":\"new\"}"), new TokenCount(10, 5), Duration.ofMillis(100), false,
                 Optional.empty(), Optional.of(replay)));
 
@@ -95,7 +99,8 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
 
     @Test
     void row_without_a_replay_request_is_not_replayable() {
-        UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "Classify: ...",
+        UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, Optional.empty(), "v1",
+                "Classify: ...",
                 Optional.of("{}"), new TokenCount(10, 5), Duration.ofMillis(100), false, Optional.empty(),
                 Optional.empty()));
 
@@ -105,7 +110,8 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
 
     @Test
     void failed_call_is_logged_without_response_and_flagged_as_fallback() {
-        UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "Classify: ...",
+        UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, Optional.empty(), "v1",
+                "Classify: ...",
                 Optional.empty(), new TokenCount(0, 0), Duration.ofSeconds(30), true, Optional.empty(),
                 Optional.empty()));
 
@@ -117,7 +123,8 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
 
     @Test
     void cached_prefix_tokens_are_logged_and_priced_with_the_standard_cache_multipliers() {
-        UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, "v1", "Classify: ...",
+        UUID id = facade.recordGeneration(new GenerationEntry(FEATURE, MODEL, Optional.empty(), "v1",
+                "Classify: ...",
                 Optional.of("{}"), new TokenCount(100, 50, 0, 1_000), Duration.ofMillis(300), false,
                 Optional.empty(), Optional.empty()));
 
@@ -169,6 +176,15 @@ class AiopsFacadeIT extends AbstractIntegrationTest {
         assertThatThrownBy(() -> facade.checkAndRecordUsage(FEATURE, "unpriced-model", new TokenCount(1, 1)))
                 .isInstanceOf(UnpricedModelException.class);
         assertThatThrownBy(() -> facade.ensureBudgetAvailable("no-budget-feature"))
+                .isInstanceOf(NoBudgetConfiguredException.class);
+    }
+
+    @Test
+    void startup_check_passes_for_a_configured_pair_and_fails_closed_otherwise() {
+        facade.ensureConfigured(FEATURE, MODEL);
+        assertThatThrownBy(() -> facade.ensureConfigured(FEATURE, "unpriced-model"))
+                .isInstanceOf(UnpricedModelException.class);
+        assertThatThrownBy(() -> facade.ensureConfigured("no-budget-feature", MODEL))
                 .isInstanceOf(NoBudgetConfiguredException.class);
     }
 

@@ -109,6 +109,23 @@ class LlmNewsClassifierIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void dated_model_id_echoed_by_the_provider_is_audited_but_the_call_is_priced_by_the_configured_name() {
+        String dated = fixture("classification-valid.json")
+                .replace("\"model\": \"claude-haiku-5-5\"", "\"model\": \"claude-haiku-5-5-20261001\"");
+        WIREMOCK.stubFor(post(urlPathEqualTo(MESSAGES)).willReturn(okJson(dated)));
+
+        ClassifierResult result = classifier.classify(item);
+
+        assertThat(result).isInstanceOf(ClassifierResult.Classified.class);
+        assertThat(logRows()).singleElement().satisfies(row -> assertThat(row)
+                .containsEntry("model", "claude-haiku-5-5")
+                .containsEntry("response_model", "claude-haiku-5-5-20261001"));
+        assertThat((BigDecimal) logRows().getFirst().get("cost_usd")).isEqualByComparingTo("0.0000515");
+        assertThat(jdbc.queryForObject("SELECT call_count FROM ai_daily_usage WHERE feature = ? AND usage_date = ?",
+                Integer.class, "news-classification", LocalDate.now(ZoneOffset.UTC))).isEqualTo(1);
+    }
+
+    @Test
     void request_uses_native_structured_output_low_effort_explicit_max_tokens_and_a_cached_system_prompt() {
         WIREMOCK.stubFor(post(urlPathEqualTo(MESSAGES)).willReturn(okJson(fixture("classification-valid.json"))));
 

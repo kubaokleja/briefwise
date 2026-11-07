@@ -53,7 +53,8 @@ class ReplayNewsSummaryIT extends AbstractIntegrationTest {
     void recorded_summary_is_replayed_without_an_http_call_a_new_log_row_or_usage() {
         SummaryRequest request = LlmNewsSummarizerIT.request();
         String data = prompt.render(request);
-        aiops.recordGeneration(new GenerationEntry("news-summary", "claude-haiku-5-5", prompt.version(), "recorded",
+        aiops.recordGeneration(new GenerationEntry("news-summary", "claude-haiku-5-5", Optional.empty(),
+                prompt.version(), "recorded",
                 Optional.of(RECORDED), new TokenCount(800, 120), Duration.ofMillis(900), false, Optional.empty(),
                 Optional.of(new ReplayRequest("news-summary", "claude-haiku-5-5", prompt.version(), data))));
 

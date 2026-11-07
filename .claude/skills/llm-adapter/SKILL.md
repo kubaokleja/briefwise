@@ -36,7 +36,9 @@ Reference implementation: `news/infrastructure/ai/LlmNewsClassifier` + `NewsClas
 3. **Properties** record `briefwise.<context>.<feature>` (feature name, `max-tokens`, `effort`, `max-attempts`).
    Per-call options supplier in a config class: provider-specific options only there.
 4. **Adapter**, package-private, `@ConditionalOnExpression(CHAT_MODEL_CONFIGURED)`, plus a no-model variant that
-   defers. Per attempt, in this order:
+   defers. In the constructor: `aiops.ensureConfigured(feature, configuredModel)` (configured model =
+   `chatModel.getOptions().getModel()`), so a missing budget or price stops the app at startup (ADR 0019).
+   Per attempt, in this order:
    1. `aiops.ensureBudgetAvailable(feature)`. On `UsageLimitExceededException`: defer.
    2. `chatClient.prompt().system(...).user(data).options(...)` with the native structured output advisor params
       (`STRUCTURED_OUTPUT_NATIVE`, `STRUCTURED_OUTPUT_SCHEMA`, `OUTPUT_FORMAT` from a `BeanOutputConverter`) **and**
@@ -47,12 +49,15 @@ Reference implementation: `news/infrastructure/ai/LlmNewsClassifier` + `NewsClas
       warning).
    5. Live answer: parse yourself (`converter.convert`), not `.entity()`, so malformed answers are logged too.
       Invalid: re-ask up to `max-attempts`.
-   6. Every live attempt: `recordGeneration` (prompt = system + separator + data, response, tokens incl. cache,
-      latency, `fallback` on the give-up attempt, `subjectId`, and `replay` = the same `ReplayRequest` **only for a
-      usable answer**), then `checkAndRecordUsage`.
+   6. Every live attempt: `recordGeneration` (`model` = the **configured** name, `responseModel` = the ID the
+      provider echoed, prompt = system + separator + data, response, tokens incl. cache, latency, `fallback` on the
+      give-up attempt, `subjectId`, and `replay` = the same `ReplayRequest` **only for a usable answer**), then
+      `checkAndRecordUsage` with the configured name. Wrap both in a `try` that logs at `ERROR` and never rethrows:
+      the call is paid, and throwing only causes paid retries (ADR 0019).
 5. **Screening**: untrusted text goes through `ComplianceFacade.screenUntrustedContent` in the application service,
    before the adapter is called.
-6. **Pricing** for the model in `briefwise.aiops.pricing` (otherwise `UnpricedModelException`).
+6. **Pricing** for the model in `briefwise.aiops.pricing` and a budget in `daily-budget-usd` for the feature
+   (otherwise the startup check fails).
 
 ## Tests
 

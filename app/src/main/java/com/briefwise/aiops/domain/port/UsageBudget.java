@@ -11,6 +11,15 @@ import java.time.LocalDate;
 public interface UsageBudget {
 
     /**
+     * Startup check for an LLM adapter (ADR 0019): the feature has a budget and the model a price, so no call can be
+     * billed and then fail to be priced or counted.
+     *
+     * @throws com.briefwise.aiops.domain.model.NoBudgetConfiguredException if the feature has no budget
+     * @throws com.briefwise.aiops.domain.model.UnpricedModelException if the model has no configured price
+     */
+    void requireConfigured(String feature, String model);
+
+    /**
      * Code gate before a call.
      *
      * @throws com.briefwise.shared.domain.exception.UsageLimitExceededException if today's budget is used up

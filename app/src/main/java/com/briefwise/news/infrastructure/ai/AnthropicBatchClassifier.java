@@ -93,6 +93,7 @@ class AnthropicBatchClassifier implements BatchClassifier {
                 .outputSchema(converter.getJsonSchema())
                 .build()
                 .getOutputConfig();
+        aiops.ensureConfigured(properties.feature(), model);
     }
 
     @Override
@@ -220,14 +221,14 @@ class AnthropicBatchClassifier implements BatchClassifier {
     private EvalPrediction predictionOf(GoldenCase golden, String data, MessageBatchResult result) {
         if (!result.isSucceeded()) {
             log.warn("Eval request for case {} {}", golden.id(), result.type());
-            record(golden, data, Optional.empty(), new TokenCount(0, 0));
+            record(golden, data, Optional.empty(), Optional.empty(), new TokenCount(0, 0));
             return EvalPrediction.invalid(golden.id(), new TokenCount(0, 0));
         }
         Message message = result.asSucceeded().message();
         TokenCount tokens = tokensOf(message.usage());
         String text = message.content().stream().flatMap(block -> block.text().stream())
                 .map(TextBlock::text).collect(Collectors.joining());
-        record(golden, data, Optional.of(text), tokens);
+        record(golden, data, Optional.of(message.model().asString()), Optional.of(text), tokens);
         try {
             NewsClassification parsed = converter.convert(text).toClassification(asNewsItem(golden),
                     prompt.version());
@@ -239,12 +240,21 @@ class AnthropicBatchClassifier implements BatchClassifier {
         }
     }
 
-    /** Batch requests have no per-request latency; logged as zero. Not replayable: eval answers are not reused. */
-    private void record(GoldenCase golden, String data, Optional<String> response, TokenCount tokens) {
-        aiops.recordGeneration(new GenerationEntry(properties.feature(), model, prompt.version(),
-                prompt.system() + LlmNewsClassifier.LOG_SEPARATOR + data, response, tokens, Duration.ZERO, false,
-                Optional.of(golden.id()), Optional.empty()), PricingTier.BATCH);
-        aiops.checkAndRecordUsage(properties.feature(), model, tokens, PricingTier.BATCH);
+    /**
+     * Batch requests have no per-request latency; logged as zero. Not replayable: eval answers are not reused. Priced
+     * by the configured model; the batch is already billed, so a failure to record is logged, never thrown (ADR 0019).
+     */
+    private void record(GoldenCase golden, String data, Optional<String> responseModel, Optional<String> response,
+                        TokenCount tokens) {
+        try {
+            aiops.recordGeneration(new GenerationEntry(properties.feature(), model, responseModel, prompt.version(),
+                    prompt.system() + LlmNewsClassifier.LOG_SEPARATOR + data, response, tokens, Duration.ZERO, false,
+                    Optional.of(golden.id()), Optional.empty()), PricingTier.BATCH);
+            aiops.checkAndRecordUsage(properties.feature(), model, tokens, PricingTier.BATCH);
+        } catch (RuntimeException e) {
+            log.error("Could not record the eval call for case {} ({} tokens); the call stays unlogged", golden.id(),
+                    tokens, e);
+        }
     }
 
     private static TokenCount tokensOf(Usage usage) {

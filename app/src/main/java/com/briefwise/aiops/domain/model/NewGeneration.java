@@ -9,16 +9,19 @@ import java.util.UUID;
 /**
  * One LLM call as reported by the calling adapter. {@code response} is empty when the call failed;
  * {@code fallback} is true when the caller used its fallback result instead of the model's answer.
+ * {@code model} is the configured model name, which prices the call; {@code responseModel} is the ID the provider
+ * reported back, for the audit trail only (ADR 0019).
  * {@code subjectId} is the business object the call was made for, e.g. the news item (ADR 0014). {@code replayKey}
  * is set only for a usable answer, so the {@code replay} provider never returns a malformed one (ADR 0015).
  */
-public record NewGeneration(String feature, String model, String promptVersion, String prompt,
+public record NewGeneration(String feature, String model, Optional<String> responseModel, String promptVersion, String prompt,
                             Optional<String> response, TokenCount tokens, Duration latency, boolean fallback,
                             Optional<UUID> subjectId, Optional<ReplayKey> replayKey) {
 
     public NewGeneration {
         requireText(feature, "feature");
         requireText(model, "model");
+        Objects.requireNonNull(responseModel, "responseModel");
         requireText(promptVersion, "promptVersion");
         Objects.requireNonNull(prompt, "prompt");
         Objects.requireNonNull(response, "response");

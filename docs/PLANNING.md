@@ -106,12 +106,12 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] `ChatClient` advisor instead of a `ChatModel` decorator (ADR 0015); `AiopsFacade.findReplay`, `replay`, `isReplayed`; `on-miss: fail | fallback` (`ReplayMissException` -> item stays `RECEIVED`); Flyway V13 `replay_key`
 - [x] `test` and `demo` use `replay` + `fail` (demo: dummy key, discard port); fixture store for `evals/replay/*.jsonl`; `synthetic_news.sql`, `export_replay.sql`, recording procedure in `evals/replay/README.md`
 - [ ] Recording run (you: `ANTHROPIC_API_KEY`, < 0.01 USD): export `evals/replay/news-classification.jsonl`, replace `classification-valid.json` with the recorded body, confirm cache read tokens
-- [ ] With the recording run, check the model name Anthropic echoes back (found 2026-11-07, explain-context news classification):
-  `LlmNewsClassifier.record` prices the echoed name, and `PriceList.priceOf` matches exactly, so a dated ID would throw
-  `UnpricedModelException` after the call was billed -> Kafka redelivery x3 -> DLT -> sweep x3 (up to ~6 paid calls per
-  item, nothing stored). Same escape route for `NoBudgetConfiguredException` (only `UsageLimitExceededException` is
-  caught) and `ResourceNotFoundException` from `FacadeHeldInstruments`, against the port contract "does not throw"
-  (ADR 0012 R1). Decide: price by the configured model name, and/or catch these in the adapter / service
+- [x] Pricing escape after a billed call (found 2026-11-07): adapters priced the echoed model name, so a dated ID
+  threw `UnpricedModelException` after billing (up to ~6 paid calls per item) -> [ADR 0019](decisions/0019-price-by-configured-model-and-startup-check.md):
+  price by the configured name, echoed ID in `ai_generation_log.response_model` (V16), `AiopsFacade.ensureConfigured`
+  at adapter startup, recording failures logged not thrown (classifier, summarizer, batch). `ResourceNotFoundException`
+  (pre-call, free) left to the M3 unknown-instrument question
+- [ ] With the recording run, compare `response_model` with `model` in `ai_generation_log`
 - [x] Skill `llm-adapter` (pattern now implemented once)
 
 ### Slice 6 — Inbound adapters and daily pipeline
