@@ -115,12 +115,34 @@ class AnthropicBatchClassifier implements BatchClassifier {
         log.info("Submitted eval batch {} ({} requests, model {}, prompt {})", batch.id(), cases.size(), model,
                 prompt.version());
 
-        Optional<MessageBatch> ended = awaitEnd(batch);
-        if (ended.isEmpty()) {
-            return new BatchOutcome.Incomplete(batch.id(), "not ended after " + properties.maxWait()
-                    + "; fetch the results later with this batch id");
+        if (awaitEnd(batch.id(), properties.maxWait()).isEmpty()) {
+            return cancelled(batch.id(), cases, data);
         }
         return collect(batch.id(), cases, data);
+    }
+
+    /**
+     * A batch that outlives {@code max-wait} is cancelled: unfinished requests are then not billed, but the finished
+     * ones are, so once it ends they are recorded like a completed batch (generation log and budget). The outcome stays
+     * incomplete: a partial golden set is not scored.
+     */
+    private BatchOutcome cancelled(String batchId, List<GoldenCase> cases, Map<UUID, String> data) {
+        try {
+            client.messages().batches().cancel(batchId);
+        } catch (RuntimeException e) {
+            log.error("Could not cancel eval batch {}; cancel it in the Console: {}", batchId, e.toString());
+            return new BatchOutcome.Incomplete(batchId, "not ended after " + properties.maxWait()
+                    + " and the cancel failed; cancel it in the Console and fetch the results with this batch id");
+        }
+        log.warn("Eval batch {} cancelled after {}", batchId, properties.maxWait());
+        if (awaitEnd(batchId, properties.cancelWait()).isEmpty()) {
+            return new BatchOutcome.Incomplete(batchId, "cancelled after " + properties.maxWait()
+                    + " but not ended after " + properties.cancelWait()
+                    + "; billed results are not recorded, fetch them with this batch id");
+        }
+        String recordedUsd = collect(batchId, cases, data).costUsd().stripTrailingZeros().toPlainString();
+        return new BatchOutcome.Incomplete(batchId, "cancelled after " + properties.maxWait()
+                + "; the requests that had finished are recorded (" + recordedUsd + " USD), not scored");
     }
 
     private Optional<String> leakedHeadline(List<GoldenCase> cases) {
@@ -166,24 +188,24 @@ class AnthropicBatchClassifier implements BatchClassifier {
                 .build();
     }
 
-    private Optional<MessageBatch> awaitEnd(MessageBatch batch) {
-        Instant deadline = Instant.now().plus(properties.maxWait());
-        MessageBatch current = batch;
+    private Optional<MessageBatch> awaitEnd(String batchId, Duration maxWait) {
+        Instant deadline = Instant.now().plus(maxWait);
         try {
+            MessageBatch current = client.messages().batches().retrieve(batchId);
             while (!current.processingStatus().equals(MessageBatch.ProcessingStatus.ENDED)) {
                 if (!Instant.now().isBefore(deadline)) {
-                    log.warn("Eval batch {} still {} after {}", batch.id(), current.processingStatus().asString(),
-                            properties.maxWait());
+                    log.warn("Eval batch {} still {} after {}", batchId, current.processingStatus().asString(),
+                            maxWait);
                     return Optional.empty();
                 }
                 Thread.sleep(properties.pollInterval());
-                current = client.messages().batches().retrieve(batch.id());
+                current = client.messages().batches().retrieve(batchId);
             }
+            return Optional.of(current);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return Optional.empty();
         }
-        return Optional.of(current);
     }
 
     private BatchOutcome.Completed collect(String batchId, List<GoldenCase> cases, Map<UUID, String> data) {

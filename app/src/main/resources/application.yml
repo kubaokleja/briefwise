@@ -130,7 +130,8 @@ briefwise:
       batch:                 # Message Batches API: half price, asynchronous; model/max-tokens/effort as classification
         feature: news-classification-eval
         poll-interval: 30s
-        max-wait: 60m        # then the run fails (INCOMPLETE) and logs the batch id
+        max-wait: 60m        # then the batch is cancelled and the run fails (INCOMPLETE)
+        cancel-wait: 5m      # after the cancel: wait for the end, then record the requests that were billed
         request-timeout: 60s
     finnhub:                 # free tier: personal use only, about 60 calls/min, 30/s hard cap (checked 2026-10-21)
       base-url: https://finnhub.io/api/v1

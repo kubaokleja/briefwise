@@ -181,14 +181,51 @@ class AnthropicBatchClassifierIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void a_batch_that_does_not_end_within_max_wait_is_incomplete_with_its_id() {
+    void a_batch_that_outlives_max_wait_is_cancelled_and_its_billed_results_are_still_recorded() {
+        String cancel = BATCHES + "/" + BATCH_ID + "/cancel";
+        WIREMOCK.stubFor(post(urlPathEqualTo(BATCHES)).willReturn(okJson(batch("in_progress"))));
+        WIREMOCK.stubFor(get(urlPathEqualTo(BATCHES + "/" + BATCH_ID)).inScenario("cancel")
+                .whenScenarioStateIs(STARTED).willReturn(okJson(batch("in_progress"))));
+        WIREMOCK.stubFor(post(urlPathEqualTo(cancel)).inScenario("cancel").whenScenarioStateIs(STARTED)
+                .willReturn(okJson(batch("canceling"))).willSetStateTo("cancelled"));
+        WIREMOCK.stubFor(get(urlPathEqualTo(BATCHES + "/" + BATCH_ID)).inScenario("cancel")
+                .whenScenarioStateIs("cancelled").willReturn(okJson(batch("ended"))));
+        WIREMOCK.stubFor(get(urlPathMatching(BATCHES + "/" + BATCH_ID + "/results"))
+                .willReturn(aResponse().withHeader("Content-Type", "application/binary").withBody(String.join("\n",
+                        succeeded(valid, "{}"),
+                        "{\"custom_id\": \"" + malformed.id() + "\", \"result\": {\"type\": \"canceled\"}}")
+                        + "\n")));
+
+        BatchOutcome outcome = classifier.classify(List.of(valid, malformed));
+
+        // one finished answer of 90 x 0.10 + 60 x 0.50 + 1,000 x 0.01 = 49 per 1M, half price in a batch
+        assertThat(outcome).isEqualTo(new BatchOutcome.Incomplete(BATCH_ID,
+                "cancelled after PT2S; the requests that had finished are recorded (0.0000245 USD), not scored"));
+        WIREMOCK.verify(1, postRequestedFor(urlPathEqualTo(cancel)));
+        assertThat(jdbc.queryForList("SELECT subject_id, cost_usd FROM ai_generation_log")).hasSize(2)
+                .anySatisfy(row -> {
+                    assertThat(row).containsEntry("subject_id", valid.id());
+                    assertThat((BigDecimal) row.get("cost_usd")).isEqualByComparingTo("0.0000245");
+                })
+                .anySatisfy(row -> {
+                    assertThat(row).containsEntry("subject_id", malformed.id());
+                    assertThat((BigDecimal) row.get("cost_usd")).isZero();
+                });
+        assertThat(jdbc.queryForObject("SELECT cost_usd FROM ai_daily_usage WHERE feature = ? AND usage_date = ?",
+                BigDecimal.class, FEATURE, LocalDate.now(ZoneOffset.UTC))).isEqualByComparingTo("0.0000245");
+    }
+
+    @Test
+    void a_cancel_that_does_not_end_within_cancel_wait_is_incomplete_and_names_the_batch() {
         WIREMOCK.stubFor(post(urlPathEqualTo(BATCHES)).willReturn(okJson(batch("in_progress"))));
         WIREMOCK.stubFor(get(urlPathEqualTo(BATCHES + "/" + BATCH_ID)).willReturn(okJson(batch("in_progress"))));
+        WIREMOCK.stubFor(post(urlPathEqualTo(BATCHES + "/" + BATCH_ID + "/cancel"))
+                .willReturn(okJson(batch("canceling"))));
 
         BatchOutcome outcome = classifier.classify(List.of(valid));
 
-        assertThat(outcome).isEqualTo(new BatchOutcome.Incomplete(BATCH_ID,
-                "not ended after PT2S; fetch the results later with this batch id"));
+        assertThat(outcome).isEqualTo(new BatchOutcome.Incomplete(BATCH_ID, "cancelled after PT2S but not ended "
+                + "after PT1S; billed results are not recorded, fetch them with this batch id"));
         assertThat(jdbc.queryForObject("SELECT count(*) FROM ai_generation_log", Integer.class)).isZero();
     }
 

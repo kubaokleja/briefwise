@@ -203,13 +203,13 @@ with `./mvnw verify` green. Decision points are settled at the start of the slic
 - [x] Skill `new-eval-case`
 - [ ] You: optionally make `classification-eval` a required check (path-filtered: required checks stay pending on PRs
   that do not trigger it)
-- [ ] Eval follow-ups (found 2026-11-07, explain-context news eval): (1) an `INCOMPLETE` batch is not cancelled,
-  so Anthropic still finishes and bills it, and those tokens never reach the generation log or `ai_daily_usage`
-  (cancel it on `max-wait`, or record the late results). (2) `RegressionGate` compares only F1: a changed model,
-  prompt version or golden set (row count) is compared with the old baseline without a warning; refuse or flag a
-  non-comparable baseline (`cases` is not in `EvalBaseline` yet). (3) `evals.yml` runs on `prompts/**`, so a
-  `prompts/news-summary/` change pays for a classification run that measures nothing about it; narrow the path filter
-  to `prompts/news-classification/**` (and per eval once M2 adds the RAG eval)
+- [x] Eval follow-ups (1) and (3) (found 2026-11-07): a batch past `max-wait` is cancelled, then after
+  `cancel-wait` (5m) its finished, billed requests are recorded in the generation log and `ai_daily_usage`; still
+  `INCOMPLETE`, not scored (`AnthropicBatchClassifierIT` +1). `evals.yml` runs only on
+  `prompts/news-classification/**`, `evals/sentiment_golden.csv.gpg`, `evals/scripts/**`; timeout 80 min
+- [ ] Eval follow-up (2): `RegressionGate` compares only F1: a changed model, prompt version or golden set (row
+  count) is compared with the old baseline without a warning; refuse or flag a non-comparable baseline (`cases` is
+  not in `EvalBaseline` yet)
 
 ### Slice 9 — UI: News
 - [x] Feed source: new `GET /api/news` (all visible statuses, optional portfolio filter) instead of the per-portfolio
