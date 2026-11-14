@@ -55,13 +55,21 @@ This costs real money: about 10 Haiku 5.5 calls, well under 0.01 USD (twice for 
 5. Cache check (prompt caching, ADR 0012): the seeded items are classified within seconds of each other, so the
    first call writes the system prompt to the cache and the rest read it. No extra calls needed:
    `SELECT cache_write_tokens, cache_read_tokens FROM ai_generation_log WHERE feature = 'news-classification' ORDER BY created_at;`
-   shows one write and non-zero reads (2026-11-07: 2,058 written once, then read by the other 9 calls).
+   shows one write and non-zero reads (2026-11-07, v1: 2,058 written once, then read by the other 9 calls; 2026-11-14,
+   v2: 2,343 written once, read by the other 10).
 6. Export:
    `docker compose exec -T postgres psql -U briefwise -d briefwise_recording -At -v feature=news-classification < evals/replay/export_replay.sql > evals/replay/news-classification.jsonl`
    Daily summaries (ADR 0017): the summary only selects items published in the last 24 h, so first run
-   `UPDATE news_items SET published_at = now() - interval '1 hour' WHERE source = 'Synthetic';`. Then
-   `POST /api/admin/jobs/news-ingest/run` (its last step summarises every portfolio; without a Finnhub key the
-   ingest step fails but the summarize step still runs) and export with `-v feature=news-summary` to
+   `UPDATE news_items SET published_at = now() - interval '1 hour' WHERE source = 'Synthetic';`. Then stop the app
+   and run the job once as the runner (an admin run skips `summarize` since 2026-11-07); without a Finnhub key the
+   ingest step fails (exit 1) but the summarize step still runs:
+   ```powershell
+   $env:SPRING_PROFILES_ACTIVE = 'local,job'   # same shell: ANTHROPIC_API_KEY and DB_URL as in step 3
+   java -jar target\briefwise-app-*.jar --briefwise.job=news-ingest --spring.ai.model.chat=anthropic --spring.ai.anthropic.base-url=http://localhost:8089 --briefwise.llm.provider=replay --briefwise.llm.replay.on-miss=fallback
+   ```
+   Re-record the summaries whenever the classification labels of the synthetic items change (a prompt version
+   bump usually does: 2026-11-14, v2 moved item 7 to `MEDIUM` and item 10 to `LOW`). Export with
+   `-v feature=news-summary` to
    `evals/replay/news-summary.jsonl` (only summaries of seeded portfolios that cite synthetic items alone). A summary recording only replays while the selected items (ids, labels, text)
    are exactly the same, so it suits a seeded demo, not CI with random ids.
 7. Stop the proxy. From `briefwise-recording/__files/`, copy one valid classification response body to

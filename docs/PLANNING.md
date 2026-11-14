@@ -257,9 +257,12 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   for `LOW`, one synthetic gift-guide example (`OTHER`, `LOW`, `[]`); version + SHA-256 bumped, schema unchanged.
   `ClassificationAnswer` accepts `[]` only with `LOW`; `NewsRepositoryAdapter` skips `markAffected` for `[]` (an empty
   `IN ()` is invalid SQL). `ClassificationAnswerTest` (+2), `LlmNewsClassifierIT` (+2, fixture
-  `classification-empty-tickers-low.json`), `NewsRepositoryAdapterIT` (+1). Until the re-recording below, the
-  `demo` profile misses every classification replay (v1 keys)
-- [ ] Re-record the classification replay fixtures for v2 (throwaway DB, `evals/replay/README.md` procedure)
+  `classification-empty-tickers-low.json`), `NewsRepositoryAdapterIT` (+1)
+- [x] Re-record the classification replay fixtures for v2 (2026-11-14, 0.0022 USD, throwaway DB): 11 synthetic items
+  (new item 11, passing mention -> `LOW`/`OTHER`/no ticker); v2 moved item 7 to `MEDIUM` and item 10 to `LOW` with
+  no ticker, so the 3 summaries were re-recorded too (job runner: admin runs skip `summarize`; README step 6
+  updated). Cache: 2,343 tokens written once, read by the other 10. `classification-recorded.json` replaced
+  (`LlmNewsClassifierIT` figures)
 - [ ] Eval run on v2 (Batch API, `evals.yml`): compare with v1 per label; new `baseline.json` only if accepted (you);
   result recorded in ADR 0020 or a follow-up ADR
 
