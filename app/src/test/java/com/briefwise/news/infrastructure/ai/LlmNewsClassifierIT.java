@@ -92,11 +92,11 @@ class LlmNewsClassifierIT extends AbstractIntegrationTest {
 
         assertThat(result).isEqualTo(new ClassifierResult.Classified(new NewsClassification(Sentiment.POSITIVE,
                 Relevance.HIGH, EventType.EARNINGS, Set.of(new Ticker("AAPL")),
-                "Quarterly revenue beat expectations.", "v1")));
+                "Quarterly revenue beat expectations.", "v2")));
         assertThat(logRows()).singleElement().satisfies(row -> assertThat(row)
                 .containsEntry("feature", "news-classification")
                 .containsEntry("model", "claude-haiku-5-5")
-                .containsEntry("prompt_version", "v1")
+                .containsEntry("prompt_version", "v2")
                 .containsEntry("prompt_tokens", 92)
                 .containsEntry("completion_tokens", 61)
                 .containsEntry("cache_read_tokens", 1180)
@@ -116,7 +116,7 @@ class LlmNewsClassifierIT extends AbstractIntegrationTest {
 
         assertThat(result).isEqualTo(new ClassifierResult.Classified(new NewsClassification(Sentiment.POSITIVE,
                 Relevance.HIGH, EventType.EARNINGS, Set.of(new Ticker("AAPL")),
-                "Quarterly revenue beat consensus, driven by services growth of 9% year on year.", "v1")));
+                "Quarterly revenue beat consensus, driven by services growth of 9% year on year.", "v2")));
         assertThat(logRows()).singleElement().satisfies(row -> assertThat(row)
                 .containsEntry("model", "claude-haiku-5-5")
                 .containsEntry("response_model", "claude-haiku-5-5")
@@ -194,6 +194,29 @@ class LlmNewsClassifierIT extends AbstractIntegrationTest {
         WIREMOCK.verify(2, postRequestedFor(urlPathEqualTo(MESSAGES)));
         assertThat(logRows()).extracting(row -> row.get("is_fallback")).containsExactlyInAnyOrder(false, true);
         assertThat(logRows()).extracting(row -> row.get("replay_key")).containsOnlyNulls();
+    }
+
+    @Test
+    void a_low_item_naming_no_ticker_is_classified_without_a_re_ask() {
+        WIREMOCK.stubFor(post(urlPathEqualTo(MESSAGES))
+                .willReturn(okJson(fixture("classification-empty-tickers-low.json"))));
+
+        ClassifierResult result = classifier.classify(item);
+
+        assertThat(result).isEqualTo(new ClassifierResult.Classified(new NewsClassification(Sentiment.NEUTRAL,
+                Relevance.LOW, EventType.OTHER, Set.of(),
+                "Gift guide that mentions an iPhone accessory in passing; no company event.", "v2")));
+        WIREMOCK.verify(1, postRequestedFor(urlPathEqualTo(MESSAGES)));
+        assertThat(logRows()).singleElement().satisfies(row -> assertThat(row).containsEntry("is_fallback", false));
+    }
+
+    @Test
+    void a_high_item_naming_no_ticker_is_asked_again_then_invalid_output() {
+        String high = fixture("classification-empty-tickers-low.json").replace("\\\"LOW\\\"", "\\\"HIGH\\\"");
+        WIREMOCK.stubFor(post(urlPathEqualTo(MESSAGES)).willReturn(okJson(high)));
+
+        assertThat(classifier.classify(item)).isEqualTo(new ClassifierResult.Failed(UnclassifiedReason.INVALID_OUTPUT));
+        WIREMOCK.verify(2, postRequestedFor(urlPathEqualTo(MESSAGES)));
     }
 
     @Test

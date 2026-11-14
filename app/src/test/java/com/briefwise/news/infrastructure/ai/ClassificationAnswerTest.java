@@ -46,8 +46,28 @@ class ClassificationAnswerTest {
     }
 
     @Test
-    void no_affected_ticker_or_missing_label_is_invalid_output() {
-        assertThatThrownBy(() -> answer(List.of()).toClassification(ITEM, "v1"))
+    void a_low_item_may_name_no_affected_ticker() {
+        NewsClassification c = new ClassificationAnswer("Gift guide, passing mention.", Sentiment.NEUTRAL,
+                Relevance.LOW, EventType.OTHER, List.of()).toClassification(ITEM, "v2");
+
+        assertThat(c.tickers()).isEmpty();
+        assertThat(c.relevance()).isEqualTo(Relevance.LOW);
+    }
+
+    @Test
+    void a_medium_or_high_item_without_an_affected_ticker_is_invalid_output() {
+        assertThatThrownBy(() -> answer(List.of()).toClassification(ITEM, "v2"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("HIGH");
+        assertThatThrownBy(() -> new ClassificationAnswer("r", Sentiment.NEUTRAL, Relevance.MEDIUM, EventType.OTHER,
+                List.of()).toClassification(ITEM, "v2"))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void missing_tickers_or_missing_label_is_invalid_output() {
+        assertThatThrownBy(() -> new ClassificationAnswer("r", Sentiment.NEUTRAL, Relevance.LOW, EventType.OTHER, null)
+                .toClassification(ITEM, "v1"))
                 .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> new ClassificationAnswer("r", null, Relevance.LOW, EventType.OTHER, List.of("AAPL"))
                 .toClassification(ITEM, "v1"))

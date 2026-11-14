@@ -86,7 +86,10 @@ class NewsRepositoryAdapter implements NewsRepository {
         if (updated == 0) {
             return false;
         }
-        items.markAffected(newsId, c.tickers().stream().map(Ticker::symbol).toList());
+        // A LOW item may name no affected ticker (ADR 0023); an empty IN () is invalid SQL, and nothing is to mark.
+        if (!c.tickers().isEmpty()) {
+            items.markAffected(newsId, c.tickers().stream().map(Ticker::symbol).toList());
+        }
         return true;
     }
 

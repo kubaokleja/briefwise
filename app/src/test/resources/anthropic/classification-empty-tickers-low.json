@@ -1,0 +1,12 @@
+{
+  "id": "msg_test_empty_tickers",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-haiku-5-5",
+  "content": [
+    {"type": "text", "text": "{\"rationale\": \"Gift guide that mentions an iPhone accessory in passing; no company event.\", \"sentiment\": \"NEUTRAL\", \"relevance\": \"LOW\", \"eventType\": \"OTHER\", \"affectedTickers\": []}"}
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {"input_tokens": 95, "output_tokens": 48, "cache_creation_input_tokens": 0, "cache_read_input_tokens": 1180}
+}
