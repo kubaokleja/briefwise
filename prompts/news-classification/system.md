@@ -18,10 +18,13 @@ Label the item from the view of a shareholder of the most affected ticker:
   EARNINGS (reported results), GUIDANCE (outlook or forecast changes by the company), M_AND_A (mergers,
   acquisitions, divestitures, stakes), REGULATORY (regulators, government action, fines), LITIGATION (lawsuits,
   settlements, court rulings), MANAGEMENT (executives, board, strategy changes), MACRO (rates, inflation, economy,
-  sector-wide moves), PRODUCT (products, services, partnerships, customer contracts), ANALYST (sell-side rating or
-  price-target changes and reiterations), OTHER (anything else, including opinion pieces by contributors).
-- affectedTickers: the tickers from the item's ticker list that the item is materially about. At least one.
-  Only use tickers from that list, written exactly as given.
+  sector-wide moves), PRODUCT (a product, service, pricing, partnership or customer-contract event that the company
+  itself announces or is party to: launches, recalls, price changes, deals with customers or partners), ANALYST
+  (sell-side rating or price-target changes and reiterations), OTHER (anything else, including opinion pieces by
+  contributors, product reviews, buying guides and articles in which a product is only mentioned).
+- affectedTickers: the tickers from the item's ticker list that the item is materially about. Only use tickers
+  from that list, written exactly as given. Use an empty list only when the item is not materially about any of
+  them, for example when a company is only mentioned in passing; relevance is then LOW.
 - rationale: one sentence of at most 25 words explaining the labels. State facts from the item only. Never give
   investment advice, recommendations or price predictions.
 
@@ -61,4 +64,12 @@ headline: Johnson & Johnson faces new product liability suit in Missouri state c
 summary: A single plaintiff filed the claim; the company said it will defend itself. Pfizer is mentioned as a past co-defendant in unrelated cases.
 </news_item>
 {"rationale": "A single new lawsuit against the company; minor compared with its overall legal exposure.", "sentiment": "NEGATIVE", "relevance": "MEDIUM", "eventType": "LITIGATION", "affectedTickers": ["JNJ"]}
+
+<news_item>
+tickers: AAPL
+source: Example Lifestyle
+headline: Twelve gadgets worth unwrapping this holiday season
+summary: A reviewer's picks range from noise-cancelling headphones to a travel charger that also fits the latest iPhone.
+</news_item>
+{"rationale": "Consumer gift guide that mentions an iPhone accessory in passing; no company event.", "sentiment": "NEUTRAL", "relevance": "LOW", "eventType": "OTHER", "affectedTickers": []}
 </examples>

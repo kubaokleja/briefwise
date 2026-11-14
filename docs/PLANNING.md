@@ -253,8 +253,12 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
 - [x] Decide P1 prompt v2 scope -> [ADR 0023](decisions/0023-classification-prompt-v2-scope.md): (1) empty
   `affectedTickers` allowed only with relevance `LOW` (prompt + `ClassificationAnswer` check, schema unchanged);
   (2) narrower `PRODUCT` definition + one synthetic `OTHER` few-shot naming a product; one `v2` with both
-- [ ] `prompts/news-classification/` v2 (version bump + SHA-256 guard), schema / `NewsClassification` mapping if (1)
-  changes it; `NewsClassificationPromptTest`, `LlmNewsClassifierIT` (new fixture for the empty-ticker case)
+- [x] `prompts/news-classification/` v2 (ADR 0023): narrower `PRODUCT` / wider `OTHER`, empty `affectedTickers` only
+  for `LOW`, one synthetic gift-guide example (`OTHER`, `LOW`, `[]`); version + SHA-256 bumped, schema unchanged.
+  `ClassificationAnswer` accepts `[]` only with `LOW`; `NewsRepositoryAdapter` skips `markAffected` for `[]` (an empty
+  `IN ()` is invalid SQL). `ClassificationAnswerTest` (+2), `LlmNewsClassifierIT` (+2, fixture
+  `classification-empty-tickers-low.json`), `NewsRepositoryAdapterIT` (+1). Until the re-recording below, the
+  `demo` profile misses every classification replay (v1 keys)
 - [ ] Re-record the classification replay fixtures for v2 (throwaway DB, `evals/replay/README.md` procedure)
 - [ ] Eval run on v2 (Batch API, `evals.yml`): compare with v1 per label; new `baseline.json` only if accepted (you);
   result recorded in ADR 0020 or a follow-up ADR

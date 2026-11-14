@@ -23,16 +23,22 @@ record ClassificationAnswer(String rationale, Sentiment sentiment, Relevance rel
 
     /**
      * Checks what the schema cannot: every affected ticker is one of the item's tickers (the schema stays the same
-     * for every item, so its grammar stays cached).
+     * for every item, so its grammar stays cached), and an empty list comes only with relevance {@code LOW}: an item
+     * that is not materially about any of its tickers cannot matter to a holder (ADR 0023). Such an item never
+     * reaches a portfolio's relevant news.
      *
-     * @throws IllegalArgumentException if a field is missing, or a ticker is not the item's
+     * @throws IllegalArgumentException if a field is missing, a ticker is not the item's, or no ticker is named for
+     *                                  a {@code MEDIUM} / {@code HIGH} item
      */
     NewsClassification toClassification(NewsItem item, String promptVersion) {
         if (sentiment == null || relevance == null || eventType == null) {
             throw new IllegalArgumentException("Missing label in " + this);
         }
-        if (affectedTickers == null || affectedTickers.isEmpty()) {
-            throw new IllegalArgumentException("No affected ticker in " + this);
+        if (affectedTickers == null) {
+            throw new IllegalArgumentException("No affectedTickers in " + this);
+        }
+        if (affectedTickers.isEmpty() && relevance != Relevance.LOW) {
+            throw new IllegalArgumentException("No affected ticker for a " + relevance + " item in " + this);
         }
         Set<Ticker> affected = affectedTickers.stream()
                 .map(symbol -> new Ticker(symbol.trim().toUpperCase(Locale.ROOT)))

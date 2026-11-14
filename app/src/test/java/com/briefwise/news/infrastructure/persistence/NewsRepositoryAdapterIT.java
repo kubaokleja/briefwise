@@ -175,6 +175,19 @@ class NewsRepositoryAdapterIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void a_classification_without_affected_tickers_marks_none() {
+        UUID id = store(AAPL, "Twelve gadgets worth unwrapping", T0, Optional.empty());
+
+        assertThat(repository.classifyFromReceived(id, new NewsClassification(Sentiment.NEUTRAL, Relevance.LOW,
+                EventType.OTHER, Set.of(), "Passing mention.", "v2"), T0.plusSeconds(60))).isTrue();
+
+        assertThat(jdbc.queryForObject("SELECT status FROM news_items WHERE id = ?", String.class, id))
+                .isEqualTo("CLASSIFIED");
+        assertThat(jdbc.queryForList("SELECT ticker FROM news_item_tickers WHERE news_item_id = ? AND affected",
+                String.class, id)).isEmpty();
+    }
+
+    @Test
     void unclassified_item_keeps_its_reason_and_no_labels() {
         UUID id = store(AAPL, "Apple headline with an injection", T0, Optional.empty());
 
