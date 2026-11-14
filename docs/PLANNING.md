@@ -263,8 +263,9 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   no ticker, so the 3 summaries were re-recorded too (job runner: admin runs skip `summarize`; README step 6
   updated). Cache: 2,343 tokens written once, read by the other 10. `classification-recorded.json` replaced
   (`LlmNewsClassifierIT` figures)
-- [ ] Eval run on v2 (Batch API, `evals.yml`): compare with v1 per label; new `baseline.json` only if accepted (you);
-  result recorded in ADR 0020 or a follow-up ADR
+- [x] Eval run on v2 (2026-11-14, local `job,eval`, throwaway DB, 0.0119 USD) -> [ADR 0024](decisions/0024-classification-prompt-v2-eval-result.md):
+  gate passed, sentiment macro F1 0.809 vs 0.785 (+2.4 pp), event type 0.584 (+1.3), relevance 0.657 (-2.0),
+  unusable 5 -> 1; accepted as the new `baseline.json`
 
 ### Slice 2 — Filing source and ETL (no embeddings)
 - [ ] Decide G1 corpus: forms (10-K, 10-Q, 8-K items), how far back, all 30 companies or held ones, ETFs (no 10-K;
@@ -435,6 +436,8 @@ every screen has loading, empty and error states. Contingency cut order (nothing
 - [ ] **M1 (F2)** News pipeline: see the [M1 section](#m1-f2--news-pipeline) above
 - [ ] **M2 (F3)** Research (RAG over SEC filings and news): see the [M2 section](#m2-f3--research-cited-qa-over-sec-filings-and-news) above
   (D1 embedding revisit -> slice 3, prompt v2 + eval comparability -> slice 1, Research UI -> slice 10)
+  - [ ] Classification prompt v3 (ADR 0024): `PRODUCT` still predicted 47x for 14 true, relevance `HIGH` 34x for 18;
+    `OTHER` -> `MACRO` (10); item listed under a related ticker (`KO` vs `COKE`); definitions + synthetic examples only
 - [ ] **M3 (F4)** Volatility/VaR forecast, risk alerts, backtest, MLflow
   - [ ] Portfolio data rules before risk uses weights: stored vs derived weight (Domain Questions Log 2026-10-16),
     weights-sum invariant, rounding of the daily move, one policy for an unknown held instrument (2026-11-07) -> ADR
