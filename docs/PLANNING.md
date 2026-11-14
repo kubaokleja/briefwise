@@ -250,9 +250,9 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   `evals.yml` dispatch input `accept_new_baseline`; cannot hide a regression); `baseline.json` backfilled by hand
   (no model call). `GoldenSetFingerprintTest`, `RegressionGateTest` (+6), `EvalReportTest` (+1),
   `ClassificationEvalServiceTest` (+2), `FileEvalReportsTest` (+2), `NewsEvalFacadeIT` (+1)
-- [ ] Decide P1 prompt v2 scope (ADR 0020 follow-ups): (1) empty `affectedTickers` on generic items (allow none for
-  `OTHER`/`LOW`, or require at least one in the schema), (2) `PRODUCT` over-predicted vs `OTHER` (boundary wording,
-  synthetic few-shot change; never from the golden set) -> ADR
+- [x] Decide P1 prompt v2 scope -> [ADR 0023](decisions/0023-classification-prompt-v2-scope.md): (1) empty
+  `affectedTickers` allowed only with relevance `LOW` (prompt + `ClassificationAnswer` check, schema unchanged);
+  (2) narrower `PRODUCT` definition + one synthetic `OTHER` few-shot naming a product; one `v2` with both
 - [ ] `prompts/news-classification/` v2 (version bump + SHA-256 guard), schema / `NewsClassification` mapping if (1)
   changes it; `NewsClassificationPromptTest`, `LlmNewsClassifierIT` (new fixture for the empty-ticker case)
 - [ ] Re-record the classification replay fixtures for v2 (throwaway DB, `evals/replay/README.md` procedure)
