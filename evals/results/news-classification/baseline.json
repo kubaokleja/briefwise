@@ -4,6 +4,7 @@
   "batchId" : "msgbatch_01NEYjzTSHdRuxTG8jWRDVHU",
   "ranAt" : "2026-11-07T18:29:20.103206400Z",
   "cases" : 258,
+  "goldenSha256" : "a80c98dd1486029c14456b511cb0c4ac0573305dec8e00113e747327feb82711",
   "randomCases" : 150,
   "invalid" : 5,
   "invalidRate" : 0.0194,

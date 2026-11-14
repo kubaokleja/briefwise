@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.within;
 import com.briefwise.AbstractIntegrationTest;
 import com.briefwise.news.NewsFacade.ClassificationEvalView;
 import com.briefwise.news.NewsFacade.EvalStatusView;
+import com.briefwise.news.domain.model.GoldenSetFingerprint;
+import com.briefwise.news.domain.port.GoldenSet;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -25,7 +27,8 @@ import org.springframework.util.FileSystemUtils;
 /**
  * {@link NewsFacade#evaluateClassification} end to end (ADR 0018): the synthetic fixture golden set
  * ({@code src/test/resources/eval/golden-fixture.csv}), the batch adapter against WireMock, scoring, the report files
- * under {@code target/eval-results} and the regression gate against a {@code baseline.json}.
+ * under {@code target/eval-results} and the regression gate against a {@code baseline.json} (ADR 0022: only one on
+ * the same golden set is comparable).
  */
 class NewsEvalFacadeIT extends AbstractIntegrationTest {
 
@@ -37,6 +40,9 @@ class NewsEvalFacadeIT extends AbstractIntegrationTest {
 
     @Autowired
     JdbcTemplate jdbc;
+
+    @Autowired
+    GoldenSet goldenSet;
 
     @BeforeEach
     void setUp() {
@@ -95,16 +101,19 @@ class NewsEvalFacadeIT extends AbstractIntegrationTest {
         assertThat(view.sentimentMacroF1().orElseThrow()).isCloseTo((6.0 / 7 + 1) / 3, within(1e-9));
         assertThat(RESULTS.resolve("latest.json")).exists();
         assertThat(Files.readString(RESULTS.resolve("latest.md"), StandardCharsets.UTF_8))
-                .contains("**Gate: PASSED**").contains("6 golden cases (3 random)");
+                .contains("**Gate: PASSED**").contains("6 golden cases (3 random, golden set `");
+        assertThat(view.goldenSha256()).contains(GoldenSetFingerprint.of(goldenSet.load()).sha256());
     }
 
     @Test
     void a_drop_of_more_than_three_points_below_the_baseline_fails() throws IOException {
         stubBatchAnswers();
         Files.createDirectories(RESULTS);
+        String golden = GoldenSetFingerprint.of(goldenSet.load()).sha256();
         Files.writeString(RESULTS.resolve("baseline.json"), """
-                {"model": "claude-haiku-5-5", "promptVersion": "v1", "all": {"sentiment": {"macroF1": 0.95}}}
-                """, StandardCharsets.UTF_8);
+                {"model": "claude-haiku-5-5", "promptVersion": "v1", "cases": 6, "goldenSha256": "%s",
+                 "all": {"sentiment": {"macroF1": 0.95}}}
+                """.formatted(golden), StandardCharsets.UTF_8);
 
         ClassificationEvalView view = news.evaluateClassification();
 
@@ -112,5 +121,22 @@ class NewsEvalFacadeIT extends AbstractIntegrationTest {
         assertThat(view.passed()).isFalse();
         assertThat(view.baselineSentimentMacroF1()).contains(0.95);
         assertThat(view.message()).contains("baseline 0.950");
+    }
+
+    @Test
+    void a_baseline_without_a_golden_set_hash_is_not_comparable() throws IOException {
+        stubBatchAnswers();
+        Files.createDirectories(RESULTS);
+        Files.writeString(RESULTS.resolve("baseline.json"), """
+                {"model": "claude-haiku-5-5", "promptVersion": "v1", "cases": 6, "all": {"sentiment": {"macroF1": 0.5}}}
+                """, StandardCharsets.UTF_8);
+
+        ClassificationEvalView view = news.evaluateClassification();
+
+        assertThat(view.status()).isEqualTo(EvalStatusView.NOT_COMPARABLE);
+        assertThat(view.passed()).isFalse();
+        assertThat(view.message()).contains("baseline has no golden set hash");
+        assertThat(Files.readString(RESULTS.resolve("latest.md"), StandardCharsets.UTF_8))
+                .contains("**Gate: FAILED** (NOT COMPARABLE)");
     }
 }

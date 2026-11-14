@@ -15,6 +15,7 @@ import com.briefwise.news.domain.model.EvalPrediction;
 import com.briefwise.news.domain.model.EvalRun;
 import com.briefwise.news.domain.model.EventType;
 import com.briefwise.news.domain.model.GoldenCase;
+import com.briefwise.news.domain.model.GoldenSetFingerprint;
 import com.briefwise.news.domain.model.RegressionGate;
 import com.briefwise.news.domain.model.Relevance;
 import com.briefwise.news.domain.model.Sentiment;
@@ -80,7 +81,7 @@ class ClassificationEvalServiceTest {
         EvalPrediction wrong = new EvalPrediction(negative.id(),
                 Optional.of(new EvalLabels(Sentiment.NEUTRAL, Relevance.LOW, EventType.OTHER)), TOKENS);
         when(classifier.classify(any())).thenReturn(batch(right(positive), wrong, right(neutral)));
-        when(reports.baseline()).thenReturn(Optional.of(new EvalBaseline("claude-haiku-5-5", "v1", 1.0)));
+        when(reports.baseline()).thenReturn(Optional.of(sameGoldenSet(1.0)));
 
         EvalRun run = service.evaluate();
 
@@ -88,6 +89,45 @@ class ClassificationEvalServiceTest {
         assertThat(run.passed()).isFalse();
         assertThat(run.message()).contains("baseline 1.000");
         verify(reports).write(any(), any());
+    }
+
+    @Test
+    void a_baseline_on_another_golden_set_is_not_comparable_and_not_a_pass() {
+        when(goldenSet.load()).thenReturn(List.of(positive, negative, neutral));
+        when(classifier.classify(any())).thenReturn(batch(right(positive), right(negative), right(neutral)));
+        when(reports.baseline()).thenReturn(Optional.of(
+                new EvalBaseline("claude-haiku-5-5", "v1", 2, Optional.of("0".repeat(64)), 0.5)));
+
+        EvalRun run = service.evaluate();
+
+        assertThat(run.status()).isEqualTo(EvalRun.Status.NOT_COMPARABLE);
+        assertThat(run.passed()).isFalse();
+        assertThat(run.message()).contains("3 cases, baseline 2");
+        verify(reports).write(any(), any());
+    }
+
+    @Test
+    void an_accepted_new_baseline_is_a_pass() {
+        ClassificationEvalService accepting = new ClassificationEvalService(goldenSet, classifier, reports,
+                new RegressionGate(3.0, true), Clock.fixed(Instant.parse("2026-10-28T08:00:00Z"), ZoneOffset.UTC));
+        when(goldenSet.load()).thenReturn(List.of(positive, negative, neutral));
+        when(classifier.classify(any())).thenReturn(batch(right(positive), right(negative), right(neutral)));
+        when(reports.baseline()).thenReturn(Optional.of(
+                new EvalBaseline("claude-haiku-5-5", "v1", 258, Optional.empty(), 0.785)));
+
+        EvalRun run = accepting.evaluate();
+
+        assertThat(run.status()).isEqualTo(EvalRun.Status.BASELINE_ACCEPTED);
+        assertThat(run.passed()).isTrue();
+        assertThat(run.report().orElseThrow().goldenSha256())
+                .isEqualTo(GoldenSetFingerprint.of(List.of(positive, negative, neutral)).sha256());
+    }
+
+    /** A baseline measured on exactly this test's golden set. */
+    private EvalBaseline sameGoldenSet(double sentimentMacroF1) {
+        GoldenSetFingerprint golden = GoldenSetFingerprint.of(List.of(positive, negative, neutral));
+        return new EvalBaseline("claude-haiku-5-5", "v1", golden.cases(), Optional.of(golden.sha256()),
+                sentimentMacroF1);
     }
 
     @Test

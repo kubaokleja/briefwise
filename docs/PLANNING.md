@@ -243,9 +243,13 @@ settled at the start of the slice that lists them (ADR via `adr`). Filing ingest
 embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citations-m2)).
 
 ### Slice 1 — M1 carry-overs: eval comparability, classification prompt v2
-- [ ] Eval follow-up (2): `EvalBaseline` gains `model`, `promptVersion`, `cases` (golden row count, golden file
-  hash); `RegressionGate` refuses (or flags `NOT_COMPARABLE`) a baseline that differs, with an explicit
-  `--accept-new-baseline` path; `RegressionGateTest`, `EvalReportTest`, `ClassificationEvalServiceTest` (+n)
+- [x] Eval follow-up (2) -> [ADR 0022](decisions/0022-eval-baseline-comparability.md): only the golden set blocks
+  (model / prompt differences are what a run measures: compared and named). `GoldenSetFingerprint` (cases + SHA-256
+  over the parsed cases); `EvalBaseline` gains `cases`, `goldenSha256`; `EvalReport.goldenSha256` / `asBaseline()`;
+  gate verdicts `NOT_COMPARABLE` (fails) and `BASELINE_ACCEPTED` (property `briefwise.news.eval.accept-new-baseline`,
+  `evals.yml` dispatch input `accept_new_baseline`; cannot hide a regression); `baseline.json` backfilled by hand
+  (no model call). `GoldenSetFingerprintTest`, `RegressionGateTest` (+6), `EvalReportTest` (+1),
+  `ClassificationEvalServiceTest` (+2), `FileEvalReportsTest` (+2), `NewsEvalFacadeIT` (+1)
 - [ ] Decide P1 prompt v2 scope (ADR 0020 follow-ups): (1) empty `affectedTickers` on generic items (allow none for
   `OTHER`/`LOW`, or require at least one in the schema), (2) `PRODUCT` over-predicted vs `OTHER` (boundary wording,
   synthetic few-shot change; never from the golden set) -> ADR

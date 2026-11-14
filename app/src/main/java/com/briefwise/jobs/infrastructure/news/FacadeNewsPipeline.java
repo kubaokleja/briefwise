@@ -96,6 +96,7 @@ class FacadeNewsPipeline implements NewsPipeline {
         e.baselineSentimentMacroF1().ifPresent(f1 -> figures.put("baselineSentimentMacroF1", f1));
         e.costUsd().ifPresent(cost -> figures.put("costUsd", cost));
         e.batchId().ifPresent(id -> figures.put("batchId", id));
+        e.goldenSha256().ifPresent(hash -> figures.put("goldenSha256", hash));
         return new EvalResult(e.passed(), e.message(), figures);
     }
 

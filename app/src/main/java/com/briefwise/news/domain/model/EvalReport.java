@@ -6,23 +6,26 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * Result of one classification eval run (DESIGN 10, ADR 0018): scores on all golden rows and on the random rows alone,
- * how many answers were unusable, and the cost of the run (batch price). Holds metrics only, never news text, so it
+ * how many answers were unusable, the cost of the run (batch price) and which golden set it measured (ADR 0022). Holds metrics only, never news text, so it
  * may be committed and posted on a PR.
  */
-public record EvalReport(String model, String promptVersion, String batchId, Instant ranAt, int cases, int randomCases,
-                         int invalid, BigDecimal costUsd, EvalScores all, EvalScores random) {
+public record EvalReport(String model, String promptVersion, String batchId, Instant ranAt, int cases,
+                         String goldenSha256, int randomCases, int invalid, BigDecimal costUsd, EvalScores all,
+                         EvalScores random) {
 
     public EvalReport {
         Objects.requireNonNull(model, "model");
         Objects.requireNonNull(promptVersion, "promptVersion");
         Objects.requireNonNull(batchId, "batchId");
         Objects.requireNonNull(ranAt, "ranAt");
+        Objects.requireNonNull(goldenSha256, "goldenSha256");
         Objects.requireNonNull(costUsd, "costUsd");
         Objects.requireNonNull(all, "all");
         Objects.requireNonNull(random, "random");
@@ -36,8 +39,13 @@ public record EvalReport(String model, String promptVersion, String batchId, Ins
                 .filter(c -> !predictions.containsKey(c.id()) || !predictions.get(c.id()).valid())
                 .count();
         return new EvalReport(batch.model(), batch.promptVersion(), batch.batchId(), ranAt, cases.size(),
-                randomCases.size(), invalid, batch.costUsd(), EvalScores.of(cases, predictions),
+                GoldenSetFingerprint.of(cases).sha256(), randomCases.size(), invalid, batch.costUsd(), EvalScores.of(cases, predictions),
                 EvalScores.of(randomCases, predictions));
+    }
+
+    /** This run in the shape the regression gate compares (ADR 0022). */
+    public EvalBaseline asBaseline() {
+        return new EvalBaseline(model, promptVersion, cases, Optional.of(goldenSha256), all.sentiment().macroF1());
     }
 
     /** What 1,000 items would cost at this run's average, the unit DESIGN 8 compares models by. */

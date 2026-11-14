@@ -175,7 +175,8 @@ public class NewsFacade {
 
     /**
      * Classification eval (DESIGN 10, ADR 0018): the golden set in one Message Batch with the production prompt,
-     * scores written to the report, then the regression gate on sentiment macro F1. Only {@code PASSED} is a pass.
+     * scores written to the report, then the regression gate on sentiment macro F1 against a baseline on the same
+     * golden set (ADR 0022). Only {@code PASSED} and a deliberately {@code BASELINE_ACCEPTED} run are a pass.
      *
      * @throws IllegalStateException if the golden set is missing (not decrypted) or malformed
      */
@@ -186,7 +187,7 @@ public class NewsFacade {
                 report.map(EvalReport::cases).orElse(0), report.map(EvalReport::invalid).orElse(0),
                 report.map(r -> r.all().sentiment().macroF1()),
                 run.gate().flatMap(GateResult::baseline).map(EvalBaseline::sentimentMacroF1),
-                report.map(EvalReport::costUsd), report.map(EvalReport::batchId));
+                report.map(EvalReport::costUsd), report.map(EvalReport::batchId), report.map(EvalReport::goldenSha256));
     }
 
     private static RelevantNewsView toView(RelevantNews r) {
@@ -280,16 +281,17 @@ public class NewsFacade {
 
     public record SummaryViolationView(String rule, String offendingText) {}
 
-    /** See {@link EvalRun}: only {@code PASSED} is a pass. */
-    public enum EvalStatusView { PASSED, REGRESSED, REFUSED, INCOMPLETE }
+    /** See {@link EvalRun}: only {@code PASSED} and {@code BASELINE_ACCEPTED} are a pass. */
+    public enum EvalStatusView { PASSED, REGRESSED, NOT_COMPARABLE, BASELINE_ACCEPTED, REFUSED, INCOMPLETE }
 
     /** Scores are empty when nothing was measured (refused or incomplete batch). */
     public record ClassificationEvalView(EvalStatusView status, String message, int cases, int invalid,
                                          Optional<Double> sentimentMacroF1, Optional<Double> baselineSentimentMacroF1,
-                                         Optional<BigDecimal> costUsd, Optional<String> batchId) {
+                                         Optional<BigDecimal> costUsd, Optional<String> batchId,
+                                         Optional<String> goldenSha256) {
 
         public boolean passed() {
-            return status == EvalStatusView.PASSED;
+            return status == EvalStatusView.PASSED || status == EvalStatusView.BASELINE_ACCEPTED;
         }
     }
 }

@@ -28,13 +28,13 @@ class CsvGoldenSetTest {
     private CsvGoldenSet golden(String content) throws IOException {
         Path file = dir.resolve("golden.csv");
         Files.writeString(file, content, StandardCharsets.UTF_8);
-        return new CsvGoldenSet(new NewsEvalProperties(file, dir, 3.0));
+        return new CsvGoldenSet(new NewsEvalProperties(file, dir, 3.0, false));
     }
 
     @Test
     void reads_the_fixture_with_quotes_commas_and_line_breaks() {
         List<GoldenCase> cases = new CsvGoldenSet(new NewsEvalProperties(
-                Path.of("src/test/resources/eval/golden-fixture.csv"), dir, 3.0)).load();
+                Path.of("src/test/resources/eval/golden-fixture.csv"), dir, 3.0, false)).load();
 
         assertThat(cases).hasSize(6);
         assertThat(cases.getFirst().summary()).isEqualTo("iPhone sales rose 8%, ahead of forecasts.");
@@ -62,7 +62,7 @@ class CsvGoldenSetTest {
 
     @Test
     void a_missing_file_says_how_to_decrypt_it() {
-        CsvGoldenSet missing = new CsvGoldenSet(new NewsEvalProperties(dir.resolve("nope.csv"), dir, 3.0));
+        CsvGoldenSet missing = new CsvGoldenSet(new NewsEvalProperties(dir.resolve("nope.csv"), dir, 3.0, false));
 
         assertThatThrownBy(missing::load).isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("decrypt-golden.sh");
