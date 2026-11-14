@@ -116,16 +116,16 @@ class LlmNewsClassifierIT extends AbstractIntegrationTest {
 
         assertThat(result).isEqualTo(new ClassifierResult.Classified(new NewsClassification(Sentiment.POSITIVE,
                 Relevance.HIGH, EventType.EARNINGS, Set.of(new Ticker("AAPL")),
-                "Quarterly revenue beat consensus, driven by services growth of 9% year on year.", "v2")));
+                "Quarterly revenue rose 9% year on year and beat consensus estimates, driven by services growth.", "v2")));
         assertThat(logRows()).singleElement().satisfies(row -> assertThat(row)
                 .containsEntry("model", "claude-haiku-5-5")
                 .containsEntry("response_model", "claude-haiku-5-5")
                 .containsEntry("prompt_tokens", 99)
-                .containsEntry("completion_tokens", 93)
-                .containsEntry("cache_write_tokens", 2058)
+                .containsEntry("completion_tokens", 98)
+                .containsEntry("cache_write_tokens", 2343)
                 .containsEntry("cache_read_tokens", 0));
-        // 99 x 0.10 + 93 x 0.50 + 2,058 x 0.125 = 9.9 + 46.5 + 257.25 = 313.65 per 1M tokens
-        assertThat((BigDecimal) logRows().getFirst().get("cost_usd")).isEqualByComparingTo("0.00031365");
+        // 99 x 0.10 + 98 x 0.50 + 2,343 x 0.125 = 9.9 + 49 + 292.875 = 351.775 per 1M tokens, stored at 8 decimals
+        assertThat((BigDecimal) logRows().getFirst().get("cost_usd")).isEqualByComparingTo("0.00035178");
     }
 
     @Test

@@ -2,7 +2,8 @@
 -- Finnhub text, so the recordings may be committed (Finnhub licence, PLANNING Domain Questions 2026-10-21).
 -- Dev seed only, never a Flyway migration. Idempotent: fixed ids, ON CONFLICT DO NOTHING. Tickers are held by the
 -- seeded portfolios (V5), so the code gate lets every item through. Coverage: each sentiment, nine event types, one
--- multi-ticker item. url_hash here is a plain SHA-256 of the URL (the app normalises first); fine for a seed.
+-- multi-ticker item, one passing mention (11: expected LOW, OTHER, no affected ticker; prompt v2, ADR 0023).
+-- url_hash here is a plain SHA-256 of the URL (the app normalises first); fine for a seed.
 --
 -- Run (local Docker Compose):  docker compose exec -T postgres psql -U briefwise -d briefwise < evals/replay/synthetic_news.sql
 -- The outbox rows go to news.raw through the relay; the consumer classifies them (see README.md).
@@ -31,7 +32,9 @@ INSERT INTO synthetic_news VALUES
  (9, 'AMZN', 'MSFT', 'Amazon and Microsoft cut cloud storage prices for business customers',
      'Both providers announced lower list prices for archival storage tiers starting next month.'),
  (10, 'JPM', NULL, 'Central bank holds interest rates steady, signals patience',
-     'Policymakers left the benchmark rate unchanged and said future moves depend on incoming data.');
+     'Policymakers left the benchmark rate unchanged and said future moves depend on incoming data.'),
+ (11, 'KO', NULL, 'Five easy recipes for a summer barbecue',
+     'A food writer shares grilling ideas, from corn salad to a chicken glaze made with a splash of Coca-Cola.');
 
 INSERT INTO news_items (id, headline, summary, url, url_hash, source, published_at, status)
 SELECT ('a0000000-0000-4000-8000-' || lpad(n::text, 12, '0'))::uuid, headline, summary,
