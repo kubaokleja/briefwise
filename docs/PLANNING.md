@@ -280,8 +280,9 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   and archive URLs; `SEC_USER_AGENT` in `.env.example`
 - [ ] Dependency (ask first): HTML -> text parser for filing documents (e.g. jsoup; alternatives: Spring AI
   `JsoupDocumentReader` / Tika reader, hand-rolled); verify version on Maven Central
-- [ ] Flyway V17 `instruments.cik` (nullable, unique, NULL for ETFs) + seed for the 30 stocks (checked against
-  `company_tickers.json`); `InstrumentView` CIK as `Optional`; `MarketFacadeIT` (+1)
+- [x] Flyway V17 `instruments.cik` (nullable, unique, 10-digit check, NULL for ETFs) + seed for the 30 stocks (from
+  `company_tickers.json`, 2026-11-14; XOM now maps to 2115436 "ExxonMobil Holdings Corp", older filings may be under
+  34088: check at the first ingest); `InstrumentView` CIK as `Optional`; `MarketFacadeIT` (+1), `FlywayBaselineIT` (+1)
 - [ ] `research` layers via `new-bounded-context` (facade exists): domain `Cik`, `AccessionNo`, `FilingType`,
   `Filing`, `FilingRef`, `FilingSection` (item id, title, text, screening), `FilingSelectionPolicy`, `SectionPolicy`,
   `SectionExtractor` (pure); ports `FilingSource`, `FilingSnapshotWriter`, `FilingRepository`, `HeldCompanies`,

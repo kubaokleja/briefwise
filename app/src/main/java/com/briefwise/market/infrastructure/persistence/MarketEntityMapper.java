@@ -3,6 +3,7 @@ package com.briefwise.market.infrastructure.persistence;
 import com.briefwise.market.domain.model.DailyPrice;
 import com.briefwise.market.domain.model.Instrument;
 import com.briefwise.shared.domain.model.Ticker;
+import java.util.Optional;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -17,5 +18,9 @@ interface MarketEntityMapper {
 
     default Ticker toTicker(String symbol) {
         return new Ticker(symbol);
+    }
+
+    default Optional<String> toOptional(String value) {
+        return Optional.ofNullable(value);
     }
 }

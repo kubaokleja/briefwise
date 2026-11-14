@@ -29,6 +29,9 @@ class InstrumentEntity {
     @Column(name = "currency", nullable = false)
     private String currency;
 
+    @Column(name = "cik")
+    private String cik;
+
     protected InstrumentEntity() {
     }
 
@@ -50,5 +53,9 @@ class InstrumentEntity {
 
     public String getCurrency() {
         return currency;
+    }
+
+    public String getCik() {
+        return cik;
     }
 }

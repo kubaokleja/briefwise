@@ -30,7 +30,7 @@ class MarketQueryServiceTest {
 
     private final Ticker ticker = new Ticker("AAPL");
     private final Instrument instrument =
-            new Instrument(UUID.randomUUID(), ticker, "Apple Inc.", InstrumentType.STOCK, "USD");
+            new Instrument(UUID.randomUUID(), ticker, "Apple Inc.", InstrumentType.STOCK, "USD", Optional.of("0000320193"));
     private final LocalDate d1 = LocalDate.parse("2026-10-14");
     private final LocalDate d2 = LocalDate.parse("2026-10-15");
 
