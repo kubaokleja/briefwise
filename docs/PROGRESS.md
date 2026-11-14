@@ -34,6 +34,65 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 17 — 2026-11-14 — M2 slice 1: eval comparability, classification prompt v2
+
+**Phase:** M2 / slice 1 (M1 carry-overs), on branch `feat/m2-research`
+**Goal:** Make the eval gate compare only like with like, then ship and measure classification prompt v2.
+
+**Done**
+- Eval follow-up (2) (`617fc68`): `GoldenSetFingerprint` (cases + SHA-256 over the parsed cases, canonical form
+  pinned by a Python-computed hash); gate verdicts `NOT_COMPARABLE` / `BASELINE_ACCEPTED`
+  (`briefwise.news.eval.accept-new-baseline`, `evals.yml` dispatch input `accept_new_baseline`); model / prompt
+  differences compared and named. `baseline.json` backfilled with `goldenSha256` (production code, no model call,
+  after a byte check against a fresh decryption).
+- P1 decided (`c926ec1`, ADR 0023): empty `affectedTickers` only for `LOW`; narrower `PRODUCT`; one `v2`.
+- Prompt v2 (`d8324bc`): `system.md` v2 + synthetic gift-guide example (no golden leak), version + hash;
+  `ClassificationAnswer` accepts `[]` only with `LOW`. Found on the way: `markAffected` with `[]` would have sent
+  `IN ()` (invalid SQL); the adapter now skips it.
+- Replay re-recorded (`bf708bd`, 0.0022 USD): 11 synthetic items (new item 11: passing mention -> `LOW`/`OTHER`/no
+  ticker); v2 changed items 7 and 10, so the 3 summaries were re-recorded too (job runner, since admin runs skip
+  `summarize`; README fixed). Cache: 2,343 tokens written once, read by the other 10.
+- Eval v2 (`d19777c`, 0.0119 USD, local `job,eval`, throwaway DB): gate passed, sentiment macro F1 0.809 vs 0.785
+  (+2.4 pp), event type 0.584 (+1.3), relevance 0.657 (-2.0), unusable 5 -> 1; adopted as `baseline.json`.
+- Verified: `./mvnw verify` 367 unit + 148 IT + `JsonLoggingIT` green (incl. `ArchitectureTest`) after the last code
+  change (`bf708bd`); later commits are eval results and docs only.
+- Total live spend this session: about 0.014 USD.
+
+**Decisions**
+- [ADR 0022](decisions/0022-eval-baseline-comparability.md): only the golden set makes a baseline not comparable;
+  content hash; one-off backfill; manual accept path that cannot hide a regression (amends ADR 0018).
+- [ADR 0023](decisions/0023-classification-prompt-v2-scope.md): prompt v2 scope (P1).
+- [ADR 0024](decisions/0024-classification-prompt-v2-eval-result.md): v2 measured and adopted as the baseline.
+- Without an ADR: 11th synthetic replay item; summaries re-recorded with the job runner; DESIGN 10 gate wording.
+
+**AI concepts introduced / explained**
+- Eval comparability: the golden set is the ruler, model and prompt are what is measured; dataset fingerprinting
+  (content hash over parsed cases, plaintext not ciphertext); a pinned canonical form as a contract.
+- Structured-output limits: `minItems` only 0 or 1; forcing a non-empty list makes the model guess (a quiet
+  hallucination), so the rule lives in code instead.
+- Not tuning a prompt on the test set (overfitting the eval); synthetic few-shot examples only.
+- Replay keys include the prompt version: a bump invalidates every recording, and labels feeding a second prompt
+  (summaries) invalidate its recordings too.
+- Reading small-class metrics: a 5 pp swing from one or two rows is noise; look at several metrics and the
+  confusion matrix together.
+
+**Domain questions added** (also in PLANNING)
+- 2026-11-14: news listed under a related issuer's ticker (`KO` vs `COKE`).
+
+**Open questions / blockers**
+- Branch `feat/m2-research` is local only (5 commits, not pushed); `evals.yml` has not run with the new
+  `accept_new_baseline` input yet.
+- Prompt v3 candidates in the backlog: `PRODUCT` still 47 predicted for 14 true, relevance `HIGH` 34 for 18.
+- Nit: `latest.md` shows "**Gate: PASSED** (PASSED)"; show the verdict only when it adds information.
+
+**Next session**
+- M2 slice 2: filing source and ETL; settle G1 (corpus) and G2 (source, snapshot, CIK mapping) first -> ADRs.
+
+**Proposed commit message**
+> docs: log session 17 (M2 slice 1 done: eval comparability, prompt v2)
+
+---
+
 ## Session 16 — 2026-11-07 — M1 close-out: cost fixes, recordings, first eval, Neon, job hardening
 
 **Phase:** M1 / close-out (steps 1–8 agreed at session start; M1 is complete except the post-merge items)
