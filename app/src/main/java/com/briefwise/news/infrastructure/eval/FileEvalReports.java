@@ -26,7 +26,8 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * Writes {@code latest.json} (every metric, for tools and as the next baseline) and {@code latest.md} (the PR
  * comment) to {@code results-dir}, and reads {@code baseline.json}, a committed copy of an earlier {@code latest.json}
- * (ADR 0018). Metrics and counts only, never news text: the golden set's text may not be published.
+ * (ADR 0018). Metrics and counts only, never news text: the golden set's text may not be published; its SHA-256
+ * ({@code goldenSha256}, ADR 0022) identifies the set without revealing it.
  */
 @Component
 class FileEvalReports implements EvalReports {
@@ -55,8 +56,11 @@ class FileEvalReports implements EvalReports {
             if (!f1.isNumber()) {
                 throw new IllegalStateException(file + " has no all.sentiment.macroF1");
             }
+            JsonNode hash = root.path("goldenSha256");
+            Optional<String> goldenSha256 = hash.isString() && !hash.asString().isBlank()
+                    ? Optional.of(hash.asString()) : Optional.empty();
             return Optional.of(new EvalBaseline(root.path("model").asString(), root.path("promptVersion").asString(),
-                    f1.asDouble()));
+                    root.path("cases").asInt(0), goldenSha256, f1.asDouble()));
         } catch (IOException e) {
             throw new UncheckedIOException("Cannot read " + file, e);
         }
@@ -82,6 +86,7 @@ class FileEvalReports implements EvalReports {
         root.put("batchId", report.batchId());
         root.put("ranAt", report.ranAt().toString());
         root.put("cases", report.cases());
+        root.put("goldenSha256", report.goldenSha256());
         root.put("randomCases", report.randomCases());
         root.put("invalid", report.invalid());
         root.put("invalidRate", round(report.invalidRate()));
@@ -89,10 +94,13 @@ class FileEvalReports implements EvalReports {
         root.put("costPer1000Usd", report.costPerThousandUsd());
         Map<String, Object> gateJson = new LinkedHashMap<>();
         gateJson.put("passed", gate.passed());
+        gateJson.put("verdict", gate.verdict().name());
         gateJson.put("message", gate.message());
         gate.baseline().ifPresent(b -> {
             gateJson.put("baselineModel", b.model());
             gateJson.put("baselinePromptVersion", b.promptVersion());
+            gateJson.put("baselineCases", b.cases());
+            gateJson.put("baselineGoldenSha256", b.goldenSha256().orElse(null));
             gateJson.put("baselineSentimentMacroF1", round(b.sentimentMacroF1()));
         });
         root.put("gate", gateJson);

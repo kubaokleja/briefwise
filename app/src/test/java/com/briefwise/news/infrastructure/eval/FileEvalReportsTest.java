@@ -35,7 +35,7 @@ class FileEvalReportsTest {
     Path dir;
 
     private FileEvalReports reports() {
-        return new FileEvalReports(new NewsEvalProperties(dir.resolve("golden.csv"), dir.resolve("results"), 3.0),
+        return new FileEvalReports(new NewsEvalProperties(dir.resolve("golden.csv"), dir.resolve("results"), 3.0, false),
                 JsonMapper.builder().build());
     }
 
@@ -60,7 +60,7 @@ class FileEvalReportsTest {
     void latest_json_copied_to_baseline_json_is_read_back_as_the_baseline() throws IOException {
         FileEvalReports reports = reports();
         EvalReport report = report();
-        reports.write(report, new RegressionGate(3.0).check(report.all().sentiment().macroF1(), Optional.empty()));
+        reports.write(report, new RegressionGate(3.0).check(report.asBaseline(), Optional.empty()));
 
         Path results = dir.resolve("results");
         Files.copy(results.resolve("latest.json"), results.resolve("baseline.json"));
@@ -69,13 +69,44 @@ class FileEvalReportsTest {
         assertThat(baseline.model()).isEqualTo("claude-haiku-5-5");
         assertThat(baseline.promptVersion()).isEqualTo("v1");
         assertThat(baseline.sentimentMacroF1()).isCloseTo(report.all().sentiment().macroF1(), within(1e-4));
+        assertThat(baseline.cases()).isEqualTo(2);
+        assertThat(baseline.goldenSha256()).contains(report.goldenSha256());
+    }
+
+    @Test
+    void a_baseline_recorded_before_the_golden_hash_reads_without_it() throws IOException {
+        Path results = Files.createDirectories(dir.resolve("results"));
+        Files.writeString(results.resolve("baseline.json"), """
+                {"model": "claude-haiku-5-5", "promptVersion": "v1", "cases": 258,
+                 "all": {"sentiment": {"macroF1": 0.7853}}}
+                """, StandardCharsets.UTF_8);
+
+        EvalBaseline baseline = reports().baseline().orElseThrow();
+
+        assertThat(baseline.cases()).isEqualTo(258);
+        assertThat(baseline.goldenSha256()).isEmpty();
+    }
+
+    @Test
+    void the_gate_verdict_and_both_golden_sets_are_written() throws IOException {
+        EvalReport report = report();
+        reports().write(report, new RegressionGate(3.0).check(report.asBaseline(),
+                Optional.of(new EvalBaseline("claude-haiku-5-5", "v1", 258, Optional.empty(), 0.9))));
+
+        String json = Files.readString(dir.resolve("results/latest.json"), StandardCharsets.UTF_8);
+        String md = Files.readString(dir.resolve("results/latest.md"), StandardCharsets.UTF_8);
+
+        assertThat(json).contains("\"goldenSha256\" : \"" + report.goldenSha256() + "\"")
+                .contains("\"verdict\" : \"NOT_COMPARABLE\"").contains("\"baselineCases\" : 258");
+        assertThat(md).contains("**Gate: FAILED** (NOT COMPARABLE)")
+                .contains("golden set `" + report.goldenSha256().substring(0, 12) + "`");
     }
 
     @Test
     void reports_hold_metrics_but_never_news_text() throws IOException {
         EvalReport report = report();
-        reports().write(report, new RegressionGate(3.0).check(0.5,
-                Optional.of(new EvalBaseline("claude-haiku-5-5", "v1", 0.9))));
+        reports().write(report, new RegressionGate(3.0).check(report.asBaseline(), Optional.of(
+                new EvalBaseline("claude-haiku-5-5", "v1", 2, Optional.of(report.goldenSha256()), 0.9))));
 
         String json = Files.readString(dir.resolve("results/latest.json"), StandardCharsets.UTF_8);
         String md = Files.readString(dir.resolve("results/latest.md"), StandardCharsets.UTF_8);

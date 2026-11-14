@@ -10,6 +10,6 @@ class NewsEvalConfig {
 
     @Bean
     RegressionGate regressionGate(NewsEvalProperties properties) {
-        return new RegressionGate(properties.maxDropPoints());
+        return new RegressionGate(properties.maxDropPoints(), properties.acceptNewBaseline());
     }
 }

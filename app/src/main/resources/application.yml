@@ -127,6 +127,7 @@ briefwise:
       golden-path: evals/sentiment_golden.csv            # decrypted by evals/scripts/decrypt-golden.sh, git-ignored
       results-dir: evals/results/news-classification     # latest.json + latest.md written, baseline.json read
       max-drop-points: 3.0   # gate: sentiment macro F1 at most 3 pp below the baseline
+      accept-new-baseline: false # ADR 0022: true only to accept a run on a changed golden set (evals.yml input)
       batch:                 # Message Batches API: half price, asynchronous; model/max-tokens/effort as classification
         feature: news-classification-eval
         poll-interval: 30s

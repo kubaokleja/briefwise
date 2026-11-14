@@ -6,9 +6,16 @@ name: Evals
 # evals/ content (replay fixtures, labelling) do not trigger it; add a filter per eval when M2 adds the RAG eval.
 # The golden set holds Finnhub text that may not be published, so only its gpg copy is committed and it is decrypted
 # here. The job's exit code is the gate: sentiment macro F1 at most 3 pp below
-# evals/results/news-classification/baseline.json (no baseline yet: passes and says so).
+# evals/results/news-classification/baseline.json (no baseline yet: passes and says so). ADR 0022: the baseline must be
+# on the same golden set (cases + goldenSha256), otherwise the run fails as not comparable; a deliberate golden set
+# change is accepted only through the manual accept_new_baseline input below, never on a PR run.
 on:
   workflow_dispatch:
+    inputs:
+      accept_new_baseline:
+        description: 'Golden set changed on purpose: pass a not-comparable run as the new baseline (then commit latest.json as baseline.json)'
+        type: boolean
+        default: false
   pull_request:
     paths:                    # evals/results/** is not listed: a new baseline is not a reason to pay for a run
       - 'prompts/news-classification/**'
@@ -82,13 +89,18 @@ jobs:
         run: ./mvnw --batch-mode --no-transfer-progress -DskipTests package
 
       # From the repo root: the eval paths (golden set, results) are relative to it.
-      # Exit code 0 passed, 1 regressed / refused (budget, leakage) / batch unfinished, 2 unknown job.
+      # Exit code 0 passed (or new baseline accepted), 1 regressed / not comparable / refused (budget, leakage) /
+      # batch unfinished, 2 unknown job.
       - name: Classification eval
         if: steps.secrets.outputs.run == 'true'
         env:
           SPRING_PROFILES_ACTIVE: job,eval
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: java -jar app/target/briefwise-app-*.jar --briefwise.job=news-classification-eval
+          # false on pull_request (no inputs there), so a PR run never accepts a new baseline.
+          ACCEPT_NEW_BASELINE: ${{ inputs.accept_new_baseline == true }}
+        run: >-
+          java -jar app/target/briefwise-app-*.jar --briefwise.job=news-classification-eval
+          --briefwise.news.eval.accept-new-baseline="$ACCEPT_NEW_BASELINE"
 
       - name: Results summary
         if: always() && hashFiles('evals/results/news-classification/latest.md') != ''

@@ -69,4 +69,20 @@ class EvalReportTest {
 
         assertThat(EvalReport.of(cases, batch, NOW).costPerThousandUsd()).isEqualByComparingTo("0.25");
     }
+
+    @Test
+    void the_report_records_its_golden_set_and_compares_as_a_baseline() {
+        GoldenCase c = golden(true, Sentiment.POSITIVE);
+        BatchOutcome.Completed batch = new BatchOutcome.Completed("msgbatch_1", "claude-haiku-5-5", "v2",
+                List.of(answer(c, Sentiment.POSITIVE)), BigDecimal.ONE);
+
+        EvalReport report = EvalReport.of(List.of(c), batch, NOW);
+        EvalBaseline asBaseline = report.asBaseline();
+
+        assertThat(report.goldenSha256()).isEqualTo(GoldenSetFingerprint.of(List.of(c)).sha256());
+        assertThat(asBaseline.cases()).isEqualTo(1);
+        assertThat(asBaseline.goldenSha256()).contains(report.goldenSha256());
+        assertThat(asBaseline.promptVersion()).isEqualTo("v2");
+        assertThat(asBaseline.sentimentMacroF1()).isEqualTo(1.0);
+    }
 }

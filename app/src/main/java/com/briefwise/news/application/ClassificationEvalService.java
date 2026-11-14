@@ -4,6 +4,7 @@ import com.briefwise.news.domain.model.BatchOutcome;
 import com.briefwise.news.domain.model.EvalReport;
 import com.briefwise.news.domain.model.EvalRun;
 import com.briefwise.news.domain.model.GoldenCase;
+import com.briefwise.news.domain.model.GoldenSetFingerprint;
 import com.briefwise.news.domain.model.RegressionGate;
 import com.briefwise.news.domain.model.RegressionGate.GateResult;
 import com.briefwise.news.domain.port.BatchClassifier;
@@ -19,7 +20,8 @@ import org.springframework.stereotype.Service;
 
 /**
  * The classification eval (DESIGN 10, ADR 0018): golden set -> one batch with the production prompt -> scores on
- * all and on random rows -> report -> regression gate on sentiment macro F1. Nothing is written for a refused or
+ * all and on random rows -> report -> regression gate on sentiment macro F1, against a baseline measured on the same
+ * golden set (ADR 0022). Nothing is written for a refused or
  * unfinished batch; such a run is not a pass.
  */
 @Service
@@ -48,7 +50,10 @@ class ClassificationEvalService implements ClassificationEvals {
         if (cases.isEmpty()) {
             throw new IllegalStateException("The golden set is empty");
         }
-        log.info("Classification eval: {} golden cases", cases.size());
+        // Logged before the batch is submitted, so a run refused before any call (no Anthropic model) still shows
+        // which golden set is decrypted; that is how a baseline's goldenSha256 is filled without paying (ADR 0022).
+        GoldenSetFingerprint golden = GoldenSetFingerprint.of(cases);
+        log.info("Classification eval: {} golden cases, golden set sha256 {}", golden.cases(), golden.sha256());
         return switch (classifier.classify(cases)) {
             case BatchOutcome.Refused refused -> {
                 log.warn("Classification eval refused: {}", refused.reason());
@@ -65,12 +70,16 @@ class ClassificationEvalService implements ClassificationEvals {
 
     private EvalRun scored(List<GoldenCase> cases, BatchOutcome.Completed batch) {
         EvalReport report = EvalReport.of(cases, batch, clock.instant());
-        GateResult result = gate.check(report.all().sentiment().macroF1(), reports.baseline());
+        GateResult result = gate.check(report.asBaseline(), reports.baseline());
         reports.write(report, result);
-        log.info("Classification eval {}: {} ({} of {} answers invalid, {} USD)",
-                result.passed() ? "passed" : "REGRESSED", result.message(), report.invalid(), report.cases(),
-                report.costUsd());
-        return new EvalRun(result.passed() ? EvalRun.Status.PASSED : EvalRun.Status.REGRESSED, Optional.of(report),
-                Optional.of(result), result.message());
+        EvalRun.Status status = switch (result.verdict()) {
+            case NO_BASELINE, PASSED -> EvalRun.Status.PASSED;
+            case REGRESSED -> EvalRun.Status.REGRESSED;
+            case NOT_COMPARABLE -> EvalRun.Status.NOT_COMPARABLE;
+            case BASELINE_ACCEPTED -> EvalRun.Status.BASELINE_ACCEPTED;
+        };
+        log.info("Classification eval {}: {} ({} of {} answers invalid, {} USD)", status, result.message(),
+                report.invalid(), report.cases(), report.costUsd());
+        return new EvalRun(status, Optional.of(report), Optional.of(result), result.message());
     }
 }

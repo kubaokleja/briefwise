@@ -22,12 +22,13 @@ final class EvalMarkdown {
     static String render(EvalReport report, GateResult gate) {
         StringBuilder md = new StringBuilder();
         md.append("## News classification eval\n\n");
-        md.append("**Gate: ").append(gate.passed() ? "PASSED" : "FAILED").append("** - ").append(gate.message())
-                .append("\n\n");
+        md.append("**Gate: ").append(gate.passed() ? "PASSED" : "FAILED").append("** (")
+                .append(gate.verdict().name().replace('_', ' ')).append(") - ").append(gate.message()).append("\n\n");
         md.append("Model `").append(report.model()).append("`, prompt `").append(report.promptVersion())
                 .append("`, batch `").append(report.batchId()).append("`, ").append(report.ranAt()).append("\n\n");
         md.append(report.cases()).append(" golden cases (").append(report.randomCases())
-                .append(" random), ").append(report.invalid()).append(" unusable answers (")
+                .append(" random, golden set `").append(report.goldenSha256(), 0, Math.min(12, report.goldenSha256().length())).append("`), ")
+                .append(report.invalid()).append(" unusable answers (")
                 .append(percent(report.invalidRate())).append(", counted as misses). Cost ")
                 .append(report.costUsd().setScale(4, RoundingMode.HALF_UP)).append(" USD (batch price), ")
                 .append(report.costPerThousandUsd()).append(" USD per 1,000 items.\n\n");
