@@ -268,25 +268,33 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   unusable 5 -> 1; accepted as the new `baseline.json`
 
 ### Slice 2 — Filing source and ETL (no embeddings)
-- [ ] Decide G1 corpus: forms (10-K, 10-Q, 8-K items), how far back, all 30 companies or held ones, ETFs (no 10-K;
-  skip like ADR 0009?), European / Swiss companies ([DESIGN 18](DESIGN.md#18-open-questions), "F3"); storage estimate
-  against Neon 0.5 GB -> ADR
-- [ ] Decide G2 source and snapshot: live EDGAR fetch vs a committed text snapshot (`data/filings/`, like ADR 0004;
-  SEC filings are public domain, check), where ingest runs (local DB, Neon or both), ticker -> CIK mapping (`cik`
-  column on market `instruments` via `MarketFacade`, or a research-owned table) -> ADR
+- [x] Decide G1 corpus -> [ADR 0025](decisions/0025-filing-corpus.md): held stocks only (9 today, from the
+  portfolios at run time), latest 10-K + 10-Qs since + 8-Ks of the last 12 months (no `/A`); 10-K Items 1, 1A, 7, 7A,
+  10-Q Part I Item 2 + Part II Item 1A, 8-K Items 2.02 / 7.01 / 8.01 + EX-99.1; TOC skipped, tables as `cell | cell`
+  rows; ETFs skipped, non-EDGAR (EU / Swiss) issuers out; about 5 MB of text
+- [x] Decide G2 source -> [ADR 0026](decisions/0026-filing-source-snapshot-and-cik.md): live EDGAR + committed text
+  snapshot `data/filings/{TICKER}/{accession}.json` (`briefwise.research.filings.source: edgar|snapshot`), `cik` column
+  on `instruments` via `MarketFacade` (V17), local ingest (Neon in slice 3), in-adapter throttle (150 ms gap), re-ingest
+  by accession + content SHA-256
 - [ ] Check current SEC EDGAR fair-access rules (requests per second, `User-Agent` with contact), submissions API
   and archive URLs; `SEC_USER_AGENT` in `.env.example`
 - [ ] Dependency (ask first): HTML -> text parser for filing documents (e.g. jsoup; alternatives: Spring AI
   `JsoupDocumentReader` / Tika reader, hand-rolled); verify version on Maven Central
-- [ ] `research` layers via `new-bounded-context` (facade exists): domain `Filing`, `FilingType`, `AccessionNo`,
-  `FilingSection` (item id, title, text), `SectionPolicy` (which items per form); ports `FilingSource`,
-  `FilingRepository`
-- [ ] Flyway V17 `research_filings` (accession unique, ticker, CIK, form, filed_at, period, source URL, content hash,
-  screening result) + `research_filing_sections`
+- [ ] Flyway V17 `instruments.cik` (nullable, unique, NULL for ETFs) + seed for the 30 stocks (checked against
+  `company_tickers.json`); `InstrumentView` CIK as `Optional`; `MarketFacadeIT` (+1)
+- [ ] `research` layers via `new-bounded-context` (facade exists): domain `Cik`, `AccessionNo`, `FilingType`,
+  `Filing`, `FilingRef`, `FilingSection` (item id, title, text, screening), `FilingSelectionPolicy`, `SectionPolicy`,
+  `SectionExtractor` (pure); ports `FilingSource`, `FilingSnapshotWriter`, `FilingRepository`, `HeldCompanies`,
+  `UntrustedContentScreen`
+- [ ] Flyway V18 `research_filings` (accession unique, ticker, CIK, form, filed_at, period, source URL, content hash,
+  extractor version) + `research_filing_sections` (screening result per section)
 - [ ] EDGAR adapter (`RestClient`, `User-Agent`, rate limit, `RetryTemplate` on 429/5xx/timeout per ADR 0005);
-  WireMock tests with saved submissions JSON + one trimmed 10-K / 10-Q / 8-K HTML each
-- [ ] Section extraction (10-K Items 1, 1A, 7, 7A; 10-Q Part I Item 2, Part II Item 1A; 8-K Items 2.02, 7.01, 8.01):
-  table of contents skipped, tables kept as text or dropped (decide in G1); `SectionExtractorTest` on the fixtures
+  WireMock tests with saved submissions JSON + one trimmed 10-K / 10-Q / 8-K (+ EX-99.1) HTML each
+- [ ] Section extraction (10-K Items 1, 1A, 7, 7A; 10-Q Part I Item 2, Part II Item 1A; 8-K Items 2.02, 7.01, 8.01
+  + EX-99.1): table of contents skipped, tables as `cell | cell` rows (ADR 0025); `SectionExtractorTest` on the fixtures
+- [ ] Snapshot (ADR 0026): `SnapshotFilingSource` + `JsonFilingSnapshotWriter` (`data/filings/`); round-trip test
+- [ ] First local ingest from live EDGAR (held stocks): snapshot committed; filings, sections, size, time, screening
+  hits in PROGRESS (may move to the start of slice 3 if the session runs long)
 - [ ] `ComplianceFacade.screenUntrustedContent` per section at ingest (ADR 0013 pattern list); suspected sections
   stored but excluded from retrieval
 - [ ] `ResearchFacade.ingestFiling(ticker, accessionNo)` + `ingestFilings(ticker)` (idempotent by accession /
@@ -311,7 +319,7 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
 - [ ] Domain `FilingChunk`, `Chunker` (pure; section boundaries, size, overlap) + `ChunkerTest`; port
   `EmbeddingPort` (batch, `TokenCount`); Ollama embedding adapter (timeout, batch size, retry); WireMock tests on the
   Ollama embed API (valid, wrong dimension, timeout)
-- [ ] Flyway V18 `research_chunks` (filing, section, ordinal, text, token count, `embedding vector(N)`,
+- [ ] Flyway V19 `research_chunks` (filing, section, ordinal, text, token count, `embedding vector(N)`,
   `embedding_model`), HNSW index; `FlywayBaselineIT`
 - [ ] `ingestFiling` chunks + embeds (embedding usage recorded in `ai_generation_log`? decide in V1: cost 0 locally,
   but latency and volume are useful); repository IT (insert, HNSW used per `EXPLAIN`)
@@ -344,7 +352,7 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
 - [ ] Decide H1: Postgres full-text (`tsvector`, `english` config, `ts_rank_cd`; not true BM25) vs a BM25
   extension (check what Neon supports); fusion: reciprocal rank fusion (k = 60) vs weighted scores; candidates per
   side; ticker / date filter applied to both sides -> ADR
-- [ ] Flyway V19: generated `tsvector` column on `research_chunks` + GIN index
+- [ ] Flyway V20: generated `tsvector` column on `research_chunks` + GIN index
 - [ ] `HybridRanker` (pure RRF) + `HybridRankerTest`; `searchFilings` mode `VECTOR | KEYWORD | HYBRID`
   (`briefwise.research.search.*`); repository IT (keyword hit a vector search misses, e.g. a ticker or a number)
 - [ ] Retrieval eval for all three modes; comparison table (recall@5, MRR) in the ADR and README (DESIGN 8 "comparison
@@ -381,7 +389,7 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   say "I don't know"), passages in `<passage id=...>` blocks after screening; `ResearchAnswer`, `Claim`,
   `AnswerValidator` (pure) + `AnswerValidatorTest` (fabricated id, quote not in passage, ungrounded number, all
   dropped)
-- [ ] `ResearchFacade.ask(question)`: rewrite -> search -> answer -> validate -> compliance -> store; Flyway V20
+- [ ] `ResearchFacade.ask(question)`: rewrite -> search -> answer -> validate -> compliance -> store; Flyway V21
   `research_answers` (if A4); generation log with `subject_id`; facade `*IT` (replay)
 - [ ] `POST /api/research/answers` (JSON) + `GET /api/research/answers/{id}`; `UsageLimitExceededException` -> 429;
   `docs/api.http` (200, 404, 400, 429 note); OpenAPI + UI types
