@@ -44,7 +44,7 @@ class PriceSnapshotImportServiceTest {
         List<DailyPrice> closes = List.of(close("2026-10-14", "100"), close("2026-10-15", "101"));
         when(source.read()).thenReturn(Map.of(AAPL, closes));
         when(instruments.findByTicker(AAPL))
-                .thenReturn(Optional.of(new Instrument(id, AAPL, "Apple Inc.", InstrumentType.STOCK, "USD")));
+                .thenReturn(Optional.of(new Instrument(id, AAPL, "Apple Inc.", InstrumentType.STOCK, "USD", Optional.of("0000320193"))));
         when(prices.insertMissing(id, closes)).thenReturn(1);
 
         ImportSummary summary = service.importSnapshot();

@@ -10,6 +10,7 @@ import com.briefwise.shared.domain.model.Ticker;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,7 +32,7 @@ public class MarketFacade {
     public InstrumentView getInstrument(Ticker ticker) {
         Instrument instrument = queries.getInstrument(ticker);
         return new InstrumentView(instrument.ticker(), instrument.name(),
-                InstrumentTypeView.valueOf(instrument.type().name()), instrument.currency());
+                InstrumentTypeView.valueOf(instrument.type().name()), instrument.currency(), instrument.cik());
     }
 
     /**
@@ -74,7 +75,9 @@ public class MarketFacade {
 
     public enum InstrumentTypeView { STOCK, ETF }
 
-    public record InstrumentView(Ticker ticker, String name, InstrumentTypeView type, String currency) {}
+    /** {@code cik}: SEC issuer id, 10 digits zero-padded; empty for ETFs (ADR 0026). */
+    public record InstrumentView(Ticker ticker, String name, InstrumentTypeView type, String currency,
+                                 Optional<String> cik) {}
 
     public record ImportSummaryView(int tickersRead, int rowsRead, int rowsInserted, List<Ticker> unknownTickers) {}
 

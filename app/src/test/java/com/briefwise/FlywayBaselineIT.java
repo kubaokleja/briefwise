@@ -26,7 +26,7 @@ class FlywayBaselineIT extends AbstractIntegrationTest {
         assertThat(environment.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("validate");
         Integer applied = jdbc.queryForObject(
                 "SELECT count(*) FROM flyway_schema_history WHERE success", Integer.class);
-        assertThat(applied).isEqualTo(16);
+        assertThat(applied).isEqualTo(17);
     }
 
     @Test
@@ -41,6 +41,17 @@ class FlywayBaselineIT extends AbstractIntegrationTest {
         List<BigDecimal> sums = jdbc.queryForList(
                 "SELECT sum(weight) FROM positions GROUP BY portfolio_id", BigDecimal.class);
         assertThat(sums).hasSize(3).allSatisfy(sum -> assertThat(sum).isEqualByComparingTo("1"));
+    }
+
+    @Test
+    void every_stock_has_a_ten_digit_cik_and_no_etf_has_one() {
+        Integer stocksWithoutCik = jdbc.queryForObject(
+                "SELECT count(*) FROM instruments WHERE instrument_type = 'STOCK' AND (cik IS NULL OR cik !~ '^[0-9]{10}$')",
+                Integer.class);
+        Integer etfsWithCik = jdbc.queryForObject(
+                "SELECT count(*) FROM instruments WHERE instrument_type = 'ETF' AND cik IS NOT NULL", Integer.class);
+        assertThat(stocksWithoutCik).isZero();
+        assertThat(etfsWithCik).isZero();
     }
 
     @Test

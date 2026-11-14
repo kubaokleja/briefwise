@@ -45,6 +45,12 @@ class MarketFacadeIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void instrument_exposes_the_sec_cik_for_stocks_only() {
+        assertThat(facade.getInstrument(AAPL).cik()).contains("0000320193");
+        assertThat(facade.getInstrument(new Ticker("SPY")).cik()).isEmpty();
+    }
+
+    @Test
     void price_history_is_inclusive_and_oldest_first() {
         insertClose("AAPL", "2026-10-13", "99");
         insertClose("AAPL", "2026-10-15", "102.5");
