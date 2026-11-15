@@ -30,6 +30,8 @@
         <wiremock.version>3.13.2</wiremock.version>
         <!-- Verified on Maven Central 2026-10-24; latest GA (2.1.0 is still RC). Not managed by the Boot BOM -->
         <spring-ai.version>2.0.2</spring-ai.version>
+        <!-- Verified on Maven Central (maven-metadata.xml) 2026-11-15; the search API still lists 1.21.1 -->
+        <jsoup.version>1.24.1</jsoup.version>
     </properties>
 
     <dependencyManagement>
@@ -106,6 +108,13 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
+        </dependency>
+
+        <!-- HTML -> text for SEC filings (research EDGAR adapter only, ADR 0025) -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
         </dependency>
 
         <!-- JSON logs in the cloud and job profiles -->

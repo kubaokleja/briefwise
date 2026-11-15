@@ -238,7 +238,9 @@ news, the market move), every claim with a citation, "I don't know" when the sou
 ([DESIGN 5](DESIGN.md#5-features-and-milestones), [7.3](DESIGN.md#73-qa-with-citations-m2)). Concepts: embeddings,
 pgvector + HNSW, cosine similarity, chunking, vector baseline -> hybrid, metadata filtering, query rewriting,
 reranking, hallucination control, SSE streaming, RAG eval. Branch `feat/m2-research` from `master` once M1 is merged.
-One slice per session, in this order; each ends with `./mvnw verify` green. Decision IDs below are new to M2 and are
+One slice per session, in this order; each ends with `./mvnw verify` green. Within a slice, run only the tests the
+step touches (plus `ArchitectureTest`, e.g. `-Dtest=... -Dit.test=...`); the full `./mvnw verify` runs once, at the end
+of the slice (session wrap-up), to save time. Decision IDs below are new to M2 and are
 settled at the start of the slice that lists them (ADR via `adr`). Filing ingest is on demand (local, Ollama
 embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citations-m2)).
 
@@ -278,8 +280,9 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   by accession + content SHA-256
 - [ ] Check current SEC EDGAR fair-access rules (requests per second, `User-Agent` with contact), submissions API
   and archive URLs; `SEC_USER_AGENT` in `.env.example`
-- [ ] Dependency (ask first): HTML -> text parser for filing documents (e.g. jsoup; alternatives: Spring AI
-  `JsoupDocumentReader` / Tika reader, hand-rolled); verify version on Maven Central
+- [x] Dependency: `org.jsoup:jsoup:1.24.1` (approved 2026-11-15, latest in Maven Central `maven-metadata.xml`;
+  no transitive deps), used only in `research/infrastructure/edgar/`. Rejected: Spring AI `JsoupDocumentReader`
+  (wraps jsoup, its `Document` does not help with sections), Tika (heavy), hand-rolled (fragile on inline XBRL)
 - [x] Flyway V17 `instruments.cik` (nullable, unique, 10-digit check, NULL for ETFs) + seed for the 30 stocks (from
   `company_tickers.json`, 2026-11-14; XOM now maps to 2115436 "ExxonMobil Holdings Corp", older filings may be under
   34088: check at the first ingest); `InstrumentView` CIK as `Optional`; `MarketFacadeIT` (+1), `FlywayBaselineIT` (+1)
@@ -289,8 +292,11 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   part-qualified); ports `FilingSource`, `FilingSnapshotWriter`, `FilingRepository`, `Companies`,
   `UntrustedContentScreen`. `IdentifiersTest`, `ContentHashTest`, `SectionPolicyTest`, `FilingSelectionPolicyTest`,
   `SectionExtractorTest` (synthetic text; real fixtures in the EDGAR step)
-- [ ] Flyway V18 `research_filings` (accession unique, ticker, CIK, form, filed_at, period, source URL, content hash,
-  extractor version) + `research_filing_sections` (screening result per section)
+- [x] Flyway V18 `research_filings` (accession unique, ticker, CIK, form, filed_at, period, primary document, 8-K
+  items, source URL, content hash, extractor version) + `research_filing_sections` (ordinal, item, title, text,
+  `injection_suspected`, `matched_rules`; one per item; cascade on delete); JDBC `FilingRepositoryAdapter`
+  (`findContentSha256`, `findByAccession`, `insert`, `replace` keeping the filing id); `FilingRepositoryAdapterIT`
+  (4), `FlywayBaselineIT` (18 migrations)
 - [ ] EDGAR adapter (`RestClient`, `User-Agent`, rate limit, `RetryTemplate` on 429/5xx/timeout per ADR 0005);
   WireMock tests with saved submissions JSON + one trimmed 10-K / 10-Q / 8-K (+ EX-99.1) HTML each
 - [ ] Section extraction (10-K Items 1, 1A, 7, 7A; 10-Q Part I Item 2, Part II Item 1A; 8-K Items 2.02, 7.01, 8.01
