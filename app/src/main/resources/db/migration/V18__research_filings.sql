@@ -16,7 +16,7 @@ CREATE TABLE research_filings (
     items             TEXT[] NOT NULL DEFAULT '{}', -- 8-K item numbers as listed by EDGAR; empty for 10-K / 10-Q
     source_url        TEXT NOT NULL,                -- the primary document on sec.gov, cited later
     content_sha256    VARCHAR(64) NOT NULL CHECK (content_sha256 ~ '^[0-9a-f]{64}$'),
-    extractor_version VARCHAR(16) NOT NULL,
+    extractor_version VARCHAR(64) NOT NULL,        -- e.g. html-1/sections-2 (EdgarFilingSource)
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );

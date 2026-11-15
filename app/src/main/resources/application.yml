@@ -142,6 +142,8 @@ briefwise:
       max-retries: 2         # on 429, 5xx, I/O errors (ADR 0005); delay doubles
       retry-delay: 1s
   research:
+    ingest:
+      lookback-days: 365     # ADR 0025: 8-Ks of the last 12 months (and 10-Qs while a company has no 10-K)
     filings:
       source: snapshot       # ADR 0026: snapshot everywhere; edgar only for a deliberate local refresh
       snapshot-dir: ../data/filings # {TICKER}/{accession}.json, committed; relative to app/; edgar writes, snapshot reads
