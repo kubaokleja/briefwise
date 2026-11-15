@@ -1,0 +1,24 @@
+{
+  "formatVersion" : 1,
+  "ticker" : "JPM",
+  "accessionNo" : "0001193125-26-039427",
+  "cik" : "0000019617",
+  "form" : "8-K",
+  "filedAt" : "2026-02-05",
+  "reportDate" : "2026-02-05",
+  "primaryDocument" : "d23804d8k.htm",
+  "items" : [
+    "8.01",
+    "9.01"
+  ],
+  "sourceUrl" : "https://www.sec.gov/Archives/edgar/data/19617/000119312526039427/d23804d8k.htm",
+  "extractorVersion" : "html-2/sections-2",
+  "contentSha256" : "b83c7b5c1c73bbb2b7bc1e703a985c79e25ae24655415843fd2bb08cb57b691e",
+  "sections" : [
+    {
+      "itemId" : "8.01",
+      "title" : "Other Events.",
+      "text" : "On February 5, 2026, JPMorgan Chase & Co. closed a public offering of $3,000,000,000 aggregate principal amount of Fixed-to-Floating Rate Subordinated Notes due 2037 (the “Subordinated Notes”).\nThe offering of the Subordinated Notes was registered under the Securities Act of 1933, as amended, pursuant to a registration statement on Form S-3 (File No. 333-285537), as amended. In connection with this offering, the legal opinion as to the legality of the Subordinated Notes is being filed as Exhibit 5.1 to this report."
+    }
+  ]
+}

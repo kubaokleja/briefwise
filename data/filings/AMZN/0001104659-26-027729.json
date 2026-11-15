@@ -1,0 +1,24 @@
+{
+  "formatVersion" : 1,
+  "ticker" : "AMZN",
+  "accessionNo" : "0001104659-26-027729",
+  "cik" : "0001018724",
+  "form" : "8-K",
+  "filedAt" : "2026-03-13",
+  "reportDate" : "2026-03-13",
+  "primaryDocument" : "tm266670d8_8k.htm",
+  "items" : [
+    "8.01",
+    "9.01"
+  ],
+  "sourceUrl" : "https://www.sec.gov/Archives/edgar/data/1018724/000110465926027729/tm266670d8_8k.htm",
+  "extractorVersion" : "html-2/sections-2",
+  "contentSha256" : "28c7fb38b379cf716ce651a2629a275ce3a0001ae444db1e830045600de9fea0",
+  "sections" : [
+    {
+      "itemId" : "8.01",
+      "title" : "OTHER EVENTS.",
+      "text" : "On March 13, 2026, Amazon.com, Inc. (the “Company”) closed the sale of $1,750,000,000 aggregate principal amount of its floating rate notes due 2028 (the “2028 Floating Rate Notes”), $1,000,000,000 aggregate principal amount of its floating rate notes due 2029 (the “2029 Floating Rate Notes”), $2,250,000,000 aggregate principal amount of its 3.850% notes due 2028 (the “2028 Notes”), $3,000,000,000 aggregate principal amount of its 4.000% notes due 2029 (the “2029 Notes”), $5,000,000,000 aggregate principal amount of its 4.250% notes due 2031 (the “2031 Notes”), $4,000,000,000 aggregate principal amount of its 4.550% notes due 2033 (the “2033 Notes”), $6,000,000,000 aggregate principal amount of its 4.875% notes due 2036 (the “2036 Notes”), $2,500,000,000 aggregate principal amount of its 5.650% notes due 2046 (the “2046 Notes”), $5,500,000,000 aggregate principal amount of its 5.800% notes due 2056 (the “2056 Notes”), $3,000,000,000 aggregate principal amount of its 5.950% notes due 2066 (the “2066 Notes”), and $3,000,000,000 aggregate principal amount of its 6.050% notes due 2076 (the “2076 Notes” and, together with the 2028 Floating Rate Notes, 2029 Floating Rate Notes, 2028 Notes, 2029 Notes, 2031 Notes, 2033 Notes, 2036 Notes, 2046 Notes, 2056 Notes, and 2066 Notes, the “Notes”) pursuant to an Underwriting Agreement dated March 10, 2026 (the “Underwriting Agreement”) among the Company and J.P. Morgan Securities LLC, Citigroup Global Markets Inc., Goldman Sachs & Co. LLC, and HSBC Securities (USA) Inc., as managers of the several underwriters named in Schedule II therein. The sale of the Notes was registered under the Company’s registration statement on Form S-3 filed on February 6, 2026 (File No. 333-293246).\nThe aggregate public offering price of the Notes was $36.898 billion and the estimated net proceeds from the offering were approximately $36.813 billion, after deducting underwriting discounts from the public offering price and before deducting offering expenses payable by us. The Notes were issued pursuant to an Indenture dated as of November 29, 2012 between the Company and Wells Fargo Bank, National Association, as trustee (the “Prior Trustee”), as amended and supplemented by Supplemental Indenture No. 1, dated as of April 13, 2022, among the Company, the Prior Trustee, and Computershare Trust Company, National Association, as successor trustee, together with the officers’ certificate dated as of March 13, 2026 issued pursuant thereto establishing the terms of each series of the Notes (the “Officers’ Certificate”).\nThe foregoing descriptions of the Underwriting Agreement and the Officers’ Certificate are qualified in their entirety by the terms of such documents, which are filed as Exhibit 1.1 and Exhibit 4.1, respectively, and incorporated herein by reference. The foregoing description of the Notes is qualified in its entirety by reference to the full text of the form of 2028 Floating Rate Note, form of 2029 Floating Rate Note, form of 2028 Note, form of 2029 Note, form of 2031 Note, form of 2033 Note, form of 2036 Note, form of 2046 Note, form of 2056 Note, form of 2066 Note, and form of 2076 Note, which are filed hereto as Exhibit 4.2, Exhibit 4.3, Exhibit 4.4, Exhibit 4.5, Exhibit 4.6, Exhibit 4.7, Exhibit 4.8, Exhibit 4.9, Exhibit 4.10, Exhibit 4.11, and Exhibit 4.12, respectively, and incorporated herein by reference."
+    }
+  ]
+}

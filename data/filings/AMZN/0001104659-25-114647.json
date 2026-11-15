@@ -1,0 +1,24 @@
+{
+  "formatVersion" : 1,
+  "ticker" : "AMZN",
+  "accessionNo" : "0001104659-25-114647",
+  "cik" : "0001018724",
+  "form" : "8-K",
+  "filedAt" : "2025-11-20",
+  "reportDate" : "2025-11-20",
+  "primaryDocument" : "tm2530638d3_8k.htm",
+  "items" : [
+    "8.01",
+    "9.01"
+  ],
+  "sourceUrl" : "https://www.sec.gov/Archives/edgar/data/1018724/000110465925114647/tm2530638d3_8k.htm",
+  "extractorVersion" : "html-2/sections-2",
+  "contentSha256" : "5388e4c69d99e5f07d9635a87f99bf408bd13f2f203aab8130bfd9ded9ec8d11",
+  "sections" : [
+    {
+      "itemId" : "8.01",
+      "title" : "OTHER EVENTS.",
+      "text" : "On November 20, 2025, Amazon.com, Inc. (the “Company”) closed the sale of $2,500,000,000 aggregate principal amount of its 3.900% notes due 2028 (the “2028 Notes”), $2,500,000,000 aggregate principal amount of its 4.100% notes due 2030 (the “2030 Notes”), $1,500,000,000 aggregate principal amount of its 4.350% notes due 2033 (the “2033 Notes”), $3,500,000,000 aggregate principal amount of its 4.650% notes due 2035 (the “2035 Notes”), $3,000,000,000 aggregate principal amount of its 5.450% notes due 2055 (the “2055 Notes”), and $2,000,000,000 aggregate principal amount of its 5.550% notes due 2065 (the “2065 Notes” and, together with the 2028 Notes, 2030 Notes, 2033 Notes, 2035 Notes, and 2055 Notes, the “Notes”) pursuant to an Underwriting Agreement dated November 17, 2025 (the “Underwriting Agreement”) among the Company and Goldman Sachs & Co. LLC, J.P. Morgan Securities LLC, and Morgan Stanley & Co. LLC, as managers of the several underwriters named in Schedule II therein. The sale of the Notes was registered under the Company’s registration statement on Form S-3 filed on February 3, 2023 (File No. 333-269547).\nThe aggregate public offering price of the Notes was $14.961 billion and the estimated net proceeds from the offering were approximately $14.926 billion, after deducting underwriting discounts from the public offering price and before deducting offering expenses payable by us. The Notes were issued pursuant to an Indenture dated as of November 29, 2012 between the Company and Wells Fargo Bank, National Association, as trustee (the “Prior Trustee”), as amended and supplemented by Supplemental Indenture No. 1, dated as of April 13, 2022, among the Company, the Prior Trustee, and Computershare Trust Company, National Association, as successor trustee, together with the officers’ certificate dated as of November 20, 2025 issued pursuant thereto establishing the terms of each series of the Notes (the “Officers’ Certificate”).\nThe foregoing descriptions of the Underwriting Agreement and the Officers’ Certificate are qualified in their entirety by the terms of such documents, which are filed as Exhibit 1.1 and Exhibit 4.1, respectively, and incorporated herein by reference. The foregoing description of the Notes is qualified in its entirety by reference to the full text of the form of 2028 Note, form of 2030 Note, form of 2033 Note, form of 2035 Note, form of 2055 Note, and form of 2065 Note, which are filed hereto as Exhibit 4.2, Exhibit 4.3, Exhibit 4.4, Exhibit 4.5, Exhibit 4.6, and Exhibit 4.7, respectively, and incorporated herein by reference."
+    }
+  ]
+}

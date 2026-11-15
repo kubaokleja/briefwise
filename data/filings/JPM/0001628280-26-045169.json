@@ -1,0 +1,24 @@
+{
+  "formatVersion" : 1,
+  "ticker" : "JPM",
+  "accessionNo" : "0001628280-26-045169",
+  "cik" : "0000019617",
+  "form" : "8-K",
+  "filedAt" : "2026-06-24",
+  "reportDate" : "2026-06-24",
+  "primaryDocument" : "jpm-20260624.htm",
+  "items" : [
+    "7.01",
+    "9.01"
+  ],
+  "sourceUrl" : "https://www.sec.gov/Archives/edgar/data/19617/000162828026045169/jpm-20260624.htm",
+  "extractorVersion" : "html-2/sections-2",
+  "contentSha256" : "3a8432a27158f6e2acb35cd822dbfdbeb1d55b9035756a41c0a4596423e1732b",
+  "sections" : [
+    {
+      "itemId" : "7.01",
+      "title" : "Regulation FD Disclosure",
+      "text" : "On June 24, 2026, JPMorgan Chase & Co. (“JPMorganChase” or the “Firm”) released the results of its company-run 2026 Dodd-Frank Act Stress Test (“DFAST”) for JPMorganChase and JPMorgan Chase Bank, National Association. A copy of that information is attached as Exhibit 99.\nThe company-run 2026 DFAST results are being furnished pursuant to Item 7.01, and the information contained therein shall not be deemed “filed” for purposes of Section 18 of the Securities Exchange Act of 1934, or otherwise subject to the liabilities under that Section. Furthermore, the information contained in Exhibit 99 shall not be deemed to be incorporated by reference into the filings of the Firm under the Securities Act of 1933.\nThis Current Report on Form 8-K (including the Exhibit hereto) contains forward-looking statements within the meaning of the Private Securities Litigation Reform Act of 1995. These statements are based on the beliefs and expectations of JPMorganChase’s management, speak only as of the date on which they were made, and are subject to significant risks and uncertainties. Actual results may differ from those set forth in the forward-looking statements. Factors that could cause JPMorganChase’s actual results to differ materially from those described in the forward-looking statements can be found in JPMorganChase’s Annual Report on Form 10-K for the year ended December 31, 2025 and Quarterly Report on Form 10-Q for the quarter ended March 31, 2026, which have been filed with the Securities and Exchange Commission and are available on JPMorganChase’s website (https://jpmorganchaseco.gcs-web.com/ir/sec-other-filings/overview) and on the Securities and Exchange Commission’s website (www.sec.gov). JPMorganChase does not undertake to update any forward-looking statements."
+    }
+  ]
+}

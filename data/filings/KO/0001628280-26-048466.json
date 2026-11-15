@@ -1,0 +1,23 @@
+{
+  "formatVersion" : 1,
+  "ticker" : "KO",
+  "accessionNo" : "0001628280-26-048466",
+  "cik" : "0000021344",
+  "form" : "8-K",
+  "filedAt" : "2026-07-16",
+  "reportDate" : "2026-07-16",
+  "primaryDocument" : "ko-20260716.htm",
+  "items" : [
+    "8.01"
+  ],
+  "sourceUrl" : "https://www.sec.gov/Archives/edgar/data/21344/000162828026048466/ko-20260716.htm",
+  "extractorVersion" : "html-2/sections-2",
+  "contentSha256" : "2d8a997062e5c336b76718c4df992fdd03425ebd383ca455fa19df8daeab1cac",
+  "sections" : [
+    {
+      "itemId" : "8.01",
+      "title" : "Other Events.",
+      "text" : "On July 16, 2026, The Coca-Cola Company (the “Company”) announced that fairlife, LLC (“fairlife”), a dairy company owned by the Company, identified unauthorized access by a third party to a portion of its systems, including its production-related systems, in connection with a ransomware event.\nAfter detecting the issue, the Company promptly activated its incident response and business continuity protocols. The Company’s investigation and assessment of the impact of the incident is ongoing, with the assistance of outside advisors and cybersecurity experts. The Company has also notified law enforcement.\nProduct quality and safety have not been impacted. However, as a result of the incident, production operations at fairlife in the United States are temporarily suspended. fairlife’s Canada production operations are not currently impacted.\nThe Company is working diligently to complete the investigation and restore the systems and impacted operations. The full scope, nature and impacts of the incident are not yet known. Accordingly, the Company has not yet determined whether the incident is reasonably likely to materially affect the Company.\nThe information in this Form 8-K shall not be deemed “filed” for purposes of Section 18 of the Securities Exchange Act of 1934, nor shall it be deemed incorporated by reference in any filing under the Securities Act of 1933, except as shall be expressly set forth by specific reference in such filing.\nSIGNATURES\nPursuant to the requirements of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned hereunto duly authorized.\nTHE COCA-COLA COMPANY (REGISTRANT)\nDate: July 16, 2026 | By: | /s/ Monica Howard Douglas\nMonica Howard Douglas Executive Vice President and Global General Counsel"
+    }
+  ]
+}
