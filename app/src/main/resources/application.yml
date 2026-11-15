@@ -144,6 +144,7 @@ briefwise:
   research:
     filings:
       source: snapshot       # ADR 0026: snapshot everywhere; edgar only for a deliberate local refresh
+      snapshot-dir: ../data/filings # {TICKER}/{accession}.json, committed; relative to app/; edgar writes, snapshot reads
     edgar:                   # SEC fair access: max 10 req/s, declared User-Agent, no key (checked 2026-11-15)
       data-base-url: https://data.sec.gov       # submissions JSON
       archive-base-url: https://www.sec.gov     # filing documents and -index.htm pages
