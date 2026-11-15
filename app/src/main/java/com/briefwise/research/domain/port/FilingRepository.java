@@ -10,6 +10,9 @@ public interface FilingRepository {
     /** Content hash of the stored filing, empty if the accession is not stored yet. */
     Optional<String> findContentSha256(AccessionNo accessionNo);
 
+    /** The stored filing with its sections in filing order, empty if the accession is not stored. */
+    Optional<Filing> findByAccession(AccessionNo accessionNo);
+
     /** Stores a new filing with its sections. */
     void insert(Filing filing);
 
