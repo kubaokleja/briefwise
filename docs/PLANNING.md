@@ -283,10 +283,12 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
 - [x] Flyway V17 `instruments.cik` (nullable, unique, 10-digit check, NULL for ETFs) + seed for the 30 stocks (from
   `company_tickers.json`, 2026-11-14; XOM now maps to 2115436 "ExxonMobil Holdings Corp", older filings may be under
   34088: check at the first ingest); `InstrumentView` CIK as `Optional`; `MarketFacadeIT` (+1), `FlywayBaselineIT` (+1)
-- [ ] `research` layers via `new-bounded-context` (facade exists): domain `Cik`, `AccessionNo`, `FilingType`,
-  `Filing`, `FilingRef`, `FilingSection` (item id, title, text, screening), `FilingSelectionPolicy`, `SectionPolicy`,
-  `SectionExtractor` (pure); ports `FilingSource`, `FilingSnapshotWriter`, `FilingRepository`, `HeldCompanies`,
-  `UntrustedContentScreen`
+- [x] `research` domain via `new-bounded-context` (facade exists): `Cik`, `AccessionNo`, `FilingType`, `FilingRef`,
+  `FetchedFiling`, `Filing`, `FilingSection`, `Screening`, `ScreenedSection`, `Company`, `ContentHash`,
+  `FilingSelectionPolicy`, `SectionPolicy`, `SectionExtractor` (pure; TOC dropped by "longest body wins", 10-Q items
+  part-qualified); ports `FilingSource`, `FilingSnapshotWriter`, `FilingRepository`, `Companies`,
+  `UntrustedContentScreen`. `IdentifiersTest`, `ContentHashTest`, `SectionPolicyTest`, `FilingSelectionPolicyTest`,
+  `SectionExtractorTest` (synthetic text; real fixtures in the EDGAR step)
 - [ ] Flyway V18 `research_filings` (accession unique, ticker, CIK, form, filed_at, period, source URL, content hash,
   extractor version) + `research_filing_sections` (screening result per section)
 - [ ] EDGAR adapter (`RestClient`, `User-Agent`, rate limit, `RetryTemplate` on 429/5xx/timeout per ADR 0005);
