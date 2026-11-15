@@ -1,5 +1,6 @@
 package com.briefwise.jobs.infrastructure.web;
 
+import static org.hamcrest.Matchers.greaterThan;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,6 +36,18 @@ class AdminJobControllerIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.status").value("SUCCEEDED"))
                 .andExpect(jsonPath("$.steps[0].name").value("sweep"))
                 .andExpect(jsonPath("$.steps[0].result.picked").value(0));
+    }
+
+    @Test
+    void runs_the_filing_ingest_on_demand_from_the_test_snapshot() throws Exception {
+        mvc.perform(post("/api/admin/jobs/filing-ingest/run"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.job").value("filing-ingest"))
+                .andExpect(jsonPath("$.status").value("SUCCEEDED"))
+                .andExpect(jsonPath("$.steps[0].name").value("ingest-filings"))
+                .andExpect(jsonPath("$.steps[0].result.skippedTickers").isNotEmpty())   // the held ETFs
+                .andExpect(jsonPath("$.steps[0].result.failed").value(0))
+                .andExpect(jsonPath("$.steps[0].result.selected").value(greaterThan(0)));
     }
 
     @Test
