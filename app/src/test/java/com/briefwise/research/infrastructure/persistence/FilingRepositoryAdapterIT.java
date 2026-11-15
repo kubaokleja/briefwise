@@ -93,6 +93,22 @@ class FilingRepositoryAdapterIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void update_provenance_keeps_hash_and_sections() {
+        Filing filing = filing(UUID.randomUUID(), V1, List.of(section("2.02", "Text.", Screening.CLEAN)));
+        repository.insert(filing);
+
+        repository.updateProvenance(ACCESSION, "https://www.sec.gov/Archives/new.htm", V2);
+
+        Filing stored = repository.findByAccession(ACCESSION).orElseThrow();
+        assertThat(stored.extractorVersion()).isEqualTo(V2);
+        assertThat(stored.sourceUrl()).isEqualTo("https://www.sec.gov/Archives/new.htm");
+        assertThat(stored.contentSha256()).isEqualTo(filing.contentSha256());
+        assertThat(stored.sections()).isEqualTo(filing.sections());
+        assertThatThrownBy(() -> repository.updateProvenance(new AccessionNo("0000320193-26-999999"), "x", V2))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
     void replace_without_a_stored_filing_fails() {
         Filing filing = filing(UUID.randomUUID(), V1, List.of(section("2.02", "Text.", Screening.CLEAN)));
         assertThatThrownBy(() -> repository.replace(filing)).isInstanceOf(IllegalStateException.class);

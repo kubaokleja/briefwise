@@ -36,7 +36,8 @@ import org.springframework.stereotype.Service;
  * compare the content hash with the stored one, and only for new or changed content screen every section (ADR 0013)
  * and store it. Each filing is stored in its own transaction, so a failure keeps the filings before it.
  *
- * <p>A filing whose hash is unchanged keeps its stored screening: a change to the pattern list re-screens nothing.
+ * <p>A filing whose hash is unchanged keeps its sections and stored screening (a change to the pattern list re-screens
+ * nothing); only a new extractor version or source URL is recorded (decided 2026-11-15).
  *
  * <p>{@link IllegalStateException} (misconfigured source, edited snapshot file) stops the run: every following
  * filing would fail the same way. Every other exception of one filing or listing is reported and the run goes on.
@@ -101,6 +102,11 @@ class FilingIngestService implements FilingIngest {
         String hash = fetched.contentSha256();
         Optional<Filing> stored = repository.findByAccession(ref.accessionNo());
         if (stored.isPresent() && stored.get().contentSha256().equals(hash)) {
+            if (!stored.get().extractorVersion().equals(fetched.extractorVersion())
+                    || !stored.get().sourceUrl().equals(fetched.sourceUrl())) {
+                // same text from a newer extractor: keep sections and screening, record the new provenance
+                repository.updateProvenance(ref.accessionNo(), fetched.sourceUrl(), fetched.extractorVersion());
+            }
             log.debug("Filing {} {} unchanged", ticker.symbol(), ref.accessionNo());
             return new IngestedFiling(ticker, ref, IngestOutcome.UNCHANGED, stored.get().sections().size(),
                     (int) stored.get().suspectedSections());

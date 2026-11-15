@@ -68,6 +68,17 @@ class FilingRepositoryAdapter implements FilingRepository {
 
     @Override
     @Transactional
+    public void updateProvenance(AccessionNo accessionNo, String sourceUrl, String extractorVersion) {
+        int updated = jdbc.update("""
+                UPDATE research_filings SET source_url = ?, extractor_version = ?, updated_at = now()
+                WHERE accession_no = ?""", sourceUrl, extractorVersion, accessionNo.value());
+        if (updated == 0) {
+            throw new IllegalStateException("No stored filing to update: " + accessionNo.value());
+        }
+    }
+
+    @Override
+    @Transactional
     public void replace(Filing filing) {
         FilingRef ref = filing.ref();
         List<UUID> ids = jdbc.queryForList("""

@@ -23,7 +23,9 @@ import org.jsoup.nodes.TextNode;
  */
 final class HtmlText {
 
-    static final String VERSION = "1";
+    static final String VERSION = "2";   // 2: every Unicode space separator is a plain space (thin space in headings)
+
+    private static final Pattern SPACES = Pattern.compile("[\\s\\p{Zs}]+");
 
     private static final Set<String> BLOCKS = Set.of("address", "article", "blockquote", "body", "center", "dd", "div",
             "dl", "dt", "footer", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hr", "li", "ol", "p", "pre",
@@ -115,7 +117,11 @@ final class HtmlText {
         }
     }
 
+    /**
+     * Every Unicode space separator ({@code \p{Zs}}: no-break, thin, en, em ...) becomes one plain space. Filing agents
+     * write {@code Item&#8201;8.01}, and the heading rules only know the plain space.
+     */
     private static String clean(String raw) {
-        return raw.replace(' ', ' ').replaceAll("\\s+", " ").strip();
+        return SPACES.matcher(raw).replaceAll(" ").strip();
     }
 }

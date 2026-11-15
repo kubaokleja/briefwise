@@ -76,3 +76,14 @@ access. The SEC pages state no explicit licence; company filings are public disc
   - if the snapshot grows past about 50 MB (a wider corpus, ADR 0025);
   - if the SEC changes its access rules;
   - if the licence position of redistributing filing text changes.
+
+## Update 2026-11-15: first live ingest
+
+- The first local ingest of the held stocks: 110 filings (8 10-K, 18 10-Q, 84 8-K), 204 sections, 3.97 M characters,
+  0 sections flagged by the screen; snapshot 3.9 MB in 110 files, tables 2.3 MB. Live EDGAR about 2 minutes, from the
+  snapshot 9 s.
+- Re-ingest refined: the same SHA-256 keeps the sections and their screening, but a new `extractor_version` or
+  source URL is still recorded (`FilingRepository.updateProvenance`). Otherwise the database and the snapshot disagree
+  on which extractor produced a filing after an extractor change that leaves its text alone.
+- `HtmlText` v2: every Unicode space separator becomes a plain space. Filing-agent 8-Ks write `Item&#8201;8.01`
+  (thin space), and 10 of them had no section under v1.
