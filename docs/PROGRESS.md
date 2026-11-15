@@ -34,6 +34,64 @@ Newest entry first. Copy the template below for each session (`session-wrap-up` 
 
 ---
 
+## Session 18 — 2026-11-15 — M2 slice 2: filing source and ETL (no embeddings)
+
+**Phase:** M2 / slice 2, on branch `feat/m2-research`
+**Goal:** Fetch, extract, screen and store the SEC filings of the held stocks, with a committed text snapshot.
+
+**Done**
+- G1 / G2 decided (`3f45fe5`, ADR 0025, 0026); V17 `instruments.cik` (`ae83404`); research domain and ports
+  (`91891a9`); V18 + JDBC repository (`a9f30af`); jsoup 1.24.1 approved (`6187383`).
+- EDGAR adapter (`95a7c3e`): `RestClient`, `User-Agent` from `SEC_USER_AGENT`, 150 ms throttle, `RetryTemplate`,
+  `HtmlText` (jsoup), EX-99.1 via `-index.htm`; real trimmed AAPL fixtures, WireMock tests.
+- Extractor v2 (`8ba00ac`): running headers, page numbers, TOC links and footers dropped (MSFT 10-K Item 1A 5.9K ->
+  81K characters); JPM / XOM MD&A pointer and XOM's new CIK accepted (ADR 0025 update).
+- Snapshot (`7b39f0a`): `data/filings/{TICKER}/{accession}.json`, LF JSON, atomic write, content-hash check on read.
+- Ingest (`921f73a`): `ResearchFacade.ingestFiling` / `ingestFilings` / `ingestHeld`; sections screened by
+  `ComplianceFacade.screenUntrustedContent` (source `filing`); per-filing failures reported. Fixed on the way: V18
+  `extractor_version` `VARCHAR(16)` too short for `html-1/sections-2` (edited in place, never merged).
+- Job `filing-ingest` (`f797039`): own lock group, admin endpoint + runner, no cron, `FAILED` at half failed.
+- First live ingest (`f2d29e6`, `54bb46c`): 9 companies, 110 filings (8 10-K, 18 10-Q, 84 8-K), 204 sections,
+  3.97 M characters, 0 suspected, 0 failed; snapshot 3.9 MB / 110 files, tables 2.3 MB; about 2 min live, 9 s from
+  the snapshot. Found: filing-agent 8-Ks write `Item&#8201;8.01` (thin space), 10 had no section -> `HtmlText` v2;
+  provenance now updated when the hash is the same.
+- Verified: full `./mvnw verify` green at slice end, 447 unit + 158 IT + `JsonLoggingIT` (incl. `ArchitectureTest`).
+- Live spend: 0 USD (no LLM call; EDGAR is free).
+
+**Decisions**
+- [ADR 0025](decisions/0025-filing-corpus.md) G1 corpus, with the 2026-11-15 extraction update.
+- [ADR 0026](decisions/0026-filing-source-snapshot-and-cik.md) G2 source, snapshot, CIK, with the 2026-11-15 first
+  live ingest update (provenance update on an unchanged hash, `HtmlText` v2).
+- Without an ADR (recorded in PLANNING): EX-99.1 via `-index.htm`; stale snapshot files kept, the selection policy
+  filters (pruning with M6); ingest before the live run (order change); a failing filing is reported and the run goes
+  on; job no deadline; V18 edited in place.
+
+**AI concepts introduced / explained**
+- Corpus design for RAG: which documents and sections to keep, and why boilerplate (TOC, page furniture) hurts
+  retrieval before any embedding exists.
+- Provenance per passage (accession, source URL, extractor version, content hash): the basis for citations and for
+  re-ingest only when the text changed.
+- Prompt-injection screening of retrieved documents at ingest (indirect injection): flag and keep out of retrieval
+  instead of deleting.
+
+**Domain questions added** (also in PLANNING)
+- 2026-11-15: an unchanged filing keeps its screening, so a new injection pattern does not re-screen stored text.
+
+**Open questions / blockers**
+- Branch `feat/m2-research` is local only (17 commits ahead of `master`, not pushed).
+- The footer rule could drop three same-label table rows with rising numbers; not seen in 110 filings.
+- XOM has no 10-K under CIK 2115436 until about 2027-02; JPM / XOM Item 7 is a pointer (revisit with the RAG evals).
+- Excluding suspected sections from retrieval had no task yet: added to slice 3 (not chunked, not embedded).
+
+**Next session**
+- M2 slice 3: chunking, embeddings, vector store; settle C1, V1, V2, V3 first -> ADRs; ask before the pgvector /
+  tokenizer dependencies.
+
+**Proposed commit message**
+> docs: log session 18 (M2 slice 2 done: filing source, snapshot, ingest)
+
+---
+
 ## Session 17 — 2026-11-14 — M2 slice 1: eval comparability, classification prompt v2
 
 **Phase:** M2 / slice 1 (M1 carry-overs), on branch `feat/m2-research`
