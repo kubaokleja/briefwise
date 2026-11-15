@@ -65,3 +65,22 @@ and indexes.
   cleanup yet (M6 retention).
 - Revisit when the RAG eval (slice 9) shows misses caused by missing sections or by table noise, or when
   year-over-year questions are wanted.
+
+## Update 2026-11-15: extraction on the held issuers
+
+A probe of the latest 10-K, 10-Q and earnings 8-K of all 9 held stocks against live EDGAR showed:
+
+- **Page furniture** broke the "longest body wins" rule. MSFT and JPM print running headers (`PART I` / `Item 1`)
+  on every page, so every page became a section (MSFT Item 1A: 5.9K instead of 81K characters). Extractor
+  version 2 also drops running headers (any heading shape repeated 3 or more times verbatim), bare page numbers,
+  `Table of Contents` links and footers (the same text before a rising page number). A heading title cut after a
+  connecting word takes the next line.
+- **Cross-referenced MD&A, accepted as a gap.** JPM and XOM put their MD&A (and JPM its 10-Q MD&A) in a
+  financial section outside any `Item` heading. Their Item 7 is a pointer of a few hundred characters ("appears on
+  pages 46–160"), stored as is. Risk factors, 10-Qs (XOM) and 8-K releases are still in the corpus. Options
+  considered: a per-issuer title map (deterministic, maintained by hand) and a generic title fallback (the end of
+  the section is guessed). Revisit if the RAG golden set (slice 4) or eval (slice 9) shows misses on JPM / XOM
+  results questions.
+- **XOM has no 10-K under its new CIK** 2115436 (holding company formed in 2026; the 2025 10-K is under 34088).
+  Only the new CIK is ingested: 10-Qs and 8-Ks now, the 10-K from about February 2027. No predecessor-CIK column.
+- JNJ's latest 10-Q has no Part II Item 1A (allowed when nothing changed); PG's and KO's are short pointers.

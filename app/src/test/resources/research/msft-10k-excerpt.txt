@@ -1,0 +1,760 @@
+UNITED STATES
+SECURITIES AND EXCHANGE COMMISSION
+Washington, D.C. 20549
+FORM 10-K
+☒ | ANNUAL REPORT PURSUANT TO SECTION 13 OR 15(d) OF THE SECURITIES EXCHANGE ACT OF 1934
+For the Fiscal Year Ended June 30, 2026
+OR
+☐ | TRANSITION REPORT PURSUANT TO SECTION 13 OR 15(d) OF THE SECURITIES EXCHANGE ACT OF 1934
+For the Transition Period From to
+Commission File Number 001-37845
+MICROSOFT CORPORATION
+Washington | 91-1144442
+(STATE OF INCORPORATION) | (I.R.S. ID)
+ONE MICROSOFT WAY, REDMOND, Washington 98052-6399
+(425) 882-8080
+www.microsoft.com/investor
+Securities registered pursuant to Section 12(b) of the Act:
+Title of each class | Trading Symbol | Name of exchange on which registered
+Common stock, $0.00000625 par value per share | MSFT | Nasdaq
+3.125% Notes due 2028 | MSFT | Nasdaq
+2.625% Notes due 2033 | MSFT | Nasdaq
+Securities registered pursuant to Section 12(g) of the Act:
+None
+Indicate by check mark if the registrant is a well-known seasoned issuer, as defined in Rule 405 of the Securities Act. Yes ☒ No ☐
+Indicate by check mark if the registrant is not required to file reports pursuant to Section 13 or Section 15(d) of the Act. Yes ☐ No ☒
+Indicate by check mark whether the registrant (1) has filed all reports required to be filed by Section 13 or 15(d) of the Securities Exchange Act of 1934 during the preceding 12 months (or for such ...
+Indicate by check mark whether the registrant has submitted electronically every Interactive Data File required to be submitted pursuant to Rule 405 of Regulation S-T (§232.405 of this chapter) ...
+Indicate by check mark whether the registrant is a large accelerated filer, an accelerated filer, a non-accelerated filer, a smaller reporting company, or an emerging growth company. See the ...
+Large Accelerated Filer ☒ | Accelerated Filer ☐
+Non-accelerated Filer ☐ | Smaller Reporting Company ☐
+Emerging Growth Company ☐
+If an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition period for complying with any new or revised financial accounting standards ...
+Indicate by check mark whether the registrant has filed a report on and attestation to its management’s assessment of the effectiveness of its internal control over financial reporting under Section ...
+If securities are registered pursuant to Section 12(b) of the Act, indicate by check mark whether the financial statements of the registrant included in the filing reflect the correction of an error ...
+Indicate by check mark whether any of those error corrections are restatements that required a recovery analysis of incentive-based compensation received by any of the registrant’s executive officers ...
+Indicate by check mark whether the registrant is a shell company (as defined in Rule 12b-2 of the Act). Yes ☐ No ☒
+As of December 31, 2025, the aggregate market value of the registrant’s common stock held by non-affiliates of the registrant was $3.6 trillion based on the closing sale price as reported on the ...
+DOCUMENTS INCORPORATED BY REFERENCE
+Portions of the definitive Proxy Statement to be delivered to shareholders in connection with the Annual Meeting of Shareholders to be held on December 8, 2026 are incorporated by reference into Part ...
+MICROSOFT CORPORATION
+FORM 10-K
+For the Fiscal Year Ended June 30, 2026
+INDEX
+Page
+PART I
+Item 1. | Business | 3
+Information about our Executive Officers | 12
+Item 1A. | Risk Factors | 14
+Item 1B. | Unresolved Staff Comments | 29
+Item 1C. | Cybersecurity | 29
+Item 2. | Properties | 31
+Item 3. | Legal Proceedings | 31
+Item 4. | Mine Safety Disclosures | 31
+PART II
+Item 5. | Market for Registrant’s Common Equity, Related Stockholder Matters, and Issuer Purchases of Equity Securities | 32
+Item 6. | [Reserved] | 33
+Item 7. | Management’s Discussion and Analysis of Financial Condition and Results of Operations | 34
+Item 7A. | Quantitative and Qualitative Disclosures About Market Risk | 49
+Item 8. | Financial Statements and Supplementary Data | 50
+Item 9. | Changes in and Disagreements with Accountants on Accounting and Financial Disclosure | 89
+Item 9A. | Controls and Procedures | 89
+Report of Management on Internal Control over Financial Reporting | 89
+Report of Independent Registered Public Accounting Firm | 90
+Item 9B. | Other Information | 91
+Item 9C. | Disclosure Regarding Foreign Jurisdictions that Prevent Inspections | 91
+PART III
+Item 10. | Directors, Executive Officers, and Corporate Governance | 91
+Item 11. | Executive Compensation | 91
+Item 12. | Security Ownership of Certain Beneficial Owners and Management and Related Stockholder Matters | 92
+Item 13. | Certain Relationships and Related Transactions, and Director Independence | 92
+Item 14. | Principal Accountant Fees and Services | 92
+PART IV
+Item 15. | Exhibit and Financial Statement Schedules | 93
+Item 16. | Form 10-K Summary | 100
+Signatures | 101
+2
+PART I
+Item 1
+Note About Forward-Looking Statements
+This report includes estimates, projections, statements relating to our business plans, objectives, and expected operating results that are “forward-looking statements” within the meaning of the ...
+PART I
+ITEM 1. BUSINESS
+GENERAL
+Microsoft is a technology company committed to making digital technology and artificial intelligence (“AI”) available broadly and doing so responsibly. Our mission is to empower every person and ...
+We develop and support a broad portfolio of technology solutions for individuals and businesses, focusing on secure, trusted, and innovative platforms and applications that meet evolving customer ...
+AI is fundamentally transforming productivity for every individual, organization, and industry. Microsoft's AI offerings span every layer of the technology stack, enabling transformative outcomes ...
+We believe AI should be as empowering as it is powerful, and we’re committed to designing and deploying AI responsibly with safety and security from the outset.
+What We Offer
+Founded in 1975, we develop and support software, services, devices, and solutions that deliver new value for customers and help people and businesses realize their full potential.
+We offer an array of services, including cloud-based solutions that provide customers with AI, software, services, platforms, and content, and we provide solution support and consulting services. We ...
+3
+PART I
+Item 1
+The Microsoft Cloud provides integration across the technology stack while offering openness, improving time to value, reducing costs, and increasing agility. Our cloud business benefits from three ...
+We prioritize security above all else and we offer our customers integrated AI-driven products addressing security, compliance, identity, management, and privacy across customers’ multi-cloud, ...
+4
+PART I
+Item 1
+Commitment to Sustainability
+Microsoft is committed to sustainability and our approach to addressing climate change starts with the sustainability of our own business. In 2020, we announced goals to become a carbon negative, ...
+5
+PART I
+Item 1
+LinkedIn
+LinkedIn connects the world’s professionals to make them more productive and successful and transforms the way companies hire, market, sell, and learn. In addition to LinkedIn’s free services, ...
+6
+PART I
+Item 1
+Server Products and Cloud Services
+Azure is a comprehensive set of cloud services that offer developers, IT professionals, and enterprises freedom to build, deploy, and manage applications on any platform or device. Customers can use ...
+7
+PART I
+Item 1
+We believe our server products provide customers with advantages in performance, total costs of ownership, and productivity by delivering superior applications, development tools, compatibility with ...
+Our Enterprise and partner services business competes with a wide range of companies that provide strategy and business planning, application development, and infrastructure services, including ...
+8
+PART I
+Item 1
+The gamer remains at the heart of the XBOX ecosystem. We are identifying new opportunities to attract gamers across a variety of different end points through our first- and third-party content and ...
+XBOX enables people to connect and share online gaming experiences that are accessible on XBOX consoles, Windows-enabled devices, and other devices. XBOX is designed to benefit users by providing ...
+9
+PART I
+Item 1
+OPERATIONS
+We have a global operations service center covering the Americas, Asia Pacific, Europe, and the Middle East that supports our business operations, including customer contract and order processing, ...
+10
+PART I
+Item 1
+DISTRIBUTION, SALES, AND MARKETING
+Distribution occurs through a combination of direct and indirect channels. Direct sales activities serve customers ranging from large multinational enterprises and public sector organizations to ...
+11
+PART I
+Item 1
+INFORMATION ABOUT OUR EXECUTIVE OFFICERS
+Our executive officers as of July 29, 2026 were as follows:
+12
+PART I
+Item 1
+AVAILABLE INFORMATION
+Our Internet address is www.microsoft.com. At our Investor Relations website, www.microsoft.com/investor, we make available free of charge a variety of information for investors. Our goal is to ...
+13
+PART I
+Item 1A
+ITEM 1A. RISK FACTORS
+Our operations and financial results are subject to various risks and uncertainties, including those described below, that could adversely affect our business, operations, financial condition, ...
+STRATEGIC AND COMPETITIVE RISKS
+14
+PART I
+Item 1A
+For all of these reasons, we may not be able to compete successfully against our current and future competitors, which could adversely affect our business, operations, financial condition, and ...
+Business model competition
+15
+PART I
+Item 1A
+Demand for cloud-based and AI products and services is evolving and difficult to forecast. Overestimation of demand or misalignment of capacity investments may result in underutilization of ...
+The cost structure for AI products and services is subject to significant uncertainty, including with respect to model training and inference costs, the availability and pricing of components, and ...
+16
+PART I
+Item 1A
+RISKS RELATING TO THE EVOLUTION OF OUR BUSINESS
+We make significant investments in products and services that may not achieve expected returns. We will continue to make significant investments in research, development, and marketing for existing ...
+17
+PART I
+Item 1A
+Commission on January 19, 2024 and amended on March 8, 2024, beginning in late November 2023, a nation-state associated threat actor used a password spray attack to compromise a legacy test account ...
+Cyberthreats are constantly evolving and becoming increasingly sophisticated and complex, increasing the difficulty of preventing, detecting and successfully defending against them. Threat actors ...
+18
+PART I
+Item 1A
+Security of our products, services, devices, and customers’ data
+The security of our products and services is important in our customers’ decisions to purchase or use our products or services across cloud and on-premises environments. Security threats are a ...
+19
+PART I
+Item 1A
+when software updates are not deployed, and maintain the digital security infrastructure that protects the integrity of our network, products, and services. Further, we must provide security tools ...
+The cost of these measures to protect products and customer-facing services could reduce our operating margins. If we fail to do these things well, actual or perceived security vulnerabilities in our ...
+20
+PART I
+Item 1A
+Abuse of our platforms may harm our reputation or user engagement.
+Advertising, professional, marketplace, and gaming platform abuses
+21
+PART I
+Item 1A
+manner inconsistent with our responsible AI policies and practices. These outcomes may give rise to public controversy, societal concerns, or regulatory actions relating to human rights, privacy, ...
+OPERATIONAL RISKS
+22
+PART I
+Item 1A
+inadequate datacenter capacity to support the delivery and continued development of our products and services. Component shortages, excess or obsolete inventory, or price reductions resulting in ...
+In addition to infrastructure, other products such as XBOX consoles, Surface devices, and other hardware are similarly subject to supply chain challenges and disruptions, resulting in shortages which ...
+23
+PART I
+Item 1A
+retrieve and produce customer data in response to compulsory legal demands from law enforcement and governmental authorities are evolving and the requests we are experiencing are increasing in volume ...
+New, existing, and evolving laws and regulations, or interpretations or applications of existing laws and regulations in a manner inconsistent with our interpretations of such laws and regulations or ...
+24
+PART I
+Item 1A
+•
+Cybersecurity: Legislative and regulatory actions related to cybersecurity may increase the costs associated with developing, implementing, or securing our products and services. The legal and ...
+25
+PART I
+Item 1A
+We may have additional tax liabilities. We are subject to income taxes in the U.S. and many foreign jurisdictions. Significant judgment is required in determining our worldwide provision for income ...
+We are regularly under audit by tax authorities in different jurisdictions. Although we believe that our provision for income taxes and our tax estimates are reasonable, tax authorities may disagree ...
+26
+PART I
+Item 1A
+decisions, public policy positions, or corporate philanthropic initiatives. Damage to our reputation or our brands may occur from, among other things:
+•
+27
+PART I
+Item 1A
+The occurrence of regional epidemics or a global pandemic could adversely affect our business, operations, financial condition, and results of operations. The extent to which global pandemics impact ...
+The long-term effects of climate change on the global economy and the IT industry are unclear. Environmental regulations or changes in the supply, demand, or available sources of energy or other ...
+28
+PART I
+Item 1B, 1C
+ITEM 1B. UNRESOLVED STAFF COMMENTS
+We have received no written comments regarding our periodic or current reports from the staff of the Securities and Exchange Commission that were issued 180 days or more preceding the end of our ...
+ITEM 1C. CYBERSECURITY
+RISK MANAGEMENT AND STRATEGY
+Microsoft plays a central role in the world’s digital ecosystem. We have made it a top corporate priority to protect the computing environment used by our customers and employees and to support the ...
+29
+PART I
+Item 1C
+When we experience a cybersecurity incident, we utilize our well-established incident response plans that operate both across the company and at the product and services level. Incidents are first ...
+We describe the risks from cybersecurity threats, including previous cybersecurity incidents, in section “Risk Factors” (Part I, Item 1A of this Form 10-K). As of the date of this Form 10-K, we do ...
+30
+PART I
+Item 2, 3, 4
+ITEM 2. PROPERTIES
+Our corporate headquarters are located in Redmond, Washington. We have approximately 14 million square feet of space located in King County, Washington that is used for engineering, sales, marketing, ...
+We own and lease other facilities domestically and internationally, primarily for offices, datacenters, and research and development. The largest owned international properties include space in the ...
+U.S. | 41 | 24 | 65
+International | 17 | 30 | 47
+Total | 58 | 54 | 112
+ITEM 3. LEGAL PROCEEDINGS
+Refer to Note 14 – Contingencies of the Notes to Financial Statements (Part II, Item 8 of this Form 10-K) for information regarding legal proceedings in which we are involved.
+ITEM 4. MINE SAFETY DISCLOSURES
+Not applicable.
+31
+PART II
+Item 5
+PART II
+ITEM 5. MARKET FOR REGISTRANT’S COMMON EQUITY, RELATED STOCKHOLDER MATTERS, AND ISSUER PURCHASES OF EQUITY SECURITIES
+MARKET AND STOCKHOLDERS
+Our common stock is traded on the NASDAQ Stock Market under the symbol MSFT. On July 23, 2026, there were 74,199 registered holders of record of our common stock.
+32
+PART II
+Item 6
+ITEM 6. [RESERVED]
+33
+PART II
+Item 7
+ITEM 7. MANAGEMENT’S DISCUSSION AND ANALYSIS OF FINANCIAL CONDITION AND RESULTS OF OPERATIONS
+The following Management’s Discussion and Analysis of Financial Condition and Results of Operations (“MD&A”) is intended to help the reader understand the results of operations and financial ...
+OVERVIEW
+34
+PART II
+Item 7
+Economic Conditions, Challenges, and Risks
+The markets for software, devices, and cloud-based services are dynamic and highly competitive. Our competitors are developing new software and devices, while also deploying competing cloud-based ...
+35
+PART II
+Item 7
+Metrics
+We use metrics in assessing the performance of our business and to make informed decisions regarding the allocation of resources. We disclose metrics to enable investors to evaluate progress against ...
+Microsoft Cloud revenue and revenue growth | Revenue from Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365
+Microsoft Cloud gross margin percentage | Gross margin percentage for our Microsoft Cloud business
+Productivity and Business Processes and Intelligent Cloud
+36
+PART II
+Item 7
+More Personal Computing
+Metrics related to our More Personal Computing segment assess the performance of our key consumer businesses.
+37
+PART II
+Item 7
+Current year net income and diluted EPS were positively impacted by net gains from investments in OpenAI, which resulted in an increase in net income and diluted EPS of $5.0 billion and $0.67, ...
+SEGMENT RESULTS OF OPERATIONS
+38
+PART II
+Item 7
+Operating income increased $14.1 billion or 20%.
+•
+39
+PART II
+Item 7
+Operating income increased $220 million or 2%.
+•
+40
+PART II
+Item 7
+Fiscal Year 2026 Compared with Fiscal Year 2025
+General and administrative expenses increased $733 million or 10% driven by higher legal expenses and gains on divestitures in the prior period.
+Net gains (losses) on foreign currency remeasurements | (527 | ) | 171
+Other, net | 4,722 | (4,725 | )
+Total | $ | 10,697 | $ | (4,901 | )
+41
+PART II
+Item 7
+Uncertain Tax Positions
+We remain under audit by the IRS for tax years 2014 to 2017. With respect to the audit for tax years 2004 to 2013, on September 26, 2023, we received Notices of Proposed Adjustment (“NOPAs”) from the ...
+42
+PART II
+Item 7
+Cash, Cash Equivalents, and Investments
+Cash, cash equivalents, and short-term investments totaled $76.8 billion and $94.6 billion as of June 30, 2026 and 2025, respectively. Equity and other investments were $36.3 billion and $15.4 ...
+43
+PART II
+Item 7
+Unearned Revenue
+Unearned revenue comprises mainly unearned revenue related to volume licensing programs, which may include cloud services and Software Assurance (“SA”). Unearned revenue is generally invoiced ...
+44
+PART II
+Item 7
+Dividends
+During fiscal years 2026 and 2025, our Board of Directors declared dividends totaling $27.0 billion and $24.7 billion, respectively. We intend to continue returning capital to shareholders in the ...
+45
+PART II
+Item 7
+Our products are generally sold with a right of return, we may provide other credits or incentives, and in certain instances we estimate customer usage of our products and services, which are ...
+Remaining performance obligations represent the revenue we expect to recognize for our products and services for which control has not yet been transferred to customers. We estimate total ...
+46
+PART II
+Item 7
+Application of the goodwill impairment test requires judgment, including the identification of reporting units, assignment of assets and liabilities to reporting units, assignment of goodwill to ...
+The estimates used to calculate the fair value of a reporting unit change from year to year based on operating results, market conditions, and other factors. Changes in these estimates and ...
+47
+PART II
+Item 7
+STATEMENT OF MANAGEMENT’S RESPONSIBILITY FOR FINANCIAL STATEMENTS
+Management is responsible for the preparation of the consolidated financial statements and related information that are presented in this report. The consolidated financial statements, which include ...
+48
+PART II
+Item 7A
+ITEM 7A. QUANTITATIVE AND QUALITATIVE DISCLOSURES ABOUT MARKET RISK
+RISKS
+We are exposed to economic risk from foreign exchange rates, interest rates, credit risk, and equity prices. We use derivatives instruments to manage these risks, however, they may still impact our ...
+49
+PART II
+Item 8
+ITEM 8. FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA
+INCOME STATEMENTS
+(In millions, except per share amounts)
+50
+PART II
+Item 8
+COMPREHENSIVE INCOME STATEMENTS
+(In millions)
+Net change related to derivatives | 8 | (5 | ) | 24
+Net change related to investments | 215 | 1,574 | 957
+Translation adjustments and other | (160 | ) | 674 | (228 | )
+Other comprehensive income | 63 | 2,243 | 753
+Comprehensive income | $ | 133,812 | $ | 104,075 | $ | 88,889
+Refer to accompanying notes.
+51
+PART II
+Item 8
+BALANCE SHEETS
+(In millions)
+Inventories | 1,397 | 938
+Other current assets | 48,594 | 25,723
+Total current assets | 207,710 | 191,131
+52
+PART II
+Item 8
+CASH FLOWS STATEMENTS
+(In millions)
+Other long-term liabilities | (4,707 | ) | (975 | ) | 749
+Net cash from operations | 182,935 | 136,162 | 118,548
+Financing
+53
+PART II
+Item 8
+STOCKHOLDERS’ EQUITY STATEMENTS
+(In millions, except per share amounts)
+Other, net | 2 | (2 | ) | 181
+Balance, end of period | 117,406 | 109,095 | 100,923
+Retained earnings
+Other comprehensive income | 63 | 2,243 | 753
+Balance, end of period | (3,284 | ) | (3,347 | ) | (5,590 | )
+Total stockholders’ equity | $ | 442,387 | $ | 343,479 | $ | 268,477
+54
+PART II
+Item 8
+NOTES TO FINANCIAL STATEMENTS
+NOTE 1 — ACCOUNTING POLICIES
+55
+PART II
+Item 8
+Revenue Recognition
+Revenue is recognized upon transfer of control of promised products or services to customers in an amount that reflects the consideration we expect to receive in exchange for those products or ...
+56
+PART II
+Item 8
+Judgment is required to determine the SSP for each distinct performance obligation. We use a single amount to estimate SSP for items that are not sold separately, including on-premises licenses sold ...
+In instances where SSP is not directly observable, such as when we do not sell the product or service separately, we determine the SSP using information that may include market conditions and other ...
+57
+PART II
+Item 8
+We record financing receivables when we offer certain customers the option to acquire our software products and services offerings through a financing program in a limited number of countries. As of ...
+We record an allowance for doubtful accounts which reflects our best estimate of credit losses inherent in the accounts receivable and financing receivable balances. We determine the allowance based ...
+58
+PART II
+Item 8
+Income Taxes
+Income tax expense includes U.S. and international income taxes, and interest and penalties on uncertain tax positions. Certain income and expenses are not reported in tax returns and financial ...
+59
+PART II
+Item 8
+We have a long-term strategic partnership with OpenAI. In October 2025, we signed a new definitive agreement with OpenAI that extends this partnership. We have an investment accounted for under the ...
+Derivatives
+60
+PART II
+Item 8
+We measure equity investments without readily determinable fair values on a nonrecurring basis. The fair values of these investments are determined based on valuation techniques using the best ...
+Our other current financial assets and current financial liabilities have fair values that approximate their carrying values.
+61
+PART II
+Item 8
+Recent Accounting Guidance Not Yet Adopted
+Income Statement – Disaggregation of Income Statement Expenses
+Dilutive effect of stock-based awards | 24 | 32 | 38
+Common stock and common stock equivalents (C) | 7,453 | 7,465 | 7,469
+Earnings Per Share
+62
+PART II
+Item 8
+Net Recognized Gains (Losses) on Investments
+Net recognized gains (losses) on debt investments were as follows:
+Realized gains from sales of available-for-sale securities | $ | 103 | $ | 40 | $ | 22
+Realized losses from sales of available-for-sale securities | (56 | ) | (65 | ) | (98 | )
+Impairments and allowance for credit losses | (26 | ) | 8 | 23
+Total | $ | 21 | $ | (17 | ) | $ | (53 | )
+Net recognized gains (losses) on equity investments were as follows:
+Net realized gains on investments sold | $ | 125 | $ | 83 | $ | 18
+Net unrealized gains on investments still held | 4,391 | 536 | 146
+Impairments of investments | (152 | ) | (951 | ) | (229 | )
+Total | $ | 4,364 | $ | (332 | ) | $ | (65 | )
+63
+PART II
+Item 8
+NOTE 4 — INVESTMENTS
+Investment Components
+Commercial paper | Level 2 | $ | 2,987 | $ | 0 | $ | 0 | $ | 2,987 | $ | 2,373 | $ | 614 | $ | 0
+Certificates of deposit | Level 2 | 1,745 | 0 | 0 | 1,745 | 1,701 | 44 | 0
+U.S. government securities | Level 1 | 49,714 | 2 | (1,154 | ) | 48,562 | 399 | 40,675 | 7,488
+U.S. agency securities | Level 2 | 3,133 | 0 | 0 | 3,133 | 1,787 | 1,346 | 0
+Foreign government bonds | Level 2 | 221 | 12 | (7 | ) | 226 | 0 | 226 | 0
+Mortgage- and asset-backed securities | Level 2 | 1,813 | 5 | (23 | ) | 1,795 | 0 | 1,795 | 0
+Corporate notes and bonds | Level 2 | 10,682 | 49 | (71 | ) | 10,660 | 0 | 10,660 | 0
+Corporate notes and bonds | Level 3 | 1,618 | 120 | 0 | 1,738 | 0 | 118 | 1,620
+Municipal securities | Level 2 | 152 | 0 | (5 | ) | 147 | 0 | 147 | 0
+Municipal securities | Level 3 | 105 | 0 | (14 | ) | 91 | 0 | 91 | 0
+Total debt investments | $ | 72,170 | $ | 188 | $ | (1,274 | ) | $ | 71,084 | $ | 6,260 | $ | 55,716 | $ | 9,108
+Changes in Fair Value Recorded in Net Income
+Cash | $ | 13,059 | $ | 13,059 | $ | 0 | $ | 0
+Derivatives, net (a) | 192 | 0 | 192 | 0
+Total | $ | 113,191 | $ | 20,935 | $ | 55,908 | $ | 36,348
+64
+PART II
+Item 8
+(In millions) | Fair Value Level | Adjusted Cost Basis | Unrealized Gains | Unrealized Losses | Recorded Basis | Cash and Cash Equivalents | Short-term Investments | Equity and Other Investments
+June 30, 2025
+Commercial paper | Level 2 | $ | 10,880 | $ | 0 | $ | 0 | $ | 10,880 | $ | 9,939 | $ | 941 | $ | 0
+Certificates of deposit | Level 2 | 2,653 | 0 | 0 | 2,653 | 2,309 | 344 | 0
+U.S. government securities | Level 1 | 52,878 | 71 | (1,462 | ) | 51,487 | 4,742 | 46,745 | 0
+U.S. agency securities | Level 2 | 2,686 | 0 | 0 | 2,686 | 496 | 2,190 | 0
+Foreign government bonds | Level 2 | 349 | 24 | (9 | ) | 364 | 0 | 364 | 0
+Mortgage- and asset-backed securities | Level 2 | 2,558 | 10 | (27 | ) | 2,541 | 0 | 2,541 | 0
+Corporate notes and bonds | Level 2 | 10,763 | 124 | (101 | ) | 10,786 | 0 | 10,786 | 0
+Corporate notes and bonds | Level 3 | 2,511 | 65 | (5 | ) | 2,571 | 0 | 111 | 2,460
+Municipal securities | Level 2 | 207 | 1 | (7 | ) | 201 | 0 | 201 | 0
+Municipal securities | Level 3 | 104 | 0 | (14 | ) | 90 | 0 | 90 | 0
+Total debt investments | $ | 85,589 | $ | 295 | $ | (1,625 | ) | $ | 84,259 | $ | 17,486 | $ | 64,313 | $ | 2,460
+Changes in Fair Value Recorded in Net Income
+Cash | $ | 11,711 | $ | 11,711 | $ | 0 | $ | 0
+Derivatives, net (a) | 282 | 0 | 10 | 272
+Total | $ | 109,970 | $ | 30,242 | $ | 64,323 | $ | 15,405
+(a)
+65
+PART II
+Item 8
+Unrealized Losses on Debt Investments
+Debt investments with continuous unrealized losses for less than 12 months and 12 months or greater and their related fair values were as follows:
+66
+PART II
+Item 8
+Foreign Currencies
+Certain forecasted transactions, assets, and liabilities are exposed to foreign currency risk. We monitor our foreign currency exposures daily to maximize the economic effectiveness of our foreign ...
+67
+PART II
+Item 8
+Fair Values of Derivative Instruments
+The following table presents our derivative instruments:
+Interest rate contracts | 11 | 0 | 15 | 0
+Not Designated as Hedging Instruments
+Foreign exchange contracts | 1,742 | (1,175 | ) | 248 | (809 | )
+Gross amounts of derivatives offset in the balance sheets | (1,300 | ) | 1,301 | (258 | ) | 260
+Cash collateral received | 0 | (366 | ) | 0 | (99 | )
+Net amounts of derivatives | $ | 876 | $ | (495 | ) | $ | 500 | $ | (1,676 | )
+Short-term investments | $ | 192 | $ | 0 | $ | 10 | $ | 0
+Other current assets | 681 | 0 | 201 | 0
+Equity and other investments | 0 | 0 | 272 | 0
+Other long-term assets | 3 | 0 | 17 | 0
+Other current liabilities | 0 | (379 | ) | 0 | (1,639 | )
+Other long-term liabilities | 0 | (116 | ) | 0 | (37 | )
+Derivative assets | 1 | 474 | 283 | 758
+Derivative liabilities | 0 | (1,832 | ) | (5 | ) | (1,837 | )
+68
+PART II
+Item 8
+Gains (losses) on derivative instruments recognized in other income (expense), net were as follows:
+(In millions)
+Foreign exchange contracts | 592 | (938 | ) | 367
+Equity contracts | 1,864 | (266 | ) | (177 | )
+Other contracts | (1 | ) | 21 | (15 | )
+69
+PART II
+Item 8
+The allocation of the purchase price to the assets acquired and liabilities assumed was completed as of September 30, 2024. The major classes of assets and liabilities to which we have allocated the ...
+(In millions)
+70
+PART II
+Item 8
+The measurement periods for the valuation of assets acquired and liabilities assumed end as soon as information on the facts and circumstances that existed as of the acquisition dates becomes ...
+Any change in the goodwill amounts resulting from foreign currency translations and purchase accounting adjustments are presented as “Other” in the table above. Also included in “Other” are business ...
+Contract-based | 623 | (124 | ) | 499 | 217 | (43 | ) | 174
+Total | $ | 44,079 | $ | (25,470 | ) | $ | 18,609 | $ | 43,557 | $ | (20,953 | ) | $ | 22,604
+No material impairments of intangible assets were identified during fiscal years 2026, 2025, or 2024. We estimate that we have no significant residual value related to our intangible assets.
+71
+PART II
+Item 8
+The following table outlines the estimated future amortization expense related to intangible assets held as of June 30, 2026:
+(In millions)
+2009 issuance of $3.8 billion | 2039 | 5.20% | 5.24% | $ | 520 | $ | 520
+2010 issuance of $4.8 billion | 2040 | 4.50% | 4.57% | 486 | 486
+2011 issuance of $2.3 billion | 2041 | 5.30% | 5.36% | 718 | 718
+2012 issuance of $2.3 billion | 2042 | 3.50% | 3.57% | 454 | 454
+2013 issuance of $5.2 billion | 2043 | 3.75% | – | 4.88% | 3.83% | – | 4.92% | 314 | 314
+2013 issuance of €4.1 billion | 2028 | – | 2033 | 2.63% | – | 3.13% | 2.69% | – | 3.22% | 2,630 | 2,700
+2015 issuance of $23.8 billion | 2035 | – | 2055 | 3.50% | – | 4.75% | 3.60% | – | 4.78% | 4,555 | 7,555
+2023 issuance of $0.1 billion | 2026 | – | 2050 | 1.35% | – | 4.50% | 5.16% | – | 5.49% | 56 | 56
+2024 issuance of $3.3 billion | 2026 | – | 2050 | 1.35% | – | 4.50% | 5.16% | – | 5.49% | 3,344 | 3,344
+Total face value | 46,136 | 49,206
+72
+PART II
+Item 8
+The following table outlines maturities of our long-term debt, including the current portion, as of June 30, 2026:
+(In millions)
+Foreign | 531 | 281 | 432
+Deferred taxes | $ | 14,424 | $ | (7,056 | ) | $ | (4,738 | )
+Provision for income taxes | $ | 32,185 | $ | 21,795 | $ | 19,651
+73
+PART II
+Item 8
+Effective Tax Rate
+We adopted Accounting Standards Update 2023-09, Income Taxes (Topic 740): Improvements to Income Tax Disclosures (“ASU 2023-09”) prospectively. The items accounting for the difference between income ...
+74
+PART II
+Item 8
+The decrease from the federal statutory rate in fiscal years 2026, 2025, and 2024 is primarily due to earnings taxed at lower rates in foreign jurisdictions resulting from producing and distributing ...
+The increase in our effective tax rate for fiscal year 2026 compared to fiscal year 2025 was primarily due to changes in the mix of our earnings and tax expenses between the U.S. and foreign ...
+Stock-based compensation expense | $ | 945 | $ | 909
+Accruals, reserves, and other expenses | 5,509 | 5,050
+Loss and credit carryforwards | 2,124 | 2,114
+Book/tax basis differences in investments and debt | 0 | 303
+Capitalized research and development | 15,305 | 16,891
+Other | 545 | 529
+Deferred income tax assets | 56,061 | 47,112
+Less valuation allowance | (1,332 | ) | (1,169 | )
+Book/tax basis differences in investments and debt | $ | (2,972 | ) | $ | 0
+Leasing assets | (21,474 | ) | (12,696 | )
+Depreciation | (17,675 | ) | (5,699 | )
+75
+PART II
+Item 8
+As of June 30, 2026, we had federal, state, and foreign net operating loss carryforwards of $369 million, $715 million, and $2.9 billion, respectively. The federal and state net operating loss ...
+The valuation allowance disclosed in the table above relates to the foreign net operating loss carryforwards, federal capital loss carryforwards, and foreign tax credits carryforwards that may not be ...
+76
+PART II
+Item 8
+We are subject to income tax in many jurisdictions outside the U.S., some of which are currently under audit by local tax authorities. The resolution of these audits is not expected to be material to ...
+NOTE 12 — UNEARNED REVENUE
+Interest on lease liabilities | 2,547 | 1,417 | 734
+Total finance lease cost | $ | 7,950 | $ | 4,825 | $ | 2,534
+77
+PART II
+Item 8
+Supplemental cash flow information related to leases was as follows:
+(In millions)
+Operating cash flows from finance leases | 2,547 | 1,372 | 734
+Financing cash flows from finance leases | 3,101 | 2,283 | 1,286
+Right-of-use assets obtained in exchange for lease obligations:
+78
+PART II
+Item 8
+NOTE 14 — CONTINGENCIES
+Irish Data Protection Commission Matter
+Issued | 29 | 31 | 34
+Repurchased | (36 | ) | (31 | ) | (32 | )
+Balance, end of year | 7,427 | 7,434 | 7,434
+79
+PART II
+Item 8
+All share repurchases were made using cash resources. Shares repurchased during fiscal year 2026 were under the share repurchase program approved on September 16, 2024. Shares repurchased during the ...
+Dividends
+80
+PART II
+Item 8
+NOTE 16 — ACCUMULATED OTHER COMPREHENSIVE INCOME (LOSS)
+The following table summarizes the changes in accumulated other comprehensive income (loss) by component:
+Reclassification adjustments for (gains) losses included in other income (expense), net | 63 | (103 | ) | 48
+Tax expense (benefit) included in provision for income taxes | (13 | ) | 21 | (10 | )
+Amounts reclassified from accumulated other comprehensive loss | 50 | (82 | ) | 38
+Net change related to derivatives, net of tax of $2, $(1), and $6 | 8 | (5 | ) | 24
+Balance, end of period | $ | 0 | $ | (8 | ) | $ | (3 | )
+Investments
+Unrealized gains, net of tax of $57, $411, and $247 | 232 | 1,560 | 915
+Reclassification adjustments for (gains) losses included in other income (expense), net | (21 | ) | 17 | 53
+Tax expense (benefit) included in provision for income taxes | 4 | (3 | ) | (11 | )
+Amounts reclassified from accumulated other comprehensive loss | (17 | ) | 14 | 42
+Net change related to investments, net of tax of $53, $414, and $258 | 215 | 1,574 | 957
+Balance, end of period | $ | (836 | ) | $ | (1,051 | ) | $ | (2,625 | )
+Translation Adjustments and Other
+81
+PART II
+Item 8
+Activity for All Stock Plans
+The fair value of stock awards was estimated on the date of grant using the following assumptions:
+Shares purchased | 5 | 6 | 6
+Average price per share | $ | 382.92 | $ | 385.10 | $ | 339.46
+As of June 30, 2026, 57 million shares of our common stock were reserved for future issuance through the ESPP.
+82
+PART II
+Item 8
+NOTE 18 — SEGMENT INFORMATION AND GEOGRAPHIC DATA
+In its operation of the business, management, including our chief operating decision maker (“CODM”), who is also our Chief Executive Officer, reviews certain financial information, including ...
+83
+PART II
+Item 8
+Revenue and costs are generally directly attributed to our segments. However, due to the integrated structure of our business, certain revenue recognized and costs incurred by one segment may benefit ...
+In addition, certain costs are incurred at a corporate level and allocated to our segments. These allocated costs generally include legal, including settlements and fines, information technology, ...
+84
+PART II
+Item 8
+Revenue, classified by significant product and service offerings, was as follows:
+(In millions)
+Other | 109 | 72 | 45
+Total | $ | 331,839 | $ | 281,724 | $ | 245,122
+Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $214.4 billion, $168.9 billion, ...
+85
+PART II
+Item 8
+REPORT OF INDEPENDENT REGISTERED PUBLIC ACCOUNTING FIRM
+To the Stockholders and the Board of Directors of Microsoft Corporation
+86
+PART II
+Item 8
+Revenue Recognition – Refer to Note 1 to the financial statements
+Critical Audit Matter Description
+87
+PART II
+Item 8
+Income Taxes – Uncertain Tax Positions – Refer to Note 11 to the financial statements
+Critical Audit Matter Description
+88
+PART II
+Item 9, 9A
+ITEM 9. CHANGES IN AND DISAGREEMENTS WITH ACCOUNTANTS ON ACCOUNTING AND FINANCIAL DISCLOSURE
+Not applicable.
+ITEM 9A. CONTROLS AND PROCEDURES
+Under the supervision and with the participation of our management, including the Chief Executive Officer and Chief Financial Officer, we have evaluated the effectiveness of our disclosure controls ...
+REPORT OF MANAGEMENT ON INTERNAL CONTROL OVER FINANCIAL REPORTING
+89
+PART II
+Item 9A
+REPORT OF INDEPENDENT REGISTERED PUBLIC ACCOUNTING FIRM
+To the Stockholders and the Board of Directors of Microsoft Corporation
+90
+PART II, III
+Item 9B, 9C, 10, 11
+ITEM 9B. OTHER INFORMATION
+Insider Trading Arrangements
+Our Section 16 officers and directors, as defined in Rule 16a-1(f) of the Securities Exchange Act of 1934 (the “Exchange Act”), may from time to time enter into plans for the purchase or sale of our ...
+ITEM 9C. DISCLOSURE REGARDING FOREIGN JURISDICTIONS THAT PREVENT INSPECTIONS
+Not applicable.
+PART III
+ITEM 10. DIRECTORS, EXECUTIVE OFFICERS, AND CORPORATE GOVERNANCE
+A list of our executive officers and biographical information appears in Part I, Item 1 of this Form 10-K. Information about our directors may be found under the caption “Our Director Nominees” in ...
+We have adopted the Microsoft Finance Code of Professional Conduct (the “finance code of ethics”), a code of ethics that applies to our Chief Executive Officer, Chief Financial Officer, Chief ...
+ITEM 11. EXECUTIVE COMPENSATION
+The information in the Proxy Statement set forth under the captions “Director Compensation,” “Named Executive Officer Compensation,” “Compensation Committee Report,” and, if required, “Compensation ...
+91
+PART III
+Item 12, 13, 14
+ITEM 12. SECURITY OWNERSHIP OF CERTAIN BENEFICIAL OWNERS AND MANAGEMENT AND RELATED STOCKHOLDER MATTERS
+The information in the Proxy Statement set forth under the captions “Stock Ownership Information,” “Principal Shareholders,” and “Equity Compensation Plan Information” is incorporated herein by ...
+ITEM 13. CERTAIN RELATIONSHIPS AND RELATED TRANSACTIONS, AND DIRECTOR INDEPENDENCE
+The information set forth in the Proxy Statement under the captions “Director Independence” and “Certain Relationships and Related Transactions” is incorporated herein by reference.
+ITEM 14. PRINCIPAL ACCOUNTANT FEES AND SERVICES
+Information concerning fees and services provided by our principal accountant, Deloitte & Touche LLP (PCAOB ID No. 34), appears in the Proxy Statement under the headings “Fees Billed by Deloitte & ...
+92
+PART IV
+Item 15
+PART IV
+ITEM 15. EXHIBIT AND FINANCIAL STATEMENT SCHEDULES
+(a)
+Financial Statements and Schedules
+Income Statements | 50
+Comprehensive Income Statements | 51
+Balance Sheets | 52
+Cash Flows Statements | 53
+Stockholders’ Equity Statements | 54
+Notes to Financial Statements | 55
+Report of Independent Registered Public Accounting Firm | 86
+(b)
+Exhibit Listing
+93
+PART IV
+Item 15
+Incorporated by Reference
+Exhibit Number | Exhibit Description | Filed Herewith | Form | Period Ending | Exhibit | Filing Date
+94
+PART IV
+Item 15
+Incorporated by Reference
+Exhibit Number | Exhibit Description | Filed Herewith | Form | Period Ending | Exhibit | Filing Date
+95
+PART IV
+Item 15
+Incorporated by Reference
+Exhibit Number | Exhibit Description | Filed Herewith | Form | Period Ending | Exhibit | Filing Date
+96
+PART IV
+Item 15
+Incorporated by Reference
+Exhibit Number | Exhibit Description | Filed Herewith | Form | Period Ending | Exhibit | Filing Date
+97
+PART IV
+Item 15
+Incorporated by Reference
+Exhibit Number | Exhibit Description | Filed Herewith | Form | Period Ending | Exhibit | Filing Date
+98
+PART IV
+Item 15
+Incorporated by Reference
+Exhibit Number | Exhibit Description | Filed Herewith | Form | Period Ending | Exhibit | Filing Date
+99
+PART IV
+Item 16
+ITEM 16. FORM 10-K SUMMARY
+None.
+100
+SIGNATURES
+Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned; thereunto duly ...
+101

@@ -310,9 +310,14 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   ~230 KB: 10-K, 10-Q, earnings 8-K + index + EX-99.1, 8.01 8-K without EX-99.1 + index, 8-row submissions).
   `EdgarFilingSourceTest` (15), `HtmlTextTest` (6), `EdgarThrottleTest` (4). Seen on the full filings: page footers
   (`Apple Inc. | 2026 Form 10-K | 12`) stay inside section text -> next step
-- [ ] Section extraction (10-K Items 1, 1A, 7, 7A; 10-Q Part I Item 2, Part II Item 1A; 8-K Items 2.02, 7.01, 8.01
-  + EX-99.1): table of contents skipped, tables as `cell | cell` rows (ADR 0025); page footer / page-number lines
-  dropped (seen on AAPL: `Apple Inc. | 2026 Form 10-K | 12`); `SectionExtractorTest` on the fixtures
+- [x] Section extraction checked on live EDGAR for all 9 held stocks (latest 10-K, 10-Q, earnings 8-K; probe not
+  committed) -> `SectionExtractor` v2 (ADR 0025 update): running page headers dropped and no boundary (heading
+  shape repeated >= 3 times verbatim; a running `PART` still sets the 10-Q part), bare page numbers,
+  `Table of Contents` links (all cells), footers (same text before a rising page number), title cut after `AND` /
+  `OF` / ... takes the next line. MSFT 10-K 1 / 1A / 7: 5.0K / 5.9K / 4.8K -> 41K / 81K / 51K; JPM 1A 5.2K -> 112K.
+  Accepted gap: JPM / XOM MD&A outside any Item heading (Item 7 is a pointer); XOM ingests its new CIK only (no
+  10-K before ~2027-02). `SectionExtractorTest` (+10) incl. real `HtmlText` excerpts (MSFT 10-K / 10-Q, JPM 10-K,
+  XOM 10-Q in `test/resources/research/`); `extractorVersion` now `html-1/sections-2`
 - [ ] Snapshot (ADR 0026): `SnapshotFilingSource` + `JsonFilingSnapshotWriter` (`data/filings/`); round-trip test
 - [ ] First local ingest from live EDGAR (held stocks): snapshot committed; filings, sections, size, time, screening
   hits in PROGRESS (may move to the start of slice 3 if the session runs long)
