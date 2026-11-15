@@ -318,7 +318,12 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   Accepted gap: JPM / XOM MD&A outside any Item heading (Item 7 is a pointer); XOM ingests its new CIK only (no
   10-K before ~2027-02). `SectionExtractorTest` (+10) incl. real `HtmlText` excerpts (MSFT 10-K / 10-Q, JPM 10-K,
   XOM 10-Q in `test/resources/research/`); `extractorVersion` now `html-1/sections-2`
-- [ ] Snapshot (ADR 0026): `SnapshotFilingSource` + `JsonFilingSnapshotWriter` (`data/filings/`); round-trip test
+- [x] Snapshot (ADR 0026) in `research/infrastructure/snapshot/`: `data/filings/{TICKER}/{accession}.json`
+  (`formatVersion` 1, listing + provenance + sections, items sorted, pretty LF JSON, atomic write);
+  `JsonFilingSnapshotWriter` (source `edgar`), `NoOpFilingSnapshotWriter` + `SnapshotFilingSource` (source `snapshot`,
+  the default; `list` scans by CIK, missing directory -> empty + warning; `fetch` checks `contentSha256`, an edited
+  file fails); `briefwise.research.filings.snapshot-dir` (`../data/filings`). Stale files kept, the selection policy
+  filters (decided 2026-11-15; pruning with M6 retention). `FilingSnapshotRoundTripTest` (7)
 - [ ] First local ingest from live EDGAR (held stocks): snapshot committed; filings, sections, size, time, screening
   hits in PROGRESS (may move to the start of slice 3 if the session runs long)
 - [ ] `ComplianceFacade.screenUntrustedContent` per section at ingest (ADR 0013 pattern list); suspected sections
