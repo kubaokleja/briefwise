@@ -324,13 +324,21 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   the default; `list` scans by CIK, missing directory -> empty + warning; `fetch` checks `contentSha256`, an edited
   file fails); `briefwise.research.filings.snapshot-dir` (`../data/filings`). Stale files kept, the selection policy
   filters (decided 2026-11-15; pruning with M6 retention). `FilingSnapshotRoundTripTest` (7)
+- [x] Ingest (order changed 2026-11-15: ingest path before the live run, which needs it and reports screening hits):
+  `FilingIngestService` behind port `FilingIngest`; `ResearchFacade.ingestFiling(ticker, accessionNo)`,
+  `ingestFilings(ticker)` (selection policy, `briefwise.research.ingest.lookback-days: 365`), `ingestHeld()` (funds
+  skipped). Per filing: fetch, snapshot write, same content hash -> `UNCHANGED` (stored screening kept), else every
+  section screened by `ComplianceFacade.screenUntrustedContent` (source `filing`, title + text, content id = section
+  id; suspected stored with its rules, excluded from retrieval in slice 3) -> `INSERTED` / `REPLACED`. A failing filing
+  or listing is reported and the run goes on (decided 2026-11-15); `IllegalStateException` (403, edited snapshot)
+  stops it. Adapters `FacadeCompanies` (market + portfolio), `FacadeUntrustedContentScreen`. Fixed on the way: V18
+  `extractor_version` `VARCHAR(16)` too short for `html-1/sections-2` -> 64 (V18 edited in place, never merged;
+  decided 2026-11-15). `FilingIngestServiceTest` (10), `ResearchFacadeIT` (3, synthetic AAPL 10-K + 8-K with an
+  injection phrase in `test/resources/research/snapshot/`), `FilingRepositoryAdapterIT` on real version strings
+- [ ] Job `filing-ingest` in `JobName` (own lock group; admin endpoint + runner, not in the morning pipeline) ->
+  `ResearchFacade.ingestHeld`; `docs/api.http` (happy path, 404 unknown job, 400)
 - [ ] First local ingest from live EDGAR (held stocks): snapshot committed; filings, sections, size, time, screening
   hits in PROGRESS (may move to the start of slice 3 if the session runs long)
-- [ ] `ComplianceFacade.screenUntrustedContent` per section at ingest (ADR 0013 pattern list); suspected sections
-  stored but excluded from retrieval
-- [ ] `ResearchFacade.ingestFiling(ticker, accessionNo)` + `ingestFilings(ticker)` (idempotent by accession /
-  content hash); facade `*IT`; job `filing-ingest` in `JobName` (own lock group; admin endpoint + runner, not in the
-  morning pipeline); `docs/api.http` (happy path, 404 unknown job, 400)
 
 ### Slice 3 — Chunking, embeddings, vector store
 - [ ] Decide C1 chunking: by section + size limit (DESIGN 8 proposal) vs fixed size; chunk size and overlap in

@@ -1,0 +1,26 @@
+{
+  "formatVersion": 1,
+  "ticker": "AAPL",
+  "accessionNo": "0000320193-26-000026",
+  "cik": "0000320193",
+  "form": "10-K",
+  "filedAt": "2026-11-03",
+  "reportDate": "2026-09-26",
+  "primaryDocument": "aapl-20260926.htm",
+  "items": [],
+  "sourceUrl": "https://www.sec.gov/Archives/edgar/data/320193/000032019326000026/aapl-20260926.htm",
+  "extractorVersion": "html-1/sections-2",
+  "contentSha256": "77d3741389507f8c0d5b9a4fad6b9d276f5496b9d7d17124a832a20e4fa16995",
+  "sections": [
+    {
+      "itemId": "1",
+      "title": "Business",
+      "text": "Synthetic test text. The Company designs smartphones.\n\nIt sells them worldwide."
+    },
+    {
+      "itemId": "1A",
+      "title": "Risk Factors",
+      "text": "Synthetic test text. Net sales | 2026 | 2025\niPhone | $200 | $190"
+    }
+  ]
+}

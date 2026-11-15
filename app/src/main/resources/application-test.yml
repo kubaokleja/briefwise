@@ -22,6 +22,9 @@ briefwise:
       test-model: { input: 1.00, output: 2.00 }   # round numbers: 1M input tokens = 1 USD
     daily-budget-usd:
       it-feature: 0.01
+  research:
+    filings:
+      snapshot-dir: src/test/resources/research/snapshot   # synthetic AAPL 10-K + 8-K for ResearchFacadeIT
   news:
     finnhub:                  # base-url points at WireMock (set by AbstractIntegrationTest)
       api-key: test-key
