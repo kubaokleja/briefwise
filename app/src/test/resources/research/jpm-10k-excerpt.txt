@@ -1,0 +1,1361 @@
+UNITED STATES
+SECURITIES AND EXCHANGE COMMISSION
+WASHINGTON, D.C. 20549
+FORM 10-K
+Annual report pursuant to Section 13 or 15(d) of
+the Securities Exchange Act of 1934
+For the fiscal year ended | Commission file
+December 31, 2025 | number | 1-5805
+JPMorgan Chase & Co.
+(Exact name of registrant as specified in its charter)
+Delaware | 13-2624428
+(State or other jurisdiction of incorporation or organization) | (I.R.S. employer identification no.)
+270 Park Avenue,
+New York, | New York | 10017
+(Address of principal executive offices) | (Zip Code)
+Registrant’s telephone number, including area code: (212) 270-6000
+Securities registered pursuant to Section 12(b) of the Act:
+Title of each class | Trading Symbol(s) | Name of each exchange on which registered
+Common stock | JPM | The New York Stock Exchange
+Depositary Shares, each representing a one-four hundredth interest in a share of 5.75% Non-Cumulative Preferred Stock, ...
+Depositary Shares, each representing a one-four hundredth interest in a share of 6.00% Non-Cumulative Preferred Stock, ...
+Depositary Shares, each representing a one-four hundredth interest in a share of 4.75% Non-Cumulative Preferred Stock, ...
+Depositary Shares, each representing a one-four hundredth interest in a share of 4.55% Non-Cumulative Preferred Stock, ...
+Depositary Shares, each representing a one-four hundredth interest in a share of 4.625% Non-Cumulative Preferred Stock, ...
+Depositary Shares, each representing a one-four hundredth interest in a share of 4.20% Non-Cumulative Preferred Stock, ...
+Guarantee of Callable Fixed Rate Notes due June 10, 2032 of JPMorgan Chase Financial Company LLC | JPM/32 | The New ...
+Guarantee of Alerian MLP Index ETNs due January 28, 2044 of JPMorgan Chase Financial Company LLC | AMJB | NYSE Arca, ...
+Guarantee of Inverse VIX Short-Term Futures ETNs due March 22, 2045 of JPMorgan Chase Financial Company LLC | VYLD | ...
+Securities registered pursuant to Section 12(g) of the Act: None
+Indicate by check mark if the registrant is a well-known seasoned issuer, as defined in Rule 405 of the Securities Act. ...
+Indicate by check mark if the registrant is not required to file reports pursuant to Section 13 or Section 15(d) of the ...
+Indicate by check mark whether the registrant (1) has filed all reports required to be filed by Section 13 or 15(d) of ...
+Indicate by check mark whether the registrant has submitted electronically every Interactive Data File required to be ...
+Indicate by check mark whether the registrant is a large accelerated filer, an accelerated filer, a non-accelerated ...
+☒ | Large accelerated filer | ☐ | Accelerated filer | ☐ | Non-accelerated filer | ☐ | Smaller reporting company | ☐ | ...
+If an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition ...
+Indicate by check mark whether the registrant has filed a report on and attestation to its management’s assessment of ...
+If securities are registered pursuant to Section 12(b) of the Act, indicate by check mark whether the financial ...
+Indicate by check mark whether any of those error corrections are restatements that required a recovery analysis of ...
+Indicate by check mark whether the registrant is a shell company (as defined in Rule 12b-2 of the Exchange Act). ☐ Yes ...
+The aggregate market value of JPMorgan Chase & Co. common stock held by non-affiliates as of June 30, 2025: ...
+Number of shares of common stock outstanding as of January 31, 2026: 2,697,032,375
+Documents incorporated by reference: Portions of the registrant’s Proxy Statement for the annual meeting of ...
+Form 10-K Index
+Part I | Page
+Item 1. | Business. | 1
+Overview | 1
+Business segments & Corporate | 1
+Competition | 1
+Supervision and regulation | 2-6
+Human capital | 7-8
+Distribution of assets, liabilities and stockholders’ equity; interest rates and interest differentials | 315-319
+Item 1A. | Risk Factors. | 9-31
+Item 1B. | Unresolved Staff Comments. | 32
+Item 1C. | Cybersecurity. | 32
+Item 2. | Properties. | 32
+Item 3. | Legal Proceedings. | 32
+Item 4. | Mine Safety Disclosures. | 32
+Part II
+Item 5. | Market for Registrant’s Common Equity, Related Stockholder Matters and Issuer Purchases of Equity Securities. ...
+Item 6. | Reserved | 33
+Item 7. | Management’s Discussion and Analysis of Financial Condition and Results of Operations. | 33
+Item 7A. | Quantitative and Qualitative Disclosures About Market Risk. | 33
+Item 8. | Financial Statements and Supplementary Data. | 34
+Item 9. | Changes in and Disagreements with Accountants on Accounting and Financial Disclosure. | 34
+Item 9A. | Controls and Procedures. | 34
+Item 9B. | Other Information. | 35
+Item 9C. | Disclosure regarding Foreign Jurisdictions that Prevent Inspections. | 36
+Part III
+Item 10. | Directors, Executive Officers and Corporate Governance. | 37
+Item 11. | Executive Compensation. | 38
+Item 12. | Security Ownership of Certain Beneficial Owners and Management and Related Stockholder Matters. | 38
+Item 13. | Certain Relationships and Related Transactions, and Director Independence. | 38
+Item 14. | Principal Accounting Fees and Services. | 38
+Part IV
+Item 15. | Exhibits, Financial Statement Schedules. | 39-42
+Part I
+Item 1. Business.
+Overview
+JPMorgan Chase & Co. (“JPMorganChase” or the “Firm”, NYSE: JPM), a financial holding company incorporated under ...
+JPMorganChase’s principal bank subsidiary is JPMorgan Chase Bank, National Association (“JPMorgan Chase Bank, N.A.”), a ...
+The Firm’s website is www.jpmorganchase.com. JPMorganChase makes available on its website, free of charge, annual ...
+Business segments & Corporate
+For management reporting purposes, the Firm has three reportable business segments – Consumer & Community Banking ...
+A description of the Firm’s reportable business segments and the products and services that they provide to their ...
+Competition
+JPMorganChase and its subsidiaries and affiliates operate in highly competitive environments. Competitors include other ...
+1
+Part I
+Supervision and regulation
+2
+Stress Capital Buffer (“SCB”) requirement for the coming year, which forms part of the Firm’s applicable capital ...
+3
+Part I
+including JPMorgan Chase Bank, N.A. The FDIC is required to maintain a minimum reserve ratio, which measures the ...
+4
+that would have required data providers, including banks such as JPMorgan Chase Bank, N.A., to make certain consumer ...
+5
+Part I
+clearing of standardized over-the-counter (“OTC”) derivatives, requirements that certain standardized OTC swaps be ...
+6
+Human capital
+7
+Part I
+Attracting and retaining employees
+8
+Item 1A. Risk Factors.
+The following discussion sets forth the material risk factors that could affect JPMorganChase’s financial condition and ...
+9
+Part I
+of local economic, political, regulatory and social factors on JPMorganChase’s business in certain countries in which ...
+10
+that are stricter than a global standard, which could create competitive disadvantages for those firms, such as ...
+11
+Part I
+collateral consequences for the subject financial institution, including:
+12
+JPMorganChase's business and operations could be negatively affected by governmental policies that discourage or ...
+13
+Part I
+greater than they might have been under JPMorganChase’s preferred strategy.
+14
+commodities, and the duration of any such changes, and
+15
+Part I
+prices, and could lead to further withdrawals based on the weaker investment performance.
+16
+value of the instrument. Any of these factors could cause a decline in the value of financial instruments that ...
+17
+Part I
+•counterparties are unable to post collateral for operational or other reasons.
+18
+limited during periods of market stress, low investor confidence or significant market illiquidity.
+19
+Part I
+•actions by banking regulators, as well as changes in applicable law or how applicable law is implemented by banking ...
+20
+•errors made by JPMorganChase or another market participant, whether inadvertent or malicious, which could cause ...
+21
+Part I
+JPMorganChase or its clients, customers, counterparties or employees
+22
+•strengthening network security and managing outbound connections to reduce the risk of data loss
+23
+Part I
+and to maintain an effective risk management framework is highly dependent on its ability to staff its operations ...
+24
+JPMorganChase does business, to comply with applicable law
+25
+Part I
+Enhanced regulatory and other standards for the oversight of JPMorganChase’s vendors and other service providers could ...
+26
+from the historical environments upon which the models were developed. Any heightened uncertainty associated with these ...
+27
+Part I
+Competition in the financial services industry could lead to negative effects on JPMorganChase’s results of operations.
+28
+•competitive disadvantage if competitors are able to deploy AI more quickly or effectively, potentially gaining ...
+29
+Part I
+•certain clients and customers ceasing to do business with JPMorganChase, and encouraging others to do so
+30
+countries have in the past experienced economic disruptions, including:
+31
+Parts I and II
+Item 1B. Unresolved Staff Comments.
+None.
+Item 1C. Cybersecurity.
+Refer to the Operational Risk Management section of Management’s discussion and analysis on pages 146–149 for a ...
+Item 2. Properties.
+JPMorganChase’s headquarters is located in New York City at 270 Park Avenue, a 60-story office building owned by the ...
+Item 3. Legal Proceedings.
+Refer to Note 30 for a description of the Firm’s material legal proceedings.
+Item 4. Mine Safety Disclosures.
+Not applicable.
+32
+Item 5. Market for Registrant’s Common Equity, Related Stockholder Matters and Issuer Purchases of Equity Securities.
+Market for registrant’s common equity
+Item 6. Reserved
+Item 7. Management’s Discussion and Analysis of Financial Condition and Results of Operations.
+Management’s discussion and analysis of financial condition and results of operations, entitled “Management’s ...
+Item 7A. Quantitative and Qualitative Disclosures About Market Risk.
+Refer to the Market Risk Management section of Management’s discussion and analysis on pages 133-142 for a discussion ...
+33
+Parts II and III
+Item 8. Financial Statements and Supplementary Data.
+The Consolidated Financial Statements, together with the Notes thereto and the report thereon dated February 13, 2026, ...
+Item 9. Changes in and Disagreements With Accountants on Accounting and Financial Disclosure.
+None.
+Item 9A. Controls and Procedures.
+The internal control framework promulgated by the Committee of Sponsoring Organizations of the Treadway Commission ...
+34
+Item 9B. Other Information.
+Trading arrangements
+Robin Leopold | Head of Human Resources | November 14, 2025 | November 14, 2025 – June 30, 2026 | 865
+Douglas Petno | Co-CEO, CIB | November 14, 2025 | November 14, 2025 – June 30, 2026 | 50% of the net issued shares ...
+35
+Parts II and III
+Item 9C. Disclosure regarding Foreign Jurisdictions that Prevent Inspections.
+Not applicable.
+36
+Item 10. Directors, Executive Officers and Corporate Governance.
+Executive officers of the registrant
+37
+Parts III and IV
+Item 11. Executive Compensation.
+Refer to Item 10.
+Item 12. Security Ownership of Certain Beneficial Owners and Management and Related Stockholder Matters.
+Refer to Item 10 for security ownership of certain beneficial owners and management.
+Item 13. Certain Relationships and Related Transactions, and Director Independence.
+Refer to Item 10.
+Item 14. Principal Accounting Fees and Services.
+Refer to Item 10.
+38
+Item 15. Exhibits, Financial Statement Schedules.
+1 | Financial statements
+39
+Part IV
+4.2(a) | Subordinated Indenture, dated as of March 14, 2014, between JPMorgan Chase & Co. and U.S. Bank Trust National ...
+40
+10.9 | Forms of JPMorgan Chase & Co. Long-Term Incentive Plan Terms and Conditions for restricted stock units and ...
+41
+Part IV
+31.2 | Certification.(b)
+42
+Table of contents
+Financial: | Page
+Three-Year Summary of Consolidated Financial Highlights | 44
+Five-Year Stock Performance | 45
+Management’s discussion and analysis:
+Introduction | 46
+Executive Overview | 47
+Consolidated Results of Operations | 51
+Consolidated Balance Sheets and Cash Flows Analysis | 55
+Explanation and Reconciliation of the Firm’s Use of Non-GAAP Financial Measures | 59
+Business Segment & Corporate Results | 62
+Firmwide Risk Management | 83
+Strategic Risk Management | 88
+Capital Risk Management | 89
+Liquidity Risk Management | 100
+Reputation Risk Management | 108
+Credit and Investment Risk Management | 109
+Credit Portfolio | 111
+Consumer Credit Portfolio | 112
+Wholesale Credit Portfolio | 118
+Allowance for Credit Losses | 129
+Investment Portfolio Risk Management | 132
+Market Risk Management | 133
+Country Risk Management | 143
+Climate Risk Management | 145
+Operational Risk Management | 146
+Critical Accounting Estimates Used by the Firm | 154
+Accounting and Reporting Developments | 158
+Forward-Looking Statements | 160
+Audited financial statements:
+Management’s Report on Internal Control Over Financial Reporting | 161
+Report of Independent Registered Public Accounting Firm | 162
+Consolidated Financial Statements | 165
+Notes to consolidated financial statements: | Page
+Note 1 - Basis of presentation | 170
+Note 2 - Fair value measurement | 174
+Note 3 - Fair value option | 196
+Note 4 - Credit risk concentrations | 200
+Note 5 - Derivative instruments | 202
+Note 6 - Noninterest revenue and noninterest expense | 218
+Note 7 - Interest income and interest expense | 222
+Note 8 - Pension and other postretirement employee benefit plans | 223
+Note 9 - Employee share-based incentives | 226
+Note 10 - Investment securities | 228
+Note 11 - Securities financing activities | 233
+Note 12 - Loans | 236
+Note 13 - Allowance for credit losses | 258
+Note 14 - Variable interest entities | 263
+Note 15 - Goodwill, mortgage servicing rights, and other intangible assets | 272
+Note 16 - Premises and equipment | 277
+Note 17 - Deposits | 277
+Note 18 - Leases | 278
+Note 19 - Accounts payable and other liabilities | 280
+Note 20 - Long-term debt | 281
+Note 21 - Preferred stock | 283
+Note 22 - Common stock | 285
+Note 23 - Earnings per share | 286
+Note 24 - Accumulated other comprehensive income/(loss) | 287
+Note 25 - Income taxes | 288
+Note 26 - Restricted cash, other restricted assets and intercompany funds transfers | 292
+Note 27 - Regulatory capital | 293
+Note 28 - Off-balance sheet lending-related financial instruments, guarantees, and other commitments | 295
+Note 29 - Pledged assets and collateral | 301
+Note 30 - Litigation | 302
+Note 31 – International operations | 305
+Note 32 – Business segments & Corporate | 306
+Note 33 – Parent Company | 310
+Note 34 – Business combinations | 312
+Supplementary Information:
+Distribution of assets, liabilities and stockholders’ equity; interest rates and interest differentials | 315
+Glossary of Terms and Acronyms | 320
+JPMorgan Chase & Co./2025 Form 10-K | 43
+Financial
+Return on tangible common equity (“ROTCE”)(a) | 20 | 22 | 21
+Return on assets (“ROA”) | 1.29 | 1.43 | 1.30
+Overhead ratio | 52 | 52 | 55
+Loans-to-deposits ratio | 58 | 56 | 55
+Firm Liquidity coverage ratio (“LCR”) (average)(b) | 111 | 113 | 113
+JPMorgan Chase Bank, N.A. LCR (average)(b) | 115 | 124 | 129
+Common equity Tier 1 (“CET1”) capital ratio – Standardized(c)(d) | 14.6 | (f) | 15.7 | 15.0
+JPMorgan Chase & Co./2025 Form 10-K | 45
+Management’s discussion and analysis
+Net interest income | 95,443 | 92,583 | 3
+Total net revenue | 182,447 | 177,556 | 3
+Total noninterest expense | 95,640 | 91,797 | 4
+Pre-provision profit | 86,807 | 85,759 | 1
+Provision for credit losses | 14,212 | 10,678 | 33
+Net income | 57,048 | 58,471 | (2)
+Diluted earnings per share | 20.02 | 19.75 | 1
+Selected ratios and metrics
+Return on tangible common equity | 20 | 22
+Book value per share | $ | 126.99 | $ | 116.07 | 9
+Tangible book value per share | 107.56 | 97.3 | 11
+Capital ratios - Standardized(a)(b)
+Markets(d) | 35,782 | 30,007 | 19
+Total net revenue - managed basis | $ | 185,581 | $ | 180,593 | 3%
+JPMorgan Chase & Co./2025 Form 10-K | 47
+•The provision for credit losses was $14.2 billion. Net charge-offs were $9.8 billion, up $1.2 billion, predominantly ...
+JPMorgan Chase & Co./2025 Form 10-K | 49
+Recent events
+JPMorgan Chase & Co./2025 Form 10-K | 51
+Investment securities losses decreased, reflecting lower losses on sales of securities associated with repositioning ...
+Consumer, excluding credit card | $ | 693 | $ | 631 | $ | 935
+Credit card | 10,829 | 9,292 | 6,048
+Investment securities | (28) | 24 | 38
+Total provision for credit losses | $ | 14,212 | $ | 10,678 | $ | 9,320
+JPMorgan Chase & Co./2025 Form 10-K | 53
+Noninterest expense
+Federal funds sold and securities purchased under resale agreements | 336,426 | 295,001 | 14
+Securities borrowed | 286,191 | 219,546 | 30
+Trading assets | 802,873 | 637,784 | 26
+Available-for-sale securities | 507,198 | 406,852 | 25
+Held-to-maturity securities | 270,134 | 274,468 | (2)
+Investment securities, net of allowance for credit losses | 777,332 | 681,320 | 14
+Loans | 1,493,429 | 1,347,988 | 11
+Allowance for loan losses | (25,765) | (24,345) | 6
+Loans, net of allowance for loan losses | 1,467,664 | 1,323,643 | 11
+Accrued interest and accounts receivable | 111,599 | 101,223 | 10
+Premises and equipment | 36,244 | 32,223 | 12
+Goodwill, MSRs and other intangible assets | 64,458 | 64,560 | —
+Other assets | 198,775 | 178,197 | 12
+Total assets | $ | 4,424,900 | $ | 4,002,814 | 11 | %
+JPMorgan Chase & Co./2025 Form 10-K | 55
+•$1.1 billion in consumer, driven by loan growth in Card Services and the impact of changes in the Firm's ...
+Federal funds purchased and securities loaned or sold under repurchase agreements | 442,396 | 296,835 | 49
+Short-term borrowings | 64,776 | 52,893 | 22
+Trading liabilities | 216,019 | 192,883 | 12
+Accounts payable and other liabilities | 316,794 | 280,672 | 13
+Beneficial interests issued by consolidated variable interest entities (“VIEs”) | 27,951 | 27,323 | 2
+Long-term debt | 435,206 | 401,418 | 8
+Total liabilities | 4,062,462 | 3,658,056 | 11
+Stockholders’ equity | 362,438 | 344,758 | 5
+Total liabilities and stockholders’ equity | $ | 4,424,900 | $ | 4,002,814 | 11 | %
+JPMorgan Chase & Co./2025 Form 10-K | 57
+Consolidated cash flows analysis
+JPMorgan Chase & Co./2025 Form 10-K | 59
+Net interest income, net yield, and noninterest revenue excluding Markets
+Fully taxable-equivalent adjustments | 425 | 477 | 480
+Net interest income – managed basis | $ | 95,868 | $ | 93,060 | $ | 89,747
+JPMorgan Chase & Co./2025 Form 10-K | 61
+BUSINESS SEGMENT & CORPORATE RESULTS
+JPMorgan Chase & Co./2025 Form 10-K | 63
+Segment & Corporate Results – Managed Basis
+Provision for credit losses | 11,493 | (a) | 9,974 | 6,899 | 2,615 | 762 | 2,091 | 97 | (68) | 159
+Net income | 18,245 | 17,603 | 21,232 | 27,761 | 24,846 | 20,272 | 6,522 | 5,421 | 5,227
+Production revenue | 622 | 627 | 421
+Net mortgage servicing revenue(c) | 704 | 751 | 754
+Mortgage fees and related income | $ | 1,326 | $ | 1,378 | $ | 1,175
+Overhead ratio | 53 | 53 | 50
+(a)Primarily includes operating lease income and commissions and other fees. Operating lease income was $3.8 billion, ...
+JPMorgan Chase & Co./2025 Form 10-K | 65
+2025 compared with 2024
+Banking & Wealth Management | 356 | 442 | 340
+Home Lending | (122) | (106) | (56)
+Auto | 335 | 444 | 357
+Total net charge-offs/(recoveries) | $ | 8,247 | $ | 7,928 | $ | 5,340
+Banking & Wealth Management | $ | 765 | $ | 764 | $ | 685
+Home Lending | 647 | 447 | 578
+Card Services | 15,558 | 14,608 | 12,453
+Auto | 587 | 692 | 742
+Total allowance for loan losses | $ | 17,557 | $ | 16,511 | $ | 14,458
+Allowance for lending-related commitments | $ | 2,290 | (c) | $ | 91 | $ | 97
+Total allowance for credit losses | $ | 19,847 | $ | 16,602 | $ | 14,555
+JPMorgan Chase & Co./2025 Form 10-K | 67
+Selected metrics
+Overhead ratio | 49 | 50 | 53
+Compensation expense as percentage of total net revenue | 25 | 26 | 27
+Revenue by business
+Other | 6 | 76 | 107
+Total Banking & Payments | 37,136 | 35,267 | 31,897
+JPMorgan Chase & Co./2025 Form 10-K | 69
+Banking & Payments Revenue by Client Coverage Segment: (a) Global Corporate Banking & Global Investment Banking ...
+JPMorgan Chase & Co./2025 Form 10-K | 71
+Selected metrics
+Net charge-offs/(recoveries) | $ | 1,509 | $ | 689 | (d) | $ | 588
+Nonperforming assets:
+Nonaccrual loans held-for-sale and loans at fair value(b) | 1,518 | 1,502 | 828
+Total nonaccrual loans | 5,159 | 4,760 | 2,503
+Derivative receivables | 204 | 145 | 364
+Assets acquired in loan satisfactions | 192 | 213 | 169
+Total nonperforming assets | $ | 5,555 | $ | 5,118 | $ | 3,036
+Allowance for loan losses to nonaccrual loans retained(a) | 210 | 224 | 437
+Nonaccrual loans to total period-end loans | 0.82 | 0.91 | 0.49
+JPMorgan Chase & Co./2025 Form 10-K | 73
+For the periods presented below, the primary source of principal transactions revenue was the amount recognized upon ...
+Lending- and deposit-related fees | 451 | 182 | 633 | 391 | 100 | 491 | 307 | 40 | 347
+Commissions and other fees | 626 | 2,488 | 3,114 | 605 | 2,086 | 2,691 | 596 | 1,908 | 2,504
+Loss days(a) | 2 | 1 | 2
+(a)Markets consists of Fixed Income Markets and Equity Markets. The year ended December 31, 2025 had two loss days, ...
+JPMorgan Chase & Co./2025 Form 10-K | 75
+ASSET & WEALTH MANAGEMENT
+Commissions and other fees | 1,184 | 874 | 697
+All other income(a) | 563 | 456 | 1,037 | (b)
+Provision for credit losses | 97 | (68) | 159
+Noninterest expense
+Overhead ratio | 64 | 67 | 64
+Pre-tax margin ratio:
+Asset Management | 35 | 31 | 31
+Global Private Bank | 37 | 35 | 38
+Asset & Wealth Management | 36 | 34 | 35
+(a)Includes the amortization of the fair value discount on certain acquired lending-related commitments associated with ...
+1 year | 44 | 73 | 40
+3 years | 54 | 75 | 67
+5 years | 73 | 77 | 71
+Selected balance sheet data (period-end)(c)
+Net charge-offs/(recoveries) | $ | 92 | $ | 21 | $ | 13
+Nonaccrual loans | 1,199 | 700 | 650
+Allowance for credit losses:
+Allowance for loan losses | $ | 536 | $ | 539 | $ | 633
+Allowance for lending-related commitments | 43 | 35 | 28
+Total allowance for credit losses | $ | 579 | $ | 574 | $ | 661
+Net charge-off/(recovery) rate | 0.04 | % | 0.01 | % | 0.01 | %
+Allowance for loan losses to nonaccrual loans | 45 | 77 | 97
+Nonaccrual loans to period-end loans | 0.45 | 0.30 | 0.29
+JPMorgan Chase & Co./2025 Form 10-K | 77
+(b)Quartile ranking sourced from Morningstar, Lipper and Nomura based on country of domicile. Includes only Asset ...
+Liquidity | $ | 1,279 | $ | 1,083 | $ | 926
+Fixed income | 998 | 851 | 751
+Equity | 1,400 | 1,128 | 868
+Multi-asset | 884 | 764 | 680
+Alternatives | 230 | 219 | 197
+Total assets under management | 4,791 | 4,045 | 3,422
+Private Banking(b) | $ | 1,414 | $ | 1,162 | $ | 924
+Global Institutional | 1,953 | 1,692 | 1,488
+Liquidity | 183 | 140 | 242
+Fixed income | 94 | 91 | 70
+Equity | 95 | 114 | 70
+Multi-asset | 16 | 19 | 1
+Alternatives | 4 | 10 | (1)
+Market/performance/other impacts | 354 | 249 | 274
+Ending balance, December 31 | $ | 4,791 | $ | 4,045 | $ | 3,422
+Net asset flows | 553 | 486 | 490
+Market/performance/other impacts | 633 | 434 | 474
+Ending balance, December 31 | $ | 7,118 | $ | 5,932 | $ | 5,012
+Number of client advisors | 10,150 | 9,530 | 7
+Stock Plan Administration
+Number of stock plan participants (in thousands) | 1,794 | 1,327 | 35
+Client assets (in billions) | $ | 372 | $ | 270 | 38 | %
+Latin America/Caribbean | 1,228 | 1,065 | 985
+Total international net revenue | 7,709 | 6,651 | 6,238
+Europe/Middle East/Africa | $ | 709 | $ | 604 | $ | 539
+Asia-Pacific | 374 | 302 | 263
+Latin America/Caribbean | 126 | 106 | 86
+Total international assets under management | 1,209 | 1,012 | 888
+North America | 3,582 | 3,033 | 2,534
+Europe/Middle East/Africa | $ | 1,035 | $ | 841 | $ | 740
+Asia-Pacific | 620 | 482 | 406
+Latin America/Caribbean | 310 | 254 | 232
+Total international client assets | 1,965 | 1,577 | 1,378
+JPMorgan Chase & Co./2025 Form 10-K | 79
+CORPORATE
+Principal transactions | $ | (339) | $ | 152 | $ | 302
+Investment securities losses | (58) | (1,020) | (3,180)
+Noninterest revenue | 911 | 7,608 | 132
+Net interest income | 6,114 | 9,786 | 7,906
+Provision for credit losses | 7 | 10 | 171
+Noninterest expense(b) | 1,825 | 3,994 | (g) | 5,601
+JPMorgan Chase & Co./2025 Form 10-K | 81
+Treasury and CIO overview
+JPMorgan Chase & Co./2025 Form 10-K | 83
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 85
+Management’s discussion and analysis
+Strategic Risk | 88
+Capital Risk | 89-99
+Reputation Risk | 108
+Consumer Credit Risk | 112–117
+Investment Portfolio Risk | 132
+Market Risk | 133-142
+Climate Risk | 145
+Operational Risk | 146-149
+Compliance Risk | 150
+Conduct Risk | 151
+Legal Risk | 152
+Estimations and Model Risk | 153
+JPMorgan Chase & Co./2025 Form 10-K | 87
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 89
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 91
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 93
+Management’s discussion and analysis
+Less: Other Tier 1 adjustments | 884 | 682
+Standardized/Advanced Tier 1 capital | $ | 307,630 | $ | 294,881
+Changes in additional paid-in capital | 203
+Changes related to AOCI applicable to capital:
+Fair value hedges | 64
+Defined benefit pension and other postretirement employee benefit (“OPEB”) plans | 579
+Changes related to other CET1 capital adjustments(b) | (2,114)
+JPMorgan Chase & Co./2025 Form 10-K | 95
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 97
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 99
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 101
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 103
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 105
+Management’s discussion and analysis
+Senior notes | $ | 22,457 | $ | 25,765 | $ | 65 | $ | 65
+Subordinated debt | 317 | 3,097 | — | 250
+Structured notes | 2,929 | 892 | 56,047 | 47,425
+JPMorgan Chase & Co./2025 Form 10-K | 107
+REPUTATION RISK MANAGEMENT
+JPMorgan Chase & Co./2025 Form 10-K | 109
+Management’s discussion and analysis
+Loans held-for-sale | 13,840 | 7,048 | 67 | 160
+Loans at fair value | 70,684 | 41,350 | 1,517 | 1,502
+Derivative receivables | 57,777 | 60,967 | 204 | 145
+Receivables from customers(a) | 47,336 | 51,929 | — | —
+Real estate owned | NA | NA | 267 | 284
+Other | NA | NA | 31 | 34
+Total assets acquired in loan satisfactions | NA | NA | 298 | 318
+Lending-related commitments | 1,817,307 | (c) | 1,577,622 | 925 | 737
+Total credit portfolio | $ | 3,415,849 | $ | 3,038,506 | $ | 11,284 | $ | 10,037
+JPMorgan Chase & Co./2025 Form 10-K | 111
+Management’s discussion and analysis
+Auto and other(b)(c) | 65,210 | 66,821 | 243 | 249
+Total loans - retained | 368,741 | 376,334 | 3,875 | 3,233
+Loans held-for-sale | 334 | 945 | 59 | 155
+Loans at fair value(d) | 33,183 | 15,531 | 739 | 538
+Total consumer, excluding credit card loans | 402,258 | 392,810 | 4,673 | 3,926
+JPMorgan Chase & Co./2025 Form 10-K | 113
+Management’s discussion and analysis
+Auto and other | 42,358 | 3,121 | 4
+Credit card | 1,932 | 15 | —
+Current | $ | 840 | $ | 462
+30-89 days past due | 121 | 72
+90 or more days past due | 198 | 121
+Total government guaranteed loans | $ | 1,159 | $ | 655
+Geographic composition and current estimated loan-to-value ratio of residential real estate loans
+JPMorgan Chase & Co./2025 Form 10-K | 115
+Management’s discussion and analysis
+Auto and other | 292 | 261
+Total nonaccrual loans | 4,673 | 3,926
+Real estate owned | 103 | 78
+Other | 31 | 34
+Total assets acquired in loan satisfactions | 134 | 112
+Total nonperforming assets | $ | 4,807 | $ | 4,038
+Principal payments and other | 962 | 894
+Sales | 760 | 803
+Charge-offs | 643 | 665
+Returned to performing status | 1,200 | 963
+Foreclosures and other liquidations | 194 | 177
+Total reductions | 3,759 | 3,502
+JPMorgan Chase & Co./2025 Form 10-K | 117
+Management’s discussion and analysis
+Loans held-for-sale | 13,506 | 6,103 | 8 | 5
+Loans at fair value | 37,501 | 25,819 | 778 | 964
+Loans | 843,374 | 722,318 | 5,184 | 4,911
+Derivative receivables | 57,777 | 60,967 | 204 | 145
+Receivables from customers(a) | 47,336 | 51,929 | — | —
+Real estate owned | NA | NA | 164 | 206
+Total assets acquired in loan satisfactions | NA | NA | 164 | 206
+Lending-related commitments | 595,954 | 531,467 | 925 | 737
+Total wholesale credit portfolio | $ | 1,544,441 | $ | 1,366,681 | $ | 6,477 | $ | 5,999
+Total derivative receivables, net of collateral | 7,941 | 6,836 | 14,109 | 28,886 | 19,721 | 9,165 | 28,886 | 68
+Lending-related commitments | 155,797 | 412,594 | 27,563 | 595,954 | 383,106 | 212,848 | 595,954 | 64
+Subtotal | 435,386 | 750,330 | 231,491 | 1,417,207 | 944,191 | 473,016 | 1,417,207 | 67
+Loans held-for-sale and loans at fair value(a) | 51,007 | 51,007
+Total derivative receivables, net of collateral | 11,515 | 7,418 | 13,874 | 32,807 | 24,707 | 8,100 | 32,807 | 75
+Lending-related commitments | 121,283 | 384,529 | 25,655 | 531,467 | 352,082 | 179,385 | 531,467 | 66
+Subtotal | 358,780 | 681,146 | 214,744 | 1,254,670 | 848,459 | 406,211 | 1,254,670 | 68
+Loans held-for-sale and loans at fair value(a) | 31,922 | 31,922
+JPMorgan Chase & Co./2025 Form 10-K | 119
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 121
+Management’s discussion and analysis
+Other Income Producing Properties(b) | 23,390 | 229 | 23,619 | 46 | 53
+Services and Non Income Producing | 20,325 | 130 | 20,455 | 63 | 35
+Industrial | 19,541 | 13 | 19,554 | 67 | 69
+Office | 15,016 | 39 | 15,055 | 47 | 80
+Retail | 12,879 | 33 | 12,912 | 79 | 74
+Lodging | 4,366 | 8 | 4,374 | 26 | 48
+Total Real Estate Exposure(c) | $ | 224,381 | $ | 477 | $ | 224,858 | 69 | % | 77 | %
+Other Income Producing Properties(b) | 16,411 | 158 | 16,569 | 50 | 63
+Services and Non Income Producing | 14,047 | 57 | 14,104 | 62 | 46
+Industrial | 19,092 | 17 | 19,109 | 65 | 72
+Office | 16,331 | 29 | 16,360 | 47 | 81
+Retail | 12,230 | 23 | 12,253 | 77 | 75
+Lodging | 4,555 | 19 | 4,574 | 31 | 53
+Total Real Estate Exposure | $ | 206,740 | $ | 310 | $ | 207,050 | 69 | % | 82 | %
+Retail(a) | 36,492 | 434 | 36,926 | 55 | 29
+Food and Beverage | 31,513 | 855 | 32,368 | 53 | 36
+Consumer Hard Goods | 14,824 | 309 | 15,133 | 43 | 33
+Leisure(b) | 10,721 | 136 | 10,857 | 33 | 45
+Total Consumer & Retail(c) | $ | 131,710 | $ | 2,235 | $ | 133,945 | 47 | % | 37 | %
+Retail(a) | 34,917 | 261 | 35,178 | 51 | 31
+Food and Beverage | 34,774 | 683 | 35,457 | 61 | 34
+Consumer Hard Goods | 13,796 | 208 | 14,004 | 43 | 35
+Leisure(b) | 10,186 | 44 | 10,230 | 26 | 43
+Total Consumer & Retail | $ | 128,207 | $ | 1,608 | $ | 129,815 | 48 | % | 36 | %
+JPMorgan Chase & Co./2025 Form 10-K | 123
+Management’s discussion and analysis
+Gross charge-offs | 1,481 | 780
+Returned to performing status | 1,538 | 392
+Sales | 161 | 85
+Total reductions | 5,070 | 3,644
+Net charge-offs/(recoveries) | 1,598 | 822
+Net charge-off/(recovery) rate | 0.22 | % | 0.12 | %
+Secured by real estate | $ | 14,737 | $ | 14,356 | $ | 915
+Commercial and industrial | 5,728 | 2,109 | 7
+Other | 28,116 | 15,459 | 4,797
+Commercial and industrial | 112,463 | 16,377 | 148
+Other | 175,080 | 29,710 | 3,368
+Net charge-offs/(recoveries) | $ | 390 | $ | 313 | $ | 882 | $ | 381 | $ | 326 | $ | 128 | $ | 1,598 | $ | 822
+Average retained loans | 162,567 | 162,653 | 169,149 | 169,363 | 401,077 | 341,294 | 732,793 | 673,310
+JPMorgan Chase & Co./2025 Form 10-K | 125
+Management’s discussion and analysis
+Noninvestment-grade | 9,060 | 32 | 8,003 | 25
+Total | $ | 27,937 | 100 | % | $ | 31,786 | 100 | %
+JPMorgan Chase & Co./2025 Form 10-K | 127
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 129
+Management’s discussion and analysis
+Other | — | — | 5 | 5 | 1 | — | 68 | 69
+Ending balance at December 31, | $ | 1,920 | $ | 15,557 | $ | 8,288 | $ | 25,765 | $ | 1,807 | $ | 14,600 | $ | 7,938 | ...
+Provision for lending-related commitments | 1 | 2,200 | (d) | 768 | 2,969 | 7 | — | 121 | 128
+Other | — | — | 1 | 1 | — | — | (1) | (1)
+Asset-specific | $ | — | $ | — | $ | 119 | $ | 119 | $ | — | $ | — | $ | 109 | $ | 109
+Portfolio-based | 83 | 2,200 | (d) | 2,669 | 4,952 | 82 | — | 1,910 | 1,992
+Total allowance for investment securities | NA | NA | NA | $ | 106 | NA | NA | NA | $ | 152
+Total allowance for credit losses(b) | $ | 2,003 | $ | 17,757 | $ | 11,076 | $ | 30,942 | $ | 1,889 | $ | 14,600 | $ | ...
+Allowance for loan losses to retained nonaccrual loans(c) | 50 | NA | 188 | 311 | 56 | NA | 201 | 339
+Allowance for loan losses to retained nonaccrual loans excluding credit card | 50 | NA | 188 | 123 | 56 | NA | 201 | 136
+Net charge-off rates | 0.16 | 3.31 | 0.22 | 0.74 | 0.18 | 3.34 | 0.12 | 0.68
+Auto and other | 1,051 | 5 | 1,141 | 5
+Consumer, excluding credit card | 1,920 | 26 | 1,807 | 29
+Credit card | 15,557 | 18 | 14,600 | 18
+Total consumer | 17,477 | 44 | 16,407 | 47
+Secured by real estate | 2,226 | 12 | 2,978 | 12
+Commercial and industrial | 4,240 | 12 | 3,350 | 13
+Other | 1,822 | 32 | 1,610 | 28
+Total wholesale | 8,288 | 56 | 7,938 | 53
+Total | $ | 25,765 | 100 | % | $ | 24,345 | 100 | %
+JPMorgan Chase & Co./2025 Form 10-K | 131
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 133
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 135
+Management’s discussion and analysis
+Fixed income | $ | 35 | $ | 27 | $ | 51 | $ | 34 | $ | 26 | $ | 53
+Foreign exchange | 9 | 6 | 15 | 15 | 7 | 23
+Equities | 17 | 7 | 138 | (e) | 8 | 4 | 15
+Commodities and other | 24 | 10 | 48 | 8 | 6 | 13
+Diversification benefit to CIB trading VaR (a) | (51) | NM | NM | (32) | NM | NM
+CIB trading VaR | 34 | 21 | 142 | 33 | 27 | 42
+Credit Portfolio VaR(b) | 21 | 16 | 27 | 22 | 18 | 28
+Diversification benefit to CIB VaR(a) | (18) | NM | NM | (16) | NM | NM
+CIB VaR | 37 | 23 | 133 | 39 | 27 | 52
+CCB VaR | 4 | 2 | 7 | 3 | 1 | 6
+AWM VaR(c) | 9 | 8 | 12 | 9 | 5 | 10
+Corporate VaR(d) | 10 | 9 | 12 | 23 | 7 | 102
+Diversification benefit to other VaR(a) | (11) | NM | NM | (10) | NM | NM
+Other VaR | 12 | 10 | 14 | 25 | 10 | 101
+Diversification benefit to CIB and other VaR(a) | (9) | NM | NM | (17) | NM | NM
+Total VaR | $ | 40 | $ | 25 | $ | 136 | $ | 47 | $ | 30 | $ | 91
+(a)Diversification benefit represents the difference between the portfolio VaR and the sum of its individual ...
+JPMorgan Chase & Co./2025 Form 10-K | 137
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 139
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 141
+Management’s discussion and analysis
+Non-USD LTD hedges foreign currency (“FX”) exposure | Primarily represents the foreign exchange revaluation on the fair ...
+Derivatives – funding spread risk | Impact of changes in the spread related to derivatives FVA(b) | 1 basis point ...
+JPMorgan Chase & Co./2025 Form 10-K | 143
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 145
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 147
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 149
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 151
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 153
+Management’s discussion and analysis
+AFS securities | 507,198 | 111
+Loans | 70,684 | 3,062
+JPMorgan Chase & Co./2025 Form 10-K | 155
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 157
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 159
+Management’s discussion and analysis
+JPMorgan Chase & Co./2025 Form 10-K | 161
+Report of Independent Registered Public Accounting Firm
+JPMorgan Chase & Co./2025 Form 10-K | 163
+Report of Independent Registered Public Accounting Firm
+JPMorgan Chase & Co./2025 Form 10-K | 165
+JPMorgan Chase & Co.
+Translation adjustments, net of hedges | 1,339 | (858) | 329
+Fair value hedges | 64 | (87) | (101)
+Defined benefit pension and OPEB plans | 579 | (63) | 373
+DVA on fair value option elected liabilities | (773) | (36) | (808)
+All other assets | 683 | 681
+Total assets | $ | 43,295 | $ | 41,076
+All other liabilities | 691 | 454
+Total liabilities | $ | 28,642 | $ | 27,777
+JPMorgan Chase & Co./2025 Form 10-K | 167
+JPMorgan Chase & Co.
+Cumulative effect of change in accounting principles | — | (161) | 449
+Net income | 57,048 | 58,471 | 49,552
+JPMorgan Chase & Co./2025 Form 10-K | 169
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 171
+Notes to consolidated financial statements
+Fair value measurement | Note 2 | page 174
+Fair value option | Note 3 | page 196
+Derivative instruments | Note 5 | page 202
+Noninterest revenue and noninterest expense | Note 6 | page 218
+Interest income and interest expense | Note 7 | page 222
+Pension and other postretirement employee benefit plans | Note 8 | page 223
+Employee share-based incentives | Note 9 | page 226
+Investment securities | Note 10 | page 228
+Securities financing activities | Note 11 | page 233
+Loans | Note 12 | page 236
+Allowance for credit losses | Note 13 | page 258
+Variable interest entities | Note 14 | page 263
+Goodwill, mortgage servicing rights, and other intangible assets | Note 15 | page 272
+Premises and equipment | Note 16 | page 277
+Leases | Note 18 | page 278
+Accounts payable and other liabilities | Note 19 | page 280
+Long-term debt | Note 20 | page 281
+Earnings per share | Note 23 | page 286
+Income taxes | Note 25 | page 288
+Off–balance sheet lending-related financial instruments, guarantees, and other commitments | Note 28 | page 295
+Litigation | Note 30 | page 302
+JPMorgan Chase & Co./2025 Form 10-K | 173
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 175
+Notes to consolidated financial statements
+Securities financing agreements | Valuations are based on discounted cash flows, which consider: | Predominantly level 2
+• Derivative features: refer to the discussion of derivatives below for further information
+Investment and trading securities | Quoted market prices | Level 1
+In the absence of quoted market prices, securities are valued based on: | Level 2 or 3
+• Observable market prices for similar securities
+Physical commodities | Valued using observable market prices or data. | Predominantly Level 1 or 2
+176 | JPMorgan Chase & Co./2025 Form 10-K
+Derivatives | Actively traded derivatives, e.g., exchange-traded derivatives, that are valued using quoted prices. | ...
+Derivatives that are valued using models such as the Black-Scholes option pricing model, simulation models, or a ...
+Mortgage servicing rights | Refer to Mortgage servicing rights in Note 15. | Level 3
+Private equity direct investments | Fair value is estimated using all available information; the range of potential ...
+• Transaction prices
+JPMorgan Chase & Co./2025 Form 10-K | 177
+Notes to consolidated financial statements
+• NAV is supported by the ability to redeem and purchase at the NAV level | Level 1
+• Adjustments to the NAV as required, for restrictions on redemption (e.g., lock-up periods or withdrawal limitations) ...
+Beneficial interests issued by consolidated VIEs | Valued using observable market information, where available. | Level ...
+In the absence of observable market information, valuations are based on the fair value of the underlying assets held ...
+Credit | — | 12,018 | 1,006 | (12,545) | 479
+Foreign exchange | 111 | 181,318 | 1,807 | (163,881) | 19,355
+Corporate debt securities | — | 20 | 108 | — | 128
+Asset-backed securities:
+Beneficial interests issued by consolidated VIEs | — | 5 | — | — | 5
+Long-term debt | — | 87,886 | 46,673 | — | 134,559
+JPMorgan Chase & Co./2025 Form 10-K | 179
+Notes to consolidated financial statements
+Credit | — | 10,379 | 708 | (10,273) | 814
+Foreign exchange | 196 | 261,520 | 1,204 | (237,608) | 25,312
+Corporate debt securities | — | 70 | — | — | 70
+Asset-backed securities:
+Beneficial interests issued by consolidated VIEs | — | 1 | — | — | 1
+Long-term debt | — | 66,216 | 34,564 | — | 100,780
+MSRs | 9,167 | Discounted cash flows | Refer to Note 15
+Long-term debt, short-term borrowings, and deposits(e) | 52,953 | Option pricing | Interest rate volatility | 24bps | ...
+JPMorgan Chase & Co./2025 Form 10-K | 183
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 185
+Notes to consolidated financial statements
+U.S. GSEs and government agencies | $ | 488 | $ | 16 | $ | 34 | $ | (175) | $ | (56) | $ | — | $ | — | $ | 307 | $ | 4
+Residential – nonagency | 5 | 6 | — | (6) | — | — | — | 5 | —
+Total mortgage-backed securities | 503 | 16 | 34 | (181) | (56) | — | (4) | 312 | 4
+Obligations of U.S. states and municipalities | 1 | — | — | — | — | — | — | 1 | —
+Non-U.S. government debt securities | 152 | 30 | 346 | (308) | — | 59 | (34) | 245 | 19
+Corporate debt securities | 390 | 28 | 270 | (212) | (10) | 22 | (34) | 454 | 23
+Loans | 1,088 | (58) | 1,413 | (930) | (146) | 876 | (1,100) | 1,143 | (63)
+Physical commodities | 26 | 3 | — | — | 1 | — | — | 30 | 16
+Other | 210 | 2 | 311 | — | (99) | 59 | (39) | 444 | 192
+Total trading assets – debt and equity instruments | 2,442 | (13) | (c) | 2,666 | (1,871) | (310) | 1,181 | (1,301) | ...
+Interest rate | 301 | 1,329 | 188 | (338) | 108 | (168) | (114) | 1,306 | 790
+Credit | (363) | (637) | 94 | (10) | 10 | (273) | 44 | (1,135) | (569)
+Foreign exchange | 20 | 644 | 196 | (448) | (34) | 273 | (346) | 305 | 221
+Equity | (2,866) | 2,941 | 1,016 | (2,630) | (2,690) | 83 | 609 | (3,537) | 1,476
+Commodity | (73) | 54 | 70 | (248) | 170 | 15 | (4) | (16) | 108
+Total net derivative receivables | (2,981) | 4,331 | (c) | 1,564 | (3,674) | (2,436) | (70) | 189 | (3,077) | 2,026 | ...
+Corporate debt securities | — | 2 | 194 | (94) | — | 6 | — | 108 | 4
+Total available-for-sale securities | 8 | (3) | (d) | 194 | (94) | — | 6 | — | 111 | (1) | (d)
+Purchases | Sales | Issuances | Settlements(h) | Transfers into level 3
+Liabilities:(a)
+Purchases(g) | Sales | Settlements(h) | Transfers into level 3
+Assets:(a)
+Corporate debt securities | 484 | 36 | 459 | (354) | (181) | 13 | (67) | 390 | 45
+Loans | 684 | 63 | 800 | (642) | (74) | 839 | (582) | 1,088 | 29
+Asset-backed securities | 6 | — | 9 | (5) | (8) | 8 | — | 10 | —
+Total debt instruments | 2,138 | 116 | 1,489 | (1,449) | (349) | 888 | (689) | 2,144 | 60
+Equity securities | 127 | (21) | 138 | (123) | (1) | 85 | (143) | 62 | (308)
+Physical commodities | 7 | 17 | 3 | — | (1) | — | — | 26 | 16
+Other | 101 | 144 | 53 | — | (68) | 28 | (48) | 210 | 108
+Total trading assets – debt and equity instruments | 2,373 | 256 | (c) | 1,683 | (1,572) | (419) | 1,001 | (880) | ...
+Foreign exchange | 62 | 248 | 178 | (538) | (30) | 128 | (28) | 20 | 353
+Equity | (2,402) | (321) | 904 | (2,488) | 953 | (91) | 579 | (2,866) | 783
+Commodity | (279) | 64 | 32 | (215) | 310 | 15 | — | (73) | 102
+Total net derivative receivables | (1,852) | 528 | (c) | 1,499 | (3,455) | 292 | (181) | 188 | (2,981) | 611 | (c)
+Purchases | Sales | Issuances | Settlements(h) | Transfers into level 3
+Liabilities:(a)
+JPMorgan Chase & Co./2025 Form 10-K | 187
+Notes to consolidated financial statements
+Purchases(g) | Sales | Settlements(h) | Transfers into level 3
+Assets:(a)
+U.S. GSEs and government agencies | $ | 759 | $ | 4 | $ | 249 | $ | (133) | $ | (107) | $ | — | $ | (14) | $ | 758 | $ ...
+Residential – nonagency | 5 | 6 | — | (6) | (1) | 1 | — | 5 | 1
+Commercial – nonagency | 7 | 6 | — | — | (1) | 8 | (8) | 12 | 7
+Total mortgage-backed securities | 771 | 16 | 249 | (139) | (109) | 9 | (22) | 775 | 9
+Obligations of U.S. states and municipalities | 7 | — | 1 | — | (1) | 3 | — | 10 | —
+Non-U.S. government debt securities | 155 | 74 | 217 | (254) | — | 22 | (35) | 179 | 74
+Corporate debt securities | 463 | 36 | 322 | (172) | (41) | 114 | (238) | 484 | 35
+Loans | 759 | (15) | 1,027 | (499) | (441) | 382 | (529) | 684 | 30
+Asset-backed securities | 23 | — | 7 | (12) | (1) | 5 | (16) | 6 | —
+Total debt instruments | 2,178 | 111 | 1,823 | (1,076) | (593) | 535 | (840) | 2,138 | 148
+Equity securities | 665 | (53) | 164 | (239) | (384) | 192 | (218) | 127 | (422)
+Interest rate | 701 | 556 | 251 | (255) | 654 | (1,117) | (288) | 502 | 419
+Credit | 13 | 304 | (60) | (25) | 47 | 15 | (29) | 265 | 230
+Foreign exchange | 489 | 31 | 151 | (144) | (187) | 144 | (422) | 62 | (80)
+JPMorgan Chase & Co./2025 Form 10-K | 189
+Notes to consolidated financial statements
+Derivatives CVA | $ | (36) | $ | 29 | $ | 221
+Derivatives FVA | (18) | 99 | 114
+Valuation adjustments on fair value option elected liabilities
+JPMorgan Chase & Co./2025 Form 10-K | 191
+Notes to consolidated financial statements
+Level 1 | Level 2 | Level 3
+Loans | $ | — | $ | 618 | $ | 529 | $ | 1,147
+Other assets(a) | — | 8 | 863 | 871
+Total assets measured at fair value on a nonrecurring basis | $ | — | $ | 626 | $ | 1,392 | $ | 2,018
+Accounts payable and other liabilities | — | — | 5 | 5
+Total liabilities measured at fair value on a nonrecurring basis | $ | — | $ | — | $ | 5 | $ | 5
+December 31, 2024 (in millions) | Fair value hierarchy | Total fair value
+Level 1 | Level 2 | Level 3
+Loans | $ | — | $ | 738 | $ | 694 | $ | 1,432
+Upward carrying value changes(b) | 224 | 89
+Downward carrying value changes/impairment(c) | (102) | (286)
+JPMorgan Chase & Co./2025 Form 10-K | 193
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 195
+Notes to consolidated financial statements
+Federal funds sold and securities purchased under resale agreements | $ | 161 | $ | — | $ | 161 | $ | 144 | $ | — | $ | ...
+Securities borrowed | (3) | — | (3) | 347 | — | 347 | 164 | — | 164
+Trading assets:
+Changes in instrument-specific credit risk | (9) | — | (9) | 346 | — | 346 | 248 | — | 248
+Other changes in fair value | 14 | 20 | (c) | 34 | 9 | 10 | (c) | 19 | 3 | 5 | (c) | 8
+Loans:
+Changes in instrument-specific credit risk | 541 | — | 541 | 517 | (6) | (c) | 511 | 322 | (4) | (c) | 318
+Other changes in fair value | 463 | 782 | (c) | 1,245 | 75 | 371 | (c) | 446 | 427 | 216 | (c) | 643
+Other assets | 47 | (3) | (d) | 44 | 63 | — | 63 | 282 | (4) | (d) | 278
+Deposits(a) | (1,839) | — | (1,839) | (3,398) | — | (3,398) | (2,582) | — | (2,582)
+JPMorgan Chase & Co./2025 Form 10-K | 197
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 199
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 201
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 203
+Notes to consolidated financial statements
+•Interest rate | Hedge floating-rate assets and liabilities | Cash flow hedge | Corporate | 213
+•Foreign exchange | Hedge foreign currency-denominated assets and liabilities | Fair value hedge | Corporate | 211-212
+•Foreign exchange | Hedge foreign currency-denominated forecasted revenue and expense | Cash flow hedge | Corporate | ...
+•Foreign exchange | Hedge the value of the Firm’s investments in non-U.S. dollar functional currency entities | Net ...
+•Commodity | Hedge commodity inventory | Fair value hedge | CIB, AWM | 211-212
+•Interest rate | Manage the risk associated with mortgage commitments, warehouse loans and MSRs | Specified risk ...
+•Credit | Manage the credit risk associated with wholesale lending exposures | Specified risk management | CIB, AWM | ...
+•Interest rate and foreign exchange | Manage the risk associated with certain other specified assets and liabilities | ...
+Market-making derivatives and other activities:
+•Various | Market-making and related risk management | Market-making and other | CIB | 214
+•Various | Other derivatives | Market-making and other | CIB, AWM, Corporate | 214
+204 | JPMorgan Chase & Co./2025 Form 10-K
+Purchased options | 953 | 984
+Total foreign exchange contracts | 15,595 | 13,513
+Swaps | 1,147 | 850
+Futures and forwards | 196 | 206
+Written options | 1,118 | 914
+Purchased options | 971 | 788
+Total equity contracts | 3,432 | 2,758
+Swaps | 189 | 148
+Spot, futures and forwards | 270 | 191
+Written options | 119 | 137
+Purchased options | 120 | 125
+Total commodity contracts | 698 | 601
+Total derivative notional amounts | $ | 50,642 | $ | 47,723
+JPMorgan Chase & Co./2025 Form 10-K | 205
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 207
+Notes to consolidated financial statements
+OTC–cleared | 118,377 | (118,303) | 74 | 130,989 | (130,810) | 179
+Exchange-traded(a) | 128 | (73) | 55 | 190 | (188) | 2
+Total interest rate contracts | 280,805 | (256,483) | 24,322 | 289,381 | (265,789) | 23,592
+OTC | 9,723 | (9,433) | 290 | 8,680 | (8,030) | 650
+OTC–cleared | 3,233 | (3,112) | 121 | 2,267 | (2,243) | 24
+Total credit contracts | 12,956 | (12,545) | 411 | 10,947 | (10,273) | 674
+Foreign exchange contracts:
+OTC–cleared | 904 | (849) | 55 | 685 | (677) | 8
+Exchange-traded(a) | 21 | (3) | 18 | 34 | — | 34
+Total foreign exchange contracts | 181,045 | (163,881) | 17,164 | 260,327 | (237,608) | 22,719
+OTC–cleared | 109 | (79) | 30 | 126 | (84) | 42
+Exchange-traded(a) | 9,565 | (9,292) | 273 | 5,179 | (5,083) | 96
+Total commodity contracts | 27,918 | (23,840) | 4,078 | 13,645 | (11,015) | 2,630
+OTC–cleared | 121,702 | (121,557) | 145 | 134,555 | (134,262) | 293
+Exchange-traded(a) | 104 | (101) | 3 | 363 | (352) | 11
+Total interest rate contracts | 256,851 | (250,122) | 6,729 | 273,133 | (264,989) | 8,144
+OTC–cleared | 2,446 | (2,416) | 30 | 1,779 | (1,765) | 14
+Total credit contracts | 17,294 | (15,612) | 1,682 | 13,160 | (11,898) | 1,262
+OTC–cleared | 897 | (850) | 47 | 772 | (678) | 94
+Exchange-traded(a) | 9 | (3) | 6 | 14 | — | 14
+Total foreign exchange contracts | 176,391 | (163,308) | 13,083 | 252,646 | (238,970) | 13,676
+Exchange-traded(a) | 61,363 | (60,659) | 704 | 49,578 | (49,193) | 385
+Total equity contracts | 114,893 | (102,211) | 12,682 | 93,972 | (87,491) | 6,481
+Exchange-traded(a) | 9,334 | (9,291) | 43 | 5,182 | (4,919) | 263
+Total commodity contracts | 23,589 | (19,156) | 4,433 | 12,184 | (10,209) | 1,975
+JPMorgan Chase & Co./2025 Form 10-K | 209
+Notes to consolidated financial statements
+Amount required to settle contracts with termination triggers upon downgrade(b) | 15 | 96 | 78 | 458
+(a)Includes the additional collateral to be posted for initial margin.
+Foreign exchange(c) | 1,077 | (743) | 334 | (696) | 334 | 84
+Commodity(d) | (3,852) | 4,127 | 275 | — | 224 | —
+Total | $ | (2,863) | $ | 4,744 | $ | 1,881 | $ | (696) | $ | 1,808 | $ | 84
+Gains/(losses) recorded in income | Income statement impact of excluded components(e) | OCI impact
+JPMorgan Chase & Co./2025 Form 10-K | 211
+Notes to consolidated financial statements
+Beneficial interests issued by consolidated VIEs | $ | 5,884 | $ | 37 | $ | — | $ | 37
+Carrying amount of the hedged items(a)(b) | Cumulative amount of fair value hedging adjustments included in the ...
+Foreign exchange(b) | 50 | 197 | 147
+Total | $ | (2,406) | $ | 2,057 | $ | 4,463
+Foreign exchange(b) | 64 | 209 | 145
+Total | $ | (1,775) | $ | 483 | $ | 2,258
+JPMorgan Chase & Co./2025 Form 10-K | 213
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 215
+Notes to consolidated financial statements
+Noninvestment-grade | (42,149) | (70,525) | (2,042) | (114,716) | 1,889 | (1,738) | 151
+Total | $ | (178,099) | $ | (347,577) | $ | (35,421) | $ | (561,097) | $ | 6,482 | $ | (2,642) | $ | 3,840
+JPMorgan Chase & Co./2025 Form 10-K | 217
+Notes to consolidated financial statements
+All other asset management fees | 406 | 376 | 312
+Total asset management fees | $ | 20,327 | $ | 17,801 | $ | 15,220
+JPMorgan Chase & Co./2025 Form 10-K | 219
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 221
+Notes to consolidated financial statements
+Beneficial interest issued by consolidated VIEs | 1,218 | 1,383 | 953
+Total interest expense | $ | 97,898 | $ | 101,350 | $ | 81,321
+JPMorgan Chase & Co./2025 Form 10-K | 223
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 225
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 227
+Notes to consolidated financial statements
+Non-U.S. | 405 | 1 | — | 406 | 600 | 3 | — | 603
+Commercial | 4,466 | 48 | 30 | 4,484 | 4,115 | 20 | 70 | 4,065
+Corporate debt securities | 139 | — | 11 | 128 | 71 | — | 1 | 70
+Asset-backed securities:
+JPMorgan Chase & Co./2025 Form 10-K | 229
+Notes to consolidated financial statements
+U.S. | $ | 36 | $ | — | $ | 609 | $ | 17 | $ | 645 | $ | 17
+Non-U.S. | 3 | — | 20 | — | 23 | —
+Commercial | 142 | 1 | 576 | 29 | 718 | 30
+Total mortgage-backed securities | 181 | 1 | 1,205 | 46 | 1,386 | 47
+Obligations of U.S. states and municipalities | 5,519 | 131 | 9,597 | 662 | 15,116 | 793
+Non-U.S. government debt securities | 9,324 | 76 | 4,954 | 160 | 14,278 | 236
+Corporate debt securities | 114 | 11 | — | — | 114 | 11
+Asset-backed securities:
+Collateralized loan obligations | 814 | — | 143 | 1 | 957 | 1
+Other | 63 | — | 131 | 7 | 194 | 7
+Total available-for-sale securities with gross unrealized losses | $ | 16,015 | $ | 219 | $ | 16,030 | $ | 876 | $ | ...
+U.S. | $ | 1,505 | $ | 6 | $ | 925 | $ | 44 | $ | 2,430 | $ | 50
+Non-U.S. | — | — | 30 | — | 30 | —
+Commercial | 763 | 8 | 1,184 | 62 | 1,947 | 70
+Total mortgage-backed securities | 2,268 | 14 | 2,139 | 106 | 4,407 | 120
+Obligations of U.S. states and municipalities | 10,037 | 233 | 2,412 | 301 | 12,449 | 534
+Non-U.S. government debt securities | 14,234 | 234 | 4,184 | 270 | 18,418 | 504
+Corporate debt securities | 9 | — | 30 | 1 | 39 | 1
+Asset-backed securities:
+Collateralized loan obligations | 2 | — | 375 | 3 | 377 | 3
+Other | 214 | 1 | 200 | 8 | 414 | 9
+Total available-for-sale securities with gross unrealized losses | $ | 26,764 | $ | 482 | $ | 9,340 | $ | 689 | $ | ...
+Realized gains | $ | 674 | $ | 593 | $ | 622
+Realized losses | (731) | (1,614) | (3,802)
+Provision for credit losses | $ | (28) | $ | 24 | $ | 38
+JPMorgan Chase & Co./2025 Form 10-K | 231
+Notes to consolidated financial statements
+Amortized cost | $ | 49 | $ | 123 | $ | — | $ | — | $ | 172
+Fair value | 13 | 115 | — | — | 128
+Average yield(a) | 17.50 | % | 15.66 | % | — | % | — | % | 16.18 | %
+JPMorgan Chase & Co./2025 Form 10-K | 233
+Notes to consolidated financial statements
+Securities loaned and other(a) | 86,829 | (71,170) | 15,659 | (15,534) | 125
+December 31, 2024
+Securities loaned and other(a) | 58,989 | (48,371) | 10,618 | (10,557) | 61
+(a)Includes securities-for-securities lending agreements of $6.6 billion and $5.9 billion at December 31, 2025 and ...
+U.S. Treasury, GSEs and government agencies | 346,938 | 703 | 300,022 | 759
+Obligations of U.S. states and municipalities | 1,624 | — | 1,872 | —
+JPMorgan Chase & Co./2025 Form 10-K | 235
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 237
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 239
+Notes to consolidated financial statements
+Net gains/(losses) on sales of loans and lending-related commitments (a) | $ | 208 | $ | 154 | $ | 56
+(a)Includes $148 million, $113 million and $62 million related to loans for the years ended December 31, 2025, 2024 and ...
+JPMorgan Chase & Co./2025 Form 10-K | 241
+Notes to consolidated financial statements
+Gross charge-offs | $ | — | $ | 2 | $ | 4 | $ | 7 | $ | 10 | $ | 9 | $ | 22 | $ | 4 | $ | 58
+As of or for the year ended December 31, 2024 (in millions, except ratios) | Term loans by origination year(c) | ...
+150 or more days past due | — | 11 | 71 | 68 | 49 | 501 | 8 | 127 | 835
+Total retained loans | $ | 12,314 | $ | 17,345 | $ | 61,547 | $ | 79,938 | $ | 52,397 | $ | 71,518 | $ | 7,035 | $ | ...
+Gross charge-offs | $ | — | $ | — | $ | 1 | $ | 1 | $ | — | $ | 176 | $ | 21 | $ | 7 | $ | 206
+(a)Individual delinquency classifications include mortgage loans insured by U.S. government agencies which were not ...
+Equal to or greater than 660 | $ | 71 | $ | 72
+Less than 660 | 4 | 3
+Greater than 100% but less than or equal to 125% and refreshed FICO scores:
+Equal to or greater than 660 | 282 | 161
+Less than 660 | 5 | 5
+Greater than 80% but less than or equal to 100% and refreshed FICO scores:
+Less than 660 | 131 | 73
+Less than or equal to 80% and refreshed FICO scores:
+No FICO/LTV available(h) | 690 | 906
+Total retained loans | $ | 303,531 | $ | 309,513
+Weighted-average FICO(f)(i) | 775 | 774
+Geographic region(h)(j)
+JPMorgan Chase & Co./2025 Form 10-K | 243
+Notes to consolidated financial statements
+Current | $ | 408 | $ | 139 | $ | 107
+30-149 days past due | 45 | 47 | 13
+150 or more days past due | 571 | 20 | 16
+Total | $ | 1,024 | $ | 206 | $ | 136
+Defaults of FDMs
+30–119 days past due | 170 | 180 | 225 | 170 | 99 | 25 | 33 | 48 | 950
+120 or more days past due | — | 2 | 2 | — | 1 | — | 2 | 34 | 41
+Total retained loans | $ | 26,660 | $ | 15,768 | $ | 9,670 | $ | 5,069 | $ | 3,061 | $ | 871 | $ | 3,852 | $ | 259 | $ ...
+120 or more days past due | 1 | 1 | — | 5 | 6 | — | 3 | 30 | 46
+Total retained loans | $ | 26,356 | $ | 16,237 | $ | 9,460 | $ | 7,198 | $ | 2,954 | $ | 647 | $ | 3,757 | $ | 212 | $ ...
+JPMorgan Chase & Co./2025 Form 10-K | 245
+Notes to consolidated financial statements
+Nonaccrual loans(a)(b) | $ | 243 | $ | 249
+Geographic region(c)
+JPMorgan Chase & Co./2025 Form 10-K | 247
+Notes to consolidated financial statements
+Total | $ | 926
+248 | JPMorgan Chase & Co./2025 Form 10-K
+Total | $ | 648
+(a)Term extension includes credit card loans whose terms have been modified under long-term programs by placing the ...
+Current and less than 30 days past due and still accruing | $ | 1,801 | $ | 811 | $ | 558
+30-89 days past due and still accruing | 179 | 74 | 59
+90 or more days past due and still accruing | 104 | 41 | 31
+Total | $ | 2,084 | $ | 926 | $ | 648
+Defaults of FDMs
+JPMorgan Chase & Co./2025 Form 10-K | 249
+Notes to consolidated financial statements
+Gross charge-offs | $ | — | $ | 54 | $ | 13 | $ | 92 | $ | 119 | $ | 141 | $ | 1 | $ | — | $ | 420
+Secured by real estate
+Gross charge-offs | $ | 72 | $ | 18 | $ | 43 | $ | 2 | $ | 109 | $ | 80 | $ | — | $ | — | $ | 324
+JPMorgan Chase & Co./2025 Form 10-K | 251
+Notes to consolidated financial statements
+Gross charge-offs | $ | 43 | $ | 64 | $ | 11 | $ | 151 | $ | 129 | $ | 26 | $ | 461 | $ | 8 | $ | 893
+Commercial and industrial
+Gross charge-offs | $ | 25 | $ | 22 | $ | 128 | $ | 24 | $ | 1 | $ | 50 | $ | 270 | $ | 5 | $ | 525
+Other(a)
+Gross charge-offs | $ | 46 | $ | 195 | $ | 32 | $ | 2 | $ | 9 | $ | 58 | $ | 26 | $ | 106 | $ | 474
+Other(a)
+Gross charge-offs | $ | — | $ | 38 | $ | 3 | $ | 36 | $ | 40 | $ | 50 | $ | 6 | $ | — | $ | 173
+(a)Includes loans to financial institutions, personal investment companies and trusts, individuals and individual ...
+90 or more days past due and still accruing(b) | 42 | 126 | 2 | 58 | 14 | 88 | 58 | 272
+Criticized nonaccrual | 1,678 | 1,439 | 1,954 | 1,760 | 766 | 743 | 4,398 | 3,942
+JPMorgan Chase & Co./2025 Form 10-K | 253
+Notes to consolidated financial statements
+Total | $ | 815
+(a) Includes loans with single and multiple modifications.
+Total | $ | 354
+Secured by real estate
+Total | $ | 160
+(a) Includes a loan with multiple modifications.
+JPMorgan Chase & Co./2025 Form 10-K | 255
+Notes to consolidated financial statements
+Total | $ | 127
+(a) Includes a loan with a single modification.
+Total | $ | 275
+(a) Includes loans with a single modification.
+Total | $ | 609
+(a) Includes a loan with a single modification.
+Current and less than 30 days past due and still accruing | $ | 377 | $ | 264 | $ | 118 | $ | 1,669 | $ | 1,215 | $ | ...
+30-89 days past due and still accruing | — | 3 | 2 | 7 | 13 | 42 | — | 9 | —
+Criticized nonaccrual | 438 | 87 | 40 | 786 | 672 | 374 | 12 | 26 | 209
+Total | $ | 815 | $ | 354 | $ | 160 | $ | 2,462 | $ | 1,900 | $ | 1,363 | $ | 127 | $ | 275 | $ | 609
+Defaults of FDMs
+Term extension | $ | 173 | $ | 3 | $ | 1 | $ | 57 | $ | 92 | $ | 49 | $ | 3 | $ | 22 | $ | 31
+Other-than-insignificant payment deferral | — | — | 2 | 5 | 118 | — | — | — | —
+Total(a) | $ | 173 | $ | 3 | $ | 6 | $ | 65 | $ | 210 | $ | 50 | $ | 3 | $ | 22 | $ | 31
+(a)Represents FDMs that were 30 days or more past due.
+JPMorgan Chase & Co./2025 Form 10-K | 257
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 259
+Notes to consolidated financial statements
+Other | — | — | 5 | 5
+Ending balance at December 31, | $ | 1,920 | $ | 15,557 | $ | 8,288 | $ | 25,765
+Other | — | — | 1 | 1
+Ending balance at December 31, | $ | 83 | $ | 2,200 | $ | 2,788 | $ | 5,071
+Total allowance for investment securities | NA | NA | NA | $ | 106
+Total allowance for credit losses(b) | $ | 2,003 | $ | 17,757 | $ | 11,076 | $ | 30,942
+Asset-specific(c) | $ | (647) | $ | — | $ | 707 | $ | 60
+Portfolio-based | 2,567 | 15,557 | 7,581 | 25,705
+Net charge-offs | $ | 7 | $ | — | $ | 542 | $ | 549
+Loans measured at fair value of collateral less cost to sell | 3,412 | — | 1,852 | 5,264
+Asset-specific | $ | — | $ | — | $ | 119 | $ | 119
+Portfolio-based | 83 | 2,200 | (f) | 2,669 | 4,952
+Asset-specific | $ | — | $ | — | $ | 925 | $ | 925
+Portfolio-based(e) | 24,358 | 23,617 | (g) | 555,047 | 603,022
+NA | NA | NA | $ | 152 | NA | NA | NA | $ | 128
+$ | 1,889 | $ | 14,600 | $ | 9,957 | $ | 26,598 | $ | 1,931 | $ | 12,450 | $ | 10,013 | $ | 24,522
+JPMorgan Chase & Co./2025 Form 10-K | 261
+Notes to consolidated financial statements
+Multi-seller conduits | Assisting clients in accessing the financial markets in a cost-efficient manner and structuring ...
+Municipal bond vehicles | Financing of municipal bond investments | pages 266–267
+JPMorgan Chase & Co./2025 Form 10-K | 263
+Notes to consolidated financial statements
+Subprime | 10,690 | — | 2,766 | 100 | 12 | — | 112
+Commercial and other(b) | 212,555 | 170 | 138,986 | 1,222 | 5,285 | 823 | 7,330
+Subprime | 8,824 | — | 1,847 | 44 | 19 | — | 63
+Commercial and other(b) | 186,293 | 243 | 125,510 | 530 | 5,768 | 1,074 | 7,372
+JPMorgan Chase & Co./2025 Form 10-K | 265
+Notes to consolidated financial statements
+Mortgage securitization entities(a) | 2 | 566 | 9 | 577 | 105 | 40 | 145
+Other | 1,466 | 4,199 | (b) | 360 | 6,025 | 28 | 599 | 627
+Total | $ | 4,835 | $ | 37,777 | $ | 683 | $ | 43,295 | $ | 27,951 | $ | 691 | $ | 28,642
+Mortgage securitization entities(a) | — | 630 | 8 | 638 | 115 | 48 | 163
+Other | 496 | 1,966 | 350 | 2,812 | 51 | 355 | 406
+Total | $ | 3,885 | $ | 36,510 | $ | 681 | $ | 41,076 | $ | 27,323 | $ | 454 | $ | 27,777
+JPMorgan Chase & Co./2025 Form 10-K | 267
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 269
+Notes to consolidated financial statements
+Servicing fees collected | 34 | 41 | 35 | 35 | 24 | 5
+Cash flows received on interests | 834 | 1,376 | 405 | 1,303 | 325 | 425
+(a)Excludes re-securitization transactions.
+Proceeds received from loan sales as cash | $ | 1,905 | $ | 2,380 | $ | 300
+Proceeds from loan sales as securities(a)(b) | 28,449 | 23,178 | 19,389
+Loans repurchased or option to repurchase(a) | $ | 856 | $ | 577
+Real estate owned | 2 | 6
+Foreclosed government-guaranteed residential mortgage loans(b) | 9 | 10
+(a)Primarily all of these amounts relate to loans that have been repurchased from Ginnie Mae loan pools.
+Prime/ Alt-A & option ARMs | $ | 58,525 | $ | 50,846 | $ | 654 | $ | 501 | $ | 9 | $ | 10
+Subprime | 2,766 | 1,847 | 92 | 113 | — | 2
+Commercial and other | 138,986 | 125,510 | 4,487 | 1,715 | 292 | 77
+Total loans securitized | $ | 200,277 | $ | 178,203 | $ | 5,233 | $ | 2,329 | $ | 301 | $ | 89
+JPMorgan Chase & Co./2025 Form 10-K | 271
+Notes to consolidated financial statements
+Corporate | 722 | 692 | 685
+Total goodwill | $ | 52,731 | $ | 52,565 | $ | 52,634
+Business combinations(a) | — | 29 | 917
+Other(b) | 166 | (98) | 55
+Balance at December 31, | $ | 52,731 | $ | 52,565 | $ | 52,634
+JPMorgan Chase & Co./2025 Form 10-K | 273
+Notes to consolidated financial statements
+Originations of MSRs | 433 | 325 | 253
+Purchase of MSRs(a) | 624 | 601 | 1,028
+Changes due to market interest rates and other(b) | 48 | 670 | 424
+Changes in valuation due to other inputs and assumptions:
+Discount rates | (1) | 14 | 14
+Prepayment model changes and other(c) | 37 | (24) | 51
+Total changes in valuation due to other inputs and assumptions | — | 92 | 43
+Total changes in valuation due to inputs and assumptions | 48 | 762 | 467
+Fair value at December 31, | $ | 9,167 | $ | 9,121 | $ | 8,522
+Change in unrealized gains/(losses) included in income related to MSRs held at December 31, | $ | 48 | $ | 762 | $ | 467
+Contractual service fees, late fees and other ancillary fees included in income | 1,635 | 1,606 | 1,590
+Third-party mortgage loans serviced at December 31, (in billions) | 668 | 652 | 632
+Servicer advances, net of an allowance for uncollectible amounts, at December 31(d) | 493 | 577 | 659
+(a)Includes purchase price adjustments associated with purchased MSRs, primarily due to loans that prepaid within 90 ...
+Production revenue | $ | 622 | $ | 627 | $ | 421
+Net mortgage servicing revenue:
+Total operating revenue | 586 | 592 | 623
+Risk management:
+Changes in MSR asset fair value due to market interest rates and other(a) | 48 | 670 | 424
+Other changes in MSR asset fair value due to other inputs and assumptions in model(b) | — | 92 | 43
+Change in derivative fair value and other | 70 | (603) | (336)
+Total risk management | 118 | 159 | 131
+Total net mortgage servicing revenue | 704 | 751 | 754
+Total CCB mortgage fees and related income | 1,326 | 1,378 | 1,175
+All other | 55 | 23 | 1
+Mortgage fees and related income | $ | 1,381 | $ | 1,401 | $ | 1,176
+JPMorgan Chase & Co./2025 Form 10-K | 275
+Notes to consolidated financial statements
+After 5 years | 130 | 118 | 248
+Total | $ | 225,414 | $ | 85,986 | $ | 311,400
+JPMorgan Chase & Co./2025 Form 10-K | 277
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 279
+Notes to consolidated financial statements
+Junior subordinated debt: | Fixed rate | $ | — | $ | 495 | $ | — | $ | 495 | $ | 488
+Variable rate | — | 421 | 678 | 1,099 | 1,115
+Variable rate | — | 13 | 120 | 133 | 166
+Interest rates(f) | 5.16 | % | 4.54 | % | 3.14 | % | 4.63 | % | 4.62 | %
+JPMorgan Chase & Co./2025 Form 10-K | 281
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 283
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 285
+Notes to consolidated financial statements
+Less: Dividends and undistributed earnings allocated to participating securities | 268 | 344 | 291
+Net income applicable to common stockholders | $ | 55,681 | $ | 56,868 | $ | 47,760
+Net change | 81 | 1,258 | 1,339 | (63) | (795) | (858) | 17 | 312 | 329
+Fair value hedges, net change(c) | 84 | (20) | 64 | (115) | 28 | (87) | (134) | 33 | (101)
+Net unrealized gains/(losses) arising during the period | 2,057 | (500) | 1,557 | (3,742) | 904 | (2,838) | 483 | (114) ...
+Reclassification adjustment for realized (gains)/losses included in net income(d) | 2,406 | (575) | 1,831 | 2,579 | ...
+Defined benefit pension and OPEB plans, net change | 691 | (112) | 579 | (131) | 68 | (63) | 421 | (48) | 373
+DVA on fair value option elected liabilities, net change | (1,025) | 252 | (773) | (45) | 9 | (36) | (1,066) | 258 | ...
+JPMorgan Chase & Co./2025 Form 10-K | 287
+Notes to consolidated financial statements
+Non-U.S. | 258 | 72 | 35
+Total deferred income tax expense/(benefit) | 5,611 | 2,004 | (4,534)
+New York State | 538 | NM | 590
+California | 465 | 810 | 721
+New York City | 270 | NM | NM
+JPMorgan Chase & Co./2025 Form 10-K | 289
+Notes to consolidated financial statements
+Depreciation and amortization | — | 386
+Non-U.S. operations | 1,027 | 948
+Tax attribute carryforwards | 2,252 | 352
+Gross deferred tax assets | 17,667 | 17,849
+Increases based on tax positions related to prior periods | 128 | 92 | 37
+Decreases based on tax positions related to prior periods | (1,268) | (907) | (1,110)
+JPMorgan Chase & Co./2025 Form 10-K | 291
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 293
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 295
+Notes to consolidated financial statements
+Residential Real Estate(a) | $ | 13,496 | $ | 5,665 | $ | 3,454 | $ | 6,383 | $ | 28,998 | $ | 30,349 | $ | 327 | $ | ...
+Auto and other | 10,784 | 1 | 4 | 3,800 | 14,589 | 14,495 | 10 | 37
+Total consumer, excluding credit card | 24,280 | 5,666 | 3,458 | 10,183 | 43,587 | 44,844 | 337 | 571
+Credit card(b) | 1,073,537 | 104,229 | (h) | — | — | 1,177,766 | 1,001,311 | 2,200 | (k) | —
+Total consumer(c) | 1,097,817 | 109,895 | 3,458 | 10,183 | 1,221,353 | 1,046,155 | 2,537 | 571
+Wholesale:
+Standby letters of credit and other financial guarantees(d) | 16,443 | 8,135 | 4,905 | 436 | 29,919 | 28,676 | 616 | 473
+Other letters of credit(d) | 4,183 | 126 | 6 | 214 | 4,529 | 4,354 | 13 | 37
+Total wholesale(c) | 155,797 | 187,773 | 224,821 | 27,563 | 595,954 | 531,467 | 3,741 | 3,118
+Derivatives qualifying as guarantees | 1,168 | 633 | 9,572 | 37,658 | 49,031 | 49,628 | (12) | 113
+Unsettled resale and securities borrowed agreements | 136,841 | 231 | — | — | 137,072 | 115,939 | — | 2
+Unsettled repurchase and securities loaned agreements | 52,308 | 587 | — | — | 52,895 | 66,986 | — | (2)
+Mortgage repurchase liability | NA | NA | NA | NA | NA | NA | 37 | 45
+Loans sold with recourse | NA | NA | NA | NA | 2,015 | 1,189 | 19 | 23
+Exchange & clearing house guarantees and commitments(f) | 433,537 | NA | NA | NA | 433,537 | 401,486 | — | —
+Other guarantees and commitments (g) | 9,866 | 2,075 | 391 | 906 | 13,238 | 12,396 | 15 | 28
+(a)Includes certain commitments to purchase loans from correspondents.
+Noninvestment-grade(a) | 9,384 | 1,342 | 8,233 | 974
+Total contractual amount | $ | 29,919 | $ | 4,529 | $ | 28,676 | $ | 4,354
+Allowance for lending-related commitments | $ | 175 | $ | 13 | $ | 94 | $ | 37
+Guarantee liability | 441 | — | 379 | —
+Total carrying value | $ | 616 | $ | 13 | $ | 473 | $ | 37
+Commitments with collateral | $ | 16,969 | $ | 540 | $ | 16,805 | $ | 357
+(a)The ratings scale is based on the Firm’s internal risk ratings. Refer to Note 12 for further information on internal ...
+JPMorgan Chase & Co./2025 Form 10-K | 297
+Notes to consolidated financial statements
+Derivative guarantees | (12) | 113
+In addition to derivative contracts that meet the characteristics of a guarantee, the Firm is both a purchaser and ...
+JPMorgan Chase & Co./2025 Form 10-K | 299
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 301
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 303
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 305
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 307
+Notes to consolidated financial statements
+Provision for credit losses | 11,493 | (e) | 9,974 | 6,899 | 2,615 | 762 | 2,091 | 97 | (68) | 159
+Compensation expense(b) | 17,669 | 17,045 | 15,171 | 19,345 | 18,191 | 17,105 | 8,645 | 7,984 | 7,115
+Overhead ratio | 53 | 53 | 50 | 49 | 50 | 53 | 64 | 67 | 64
+308 | JPMorgan Chase & Co./2025 Form 10-K
+Overhead ratio | NM | NM | NM | NM | NM | NM | 52 | 52 | 55
+(a)Segment results on a managed basis reflect revenue on a FTE basis with the corresponding income tax impact recorded ...
+JPMorgan Chase & Co./2025 Form 10-K | 309
+Notes to consolidated financial statements
+Non-bank | (506) | 172 | 250
+Other income/(expense) | 697 | 1,252 | (654)
+Cash and due from banks | $ | 39 | $ | 38
+Deposits with banking subsidiaries(b) | 9,751 | 9,762
+Bank and bank holding company | 136 | 142
+Non-bank | 24 | 79
+Investments (at equity) in subsidiaries and affiliates:
+All other investing activities, net | 34 | 21 | 25
+Net cash provided by/(used in) investing activities | 34 | 21 | (24,975)
+JPMorgan Chase & Co./2025 Form 10-K | 311
+Notes to consolidated financial statements
+Contingent consideration - Shared-loss agreements | 15
+Purchase price consideration | $ | 67,865
+Indemnification assets - Shared-loss agreements | 675
+Accounts receivable and other assets(d) | 6,740
+Deferred tax liabilities | 757
+Total liabilities assumed | $ | 121,654
+JPMorgan Chase & Co./2025 Form 10-K | 313
+Notes to consolidated financial statements
+JPMorgan Chase & Co./2025 Form 10-K | 315
+(Table continued from previous page)
+JPMorgan Chase & Co./2025 Form 10-K | 317
+(Table continued from previous page)
+Non-U.S. | 559 | (1,560) | (1,001) | 83 | 608 | 691
+Federal funds sold and securities purchased under resale agreements:
+Non-U.S. | 268 | (1,179) | (911) | 184 | 680 | 864
+Securities borrowed:
+Non-U.S. | (68) | (48) | (116) | (3) | 137 | 134
+Trading assets – debt instruments:
+Non-U.S. | 378 | (235) | 143 | 310 | 91 | 401
+Loans:
+Non-U.S. | 975 | (1,082) | (107) | (26) | 288 | 262
+All other interest-earning assets, largely U.S. | 1,528 | (2,094) | (566) | 240 | 396 | 636
+Change in interest income | 14,082 | (14,726) | (644) | 11,813 | 11,529 | 23,342
+Non-U.S. | 1,657 | (693) | 964 | 480 | 100 | 580
+Trading liabilities – debt, short-term and all other interest-bearing liabilities:
+U.S. | (263) | (913) | (1,176) | 659 | (144) | 515
+Non-U.S. | 296 | (196) | 100 | 380 | 154 | 534
+Beneficial interests issued by consolidated VIEs, predominantly U.S. | 26 | (191) | (165) | 409 | 21 | 430
+Long-term debt:
+Non-U.S. | 97 | 25 | 122 | 77 | 29 | 106
+Change in interest expense | 10,904 | (14,356) | (3,452) | 11,293 | 8,736 | 20,029
+JPMorgan Chase & Co./2025 Form 10-K | 319
+Glossary of Terms and Acronyms
+JPMorgan Chase & Co./2025 Form 10-K | 321
+Glossary of Terms and Acronyms
+JPMorgan Chase & Co./2025 Form 10-K | 323
+Glossary of Terms and Acronyms
+JPMorgan Chase & Co./2025 Form 10-K | 325
+Glossary of Terms and Acronyms
+JPMorgan Chase & Co./2025 Form 10-K | 327
+Signatures

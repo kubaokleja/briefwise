@@ -1,0 +1,425 @@
+UNITED STATES
+SECURITIES AND EXCHANGE COMMISSION
+Washington, D.C. 20549
+FORM 10-Q
+☑ QUARTERLY REPORT PURSUANT TO SECTION 13 OR 15(d) OF
+THE SECURITIES EXCHANGE ACT OF 1934
+For the quarterly period ended September 30, 2026
+or
+☐ TRANSITION REPORT PURSUANT TO SECTION 13 OR 15(d) OF
+THE SECURITIES EXCHANGE ACT OF 1934
+For the transition period from __________to__________
+Commission File Number 1-43384
+ExxonMobil Holdings Corporation
+(Exact name of registrant as specified in its charter)
+Texas | 41-4104094
+(State or other jurisdiction of incorporation or organization) | (I.R.S. Employer Identification Number)
+22777 Springwoods Village Parkway, Spring, Texas 77389-1425
+(Address of principal executive offices) (Zip Code)
+(972) 940-6000
+(Registrant's telephone number, including area code)
+_______________________
+Securities registered pursuant to Section 12(b) of the Act:
+Title of Each Class | Trading Symbol | Name of Each Exchange on Which Registered
+Common Stock, par value $0.001 per share | XOM | New York Stock Exchange
+0.524% Notes due 2028 | XOM/28 | New York Stock Exchange
+0.835% Notes due 2032 | XOM/32 | New York Stock Exchange
+1.408% Notes due 2039 | XOM/39A | New York Stock Exchange
+Indicate by check mark whether the registrant (1) has filed all reports required to be filed by Section 13 or 15(d) of the Securities Exchange Act of
+1934 during the preceding 12 months (or for such shorter period that the registrant was required to file such reports), and (2) has been subject to such
+filing requirements for the past 90 days. Yes ☑ No ☐
+Indicate by check mark whether the registrant has submitted electronically every Interactive Data File required to be submitted and posted pursuant to
+Rule 405 of Regulation S-T (§ 232.405 of this chapter) during the preceding 12 months (or for such shorter period that the registrant was required to
+submit and post such files). Yes ☑ No ☐
+Indicate by check mark whether the registrant is a large accelerated filer, an accelerated filer, a non-accelerated filer, smaller reporting company, or
+an emerging growth company. See the definitions of "large accelerated filer," "accelerated filer," "smaller reporting company," and “emerging growth
+company” in Rule 12b-2 of the Exchange Act.
+Large accelerated filer | ☑ | Accelerated filer | ☐
+Non-accelerated filer | ☐ | Smaller reporting company | ☐
+Emerging growth company | ☐
+If an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition period for complying with any
+new or revised financial accounting standards provided pursuant to Section 13(a) of the Exchange Act. ☐
+Indicate by check mark whether the registrant is a shell company (as defined in Rule 12b-2 of the Exchange Act). Yes ☐ No ☑
+Indicate the number of shares outstanding of each of the issuer's classes of common stock, as of the latest practicable date.
+Class | Outstanding as of September 30, 2026
+Common stock, par value $0.001 per share | 4,079,222,444
+2
+EXXONMOBIL HOLDINGS CORPORATION
+FORM 10-Q
+FOR THE QUARTERLY PERIOD ENDED SEPTEMBER 30, 2026
+TABLE OF CONTENTS
+PART I. FINANCIAL INFORMATION
+Item 1. Financial Statements
+Condensed Consolidated Statement of Income | 3
+Condensed Consolidated Statement of Comprehensive Income | 4
+Condensed Consolidated Balance Sheet | 5
+Condensed Consolidated Statement of Cash Flows | 6
+Condensed Consolidated Statement of Changes in Equity | 7
+Notes to Condensed Consolidated Financial Statements
+Note 1. Basis of Financial Statement Preparation | 8
+Note 2. Earnings Per Share | 8
+Note 3. Disclosures about Segments and Related Information | 9
+Note 4. Pension and Other Postretirement Benefits | 14
+Note 5. Other Comprehensive Income Information | 15
+Note 6. Financial Instruments and Derivatives | 16
+Note 7. Litigation and Other Contingencies | 18
+Note 8. Divestment Activities | 18
+Item 2. Management's Discussion and Analysis of Financial Condition and Results of Operations | 19
+Item 3. Quantitative and Qualitative Disclosures About Market Risk | 35
+Item 4. Controls and Procedures | 35
+PART II. OTHER INFORMATION
+Item 1. Legal Proceedings | 36
+Item 2. Unregistered Sales of Equity Securities and Use of Proceeds | 36
+Item 5. Other Information | 36
+Item 6. Exhibits | 37
+Signature | 38
+3
+Table of Contents
+PART I. FINANCIAL INFORMATION
+ITEM 1. FINANCIAL STATEMENTS
+The information in the Notes to Condensed Consolidated Financial Statements is an integral part of these statements.
+Due to rounding, numbers presented may not add up precisely to the totals indicated.
+CONDENSED CONSOLIDATED STATEMENT OF INCOME
+(millions of dollars, unless noted) | Note Reference Number | Three Months Ended September 30, | Nine Months Ended September 30,
+2026 | 2025 | 2026 | 2025
+Revenues and other income
+Sales and other operating revenue | 3 | 110,503 | 83,331 | 308,193 | 243,866
+Income from equity affiliates | 1,126 | 1,267 | 3,388 | 4,098
+Other income | 1,535 | 696 | 2,738 | 1,966
+Total revenues and other income | 113,164 | 85,294 | 314,319 | 249,930
+Costs and other deductions
+Exploration expenses, including dry holes (1) | 116 | 149 | 397 | 464
+Non-service pension and postretirement benefit expense | 4 | (20) | 119 | 74 | 322
+Interest expense | 183 | 90 | 705 | 440
+Other taxes and duties | 5,226 | 6,475 | 15,918 | 18,767
+Total costs and other deductions | 91,928 | 74,362 | 266,692 | 216,693
+Net income (loss) attributable to noncontrolling interests | 609 | 220 | 1,254 | 812
+Net income (loss) attributable to ExxonMobil | 15,413 | 7,548 | 34,121 | 22,343
+Earnings (loss) per common share (dollars) | 2 | 3.72 | 1.76 | 8.18 | 5.16
+4
+Table of Contents
+CONDENSED CONSOLIDATED STATEMENT OF COMPREHENSIVE INCOME
+(millions of dollars) | Three Months Ended September 30, | Nine Months Ended September 30,
+Amortization and settlement of postretirement benefits reserves adjustment included in net periodic benefit costs | (61) | 6 | (113) | 36
+Total other comprehensive income (loss) | 130 | (456) | (727) | 2,036
+Comprehensive income (loss) including noncontrolling interests | 16,152 | 7,312 | 34,648 | 25,191
+5
+Table of Contents
+CONDENSED CONSOLIDATED BALANCE SHEET
+(millions of dollars, unless noted) | Note Reference Number | September 30, 2026 | December 31, 2025
+Long-term obligations to equity companies | 567 | 542
+Other long-term obligations | 29,463 | 26,178
+Total Liabilities | 198,397 | 182,354
+Commitments and contingencies | 7
+EQUITY
+Common stock without par value (9,000 million shares authorized, 8,019 million shares issued at December 31, 2025) | — | 46,150
+6
+Table of Contents
+CONDENSED CONSOLIDATED STATEMENT OF CASH FLOWS
+(millions of dollars) | Nine Months Ended September 30,
+Other investing activities including collection of advances | 1,431 | 949
+Net cash used in investing activities | (18,866) | (18,794)
+CASH FLOWS FROM FINANCING ACTIVITIES
+Additions to short-term debt (1) | — | 758
+Reductions in short-term debt (1) | (6,537) | (4,815)
+Additions/(reductions) in commercial paper, and debt with three months or less maturity | (974) | 1,212
+Inflows from noncontrolling interests for major projects | — | 68
+Common stock acquired | (15,110) | (14,894)
+Net cash used in financing activities | (37,351) | (30,347)
+Effects of exchange rate changes on cash | (221) | 532
+Increase/(decrease) in cash and cash equivalents (including restricted) | 1,472 | (9,318)
+Cash and cash equivalents at beginning of period (including restricted) | 10,681 | 23,187
+Included in cash flows from operating activities | 585 | 333
+Capitalized, included in cash flows from investing activities | 818 | 1,140
+Total cash interest paid | 1,403 | 1,473
+Finance leases | 65 | 9
+(1) Includes commercial paper with a maturity greater than three months.
+7
+Table of Contents
+CONDENSED CONSOLIDATED STATEMENT OF CHANGES IN EQUITY
+ExxonMobil Share of Equity
+Amortization of stock-based awards | 187 | — | — | — | 187 | — | 187
+Other | (8) | — | — | — | (8) | 664 | 656
+Net income (loss) for the period | — | 7,548 | — | — | 7,548 | 220 | 7,768
+Dividends - common shares | — | (4,242) | — | — | (4,242) | (151) | (4,393)
+Amortization of stock-based awards | 250 | — | — | — | 250 | — | 250
+Other | (10) | 1 | — | — | (9) | 3 | (6)
+Net income (loss) for the period | — | 15,413 | — | — | 15,413 | 609 | 16,022
+Other comprehensive income (loss) | — | — | 119 | — | 119 | 11 | 130
+Share repurchases, at cost | — | — | — | (5,103) | (5,103) | (464) | (5,567)
+Change associated with redomicile transaction | (1,846) | (266,430) | — | 268,276 | — | — | —
+Dispositions | — | — | — | 3 | 3 | — | 3
+Balance as of September 30, 2026 | 45,030 | 237,289 | (11,430) | (5,100) | 265,789 | 6,731 | 272,520
+Balance as of December 31, 2024 | 46,238 | 470,903 | (14,619) | (238,817) | 263,705 | 6,901 | 270,606
+Amortization of stock-based awards | 601 | — | — | — | 601 | — | 601
+Other | (31) | (14) | — | — | (45) | 683 | 638
+Net income (loss) for the period | — | 22,343 | — | — | 22,343 | 812 | 23,155
+Dividends - common shares | — | (12,865) | — | — | (12,865) | (603) | (13,468)
+Dispositions | — | — | — | 22 | 22 | — | 22
+Balance as of September 30, 2025 | 46,808 | 480,367 | (12,782) | (253,832) | 260,561 | 7,662 | 268,223
+Balance as of December 31, 2025 | 46,150 | 482,494 | (10,863) | (258,395) | 259,386 | 7,240 | 266,626
+Amortization of stock-based awards | 780 | — | — | — | 780 | — | 780
+Other | (54) | 1 | — | — | (53) | (636) | (689)
+Net income (loss) for the period | — | 34,121 | — | — | 34,121 | 1,254 | 35,375
+Dispositions | — | — | — | 33 | 33 | — | 33
+Balance as of September 30, 2026 | 45,030 | 237,289 | (11,430) | (5,100) | 265,789 | 6,731 | 272,520
+(1) 2026 balances include capital in excess of par value.
+8
+Table of Contents
+NOTES TO CONDENSED CONSOLIDATED FINANCIAL STATEMENTS
+Due to rounding, numbers presented may not add up precisely to the totals indicated.
+9
+Table of Contents
+Note 3. Disclosures about Segments and Related Information
+Our four reportable segments are Upstream, Energy Products, Chemical Products, and Specialty Products.
+Interest expense | 6 | 11 | 2 | 2 | — | — | — | — | 21
+Other taxes and duties | 112 | 145 | 780 | 4,099 | 16 | 30 | 4 | 40 | 5,226
+Total costs and other deductions | 13,573 | 7,435 | 41,931 | 55,820 | 3,894 | 4,887 | 1,827 | 3,366 | 132,733
+Net income (loss) attributable to noncontrolling interests | — | 209 | 68 | 334 | — | 13 | (2) | 7 | 629
+Segment income (loss) | 3,201 | 3,887 | 4,787 | 2,382 | 472 | 263 | 386 | 899 | 16,277
+Reconciliation of consolidated revenues
+Other revenues (2) | 140
+Elimination of intersegment revenues | (42,045)
+Total consolidated revenues and other income | 113,164
+10
+Table of Contents
+(millions of dollars) | Upstream | Energy Products | Chemical Products | Specialty Products | Segment Total
+U.S. | Non-U.S. | U.S. | Non-U.S. | U.S. | Non-U.S. | U.S. | Non-U.S.
+Other income | 231 | 97 | 37 | 38 | 1 | 9 | 7 | 32 | 452
+Segment revenues and other income | 14,021 | 13,769 | 30,649 | 44,341 | 3,658 | 4,914 | 1,969 | 3,206 | 116,527
+Costs and other items
+Interest expense | 34 | 15 | 4 | 11 | — | 1 | — | 1 | 66
+Other taxes and duties | 33 | 561 | 825 | 4,924 | 23 | 57 | 3 | 49 | 6,475
+Total costs and other deductions | 12,324 | 6,919 | 29,490 | 42,898 | 3,248 | 4,725 | 1,515 | 2,718 | 103,837
+Net income (loss) attributable to noncontrolling interests | — | 180 | 62 | 111 | — | 8 | — | 10 | 371
+Segment income (loss) | 1,228 | 4,451 | 858 | 982 | 329 | 186 | 354 | 386 | 8,774
+Reconciliation of consolidated revenues
+Other revenues (2) | 194
+Elimination of intersegment revenues | (31,427)
+Total consolidated revenues and other income | 85,294
+11
+Table of Contents
+(millions of dollars) | Upstream | Energy Products | Chemical Products | Specialty Products | Segment Total
+U.S. | Non-U.S. | U.S. | Non-U.S. | U.S. | Non-U.S. | U.S. | Non-U.S.
+Interest expense | 14 | 32 | 5 | 6 | — | 1 | 2 | 1 | 61
+Other taxes and duties | 319 | 696 | 2,275 | 12,309 | 60 | 108 | 14 | 137 | 15,918
+Total costs and other deductions | 42,426 | 23,329 | 118,461 | 160,235 | 10,974 | 14,467 | 5,137 | 9,170 | 384,199
+Other revenues (2) | 334
+Elimination of intersegment revenues | (121,642)
+Total consolidated revenues and other income | 314,319
+12
+Table of Contents
+(millions of dollars) | Upstream | Energy Products | Chemical Products | Specialty Products | Segment Total
+U.S. | Non-U.S. | U.S. | Non-U.S. | U.S. | Non-U.S. | U.S. | Non-U.S.
+Interest expense | 93 | 37 | 3 | 13 | — | 1 | — | 3 | 150
+Other taxes and duties | 146 | 1,631 | 2,442 | 14,230 | 57 | 118 | 6 | 137 | 18,767
+Total costs and other deductions | 34,331 | 21,461 | 86,142 | 125,577 | 10,024 | 13,543 | 4,624 | 8,119 | 303,821
+Other revenues (2) | 799
+Elimination of intersegment revenues | (91,396)
+Total consolidated revenues and other income | 249,930
+13
+Table of Contents
+Revenue from Contracts with Customers
+Sales and other operating revenue include both revenue within the scope of ASC 606 and outside the scope of ASC 606. Trade
+14
+Table of Contents
+Note 4. Pension and Other Postretirement Benefits
+(millions of dollars) | Three Months Ended September 30, | Nine Months Ended September 30,
+Service cost | 135 | 121 | 412 | 395
+Interest cost | 165 | 170 | 494 | 511
+Expected return on plan assets | (164) | (149) | (493) | (447)
+Amortization of actuarial loss/(gain) | 5 | 18 | 15 | 55
+Amortization of prior service cost | (8) | (8) | (23) | (23)
+Net pension enhancement and curtailment/settlement cost | 2 | 11 | 4 | 62
+Net benefit cost | 135 | 163 | 409 | 553
+Pension Benefits - Non-U.S.
+Service cost | 65 | 83 | 204 | 243
+Interest cost | 196 | 208 | 638 | 635
+Expected return on plan assets | (191) | (207) | (621) | (634)
+Amortization of actuarial loss/(gain) | (11) | 10 | (33) | 28
+Amortization of prior service cost | 18 | 15 | 49 | 43
+Net pension enhancement and curtailment/settlement cost | (52) | 31 | (24) | 31
+Net benefit cost | 25 | 140 | 213 | 346
+Other Postretirement Benefits
+Service cost | 21 | 14 | 63 | 61
+Interest cost | 65 | 65 | 196 | 196
+Expected return on plan assets | (5) | (4) | (13) | (12)
+Amortization of actuarial loss/(gain) | (21) | (26) | (64) | (77)
+Net benefit cost | 41 | 34 | 131 | 122
+15
+Table of Contents
+Note 5. Other Comprehensive Income Information
+ExxonMobil Share of Accumulated Other Comprehensive Income (millions of dollars) | Cumulative Foreign Exchange Translation Adjustment | Postretirement Benefits Reserves Adjustment | Total
+Amounts reclassified from accumulated other comprehensive income | — | 35 | 35
+Total change in accumulated other comprehensive income | 1,851 | (14) | 1,837
+Balance as of September 30, 2025 | (14,315) | 1,533 | (12,782)
+Foreign exchange translation adjustment | 21 | 40 | 56 | 146
+Postretirement benefits reserves adjustment (excluding amortization) | (1) | (6) | 10 | 32
+Amortization and settlement of postretirement benefits reserves adjustment included in net periodic benefit costs | 24 | 1 | 40 | (6)
+Total | 44 | 35 | 106 | 172
+16
+Table of Contents
+Note 6. Financial Instruments and Derivatives
+The estimated fair value of financial instruments and derivatives at September 30, 2026 and December 31, 2025, and the related
+Long-term obligations to equity companies (3) | — | — | 567 | 567 | — | — | — | 567
+Other long-term financial liabilities (7) | — | — | 272 | 272 | — | — | 16 | 288
+December 31, 2025
+(millions of dollars) | Fair Value
+Derivative assets (1) | 5,197 | 2,259 | — | 7,456 | (6,261) | (341) | — | 854
+Advances to/receivables from equity companies (2)(3) | — | 1,935 | 3,938 | 5,873 | — | — | 256 | 6,129
+Other long-term financial assets (4) | 1,536 | — | 1,800 | 3,336 | — | — | 216 | 3,552
+Derivative liabilities (5) | 4,994 | 2,043 | — | 7,037 | (6,261) | (141) | — | 635
+Long-term debt (6) | 24,678 | 3,909 | — | 28,587 | — | — | 3,248 | 31,835
+Long-term obligations to equity companies (3) | — | — | 542 | 542 | — | — | — | 542
+Other long-term financial liabilities (7) | — | — | 348 | 348 | — | — | 16 | 364
+(1) Included in the Balance Sheet lines: Notes and accounts receivable - net and Other assets, including intangibles - net.
+(2) Included in the Balance Sheet line: Investments, advances and long-term receivables.
+17
+Table of Contents
+At September 30, 2026 and December 31, 2025, respectively, the Corporation had $1.0 billion and $0.5 billion of collateral
+under master netting arrangements not offset against the derivatives on the Condensed Consolidated Balance Sheet, primarily
+Crude oil (barrels) | 105 | 6
+Petroleum products (barrels) | (100) | (27)
+Natural gas (MMBTUs) | (453) | (449)
+18
+Table of Contents
+Note 7. Litigation and Other Contingencies
+Litigation
+19
+Table of Contents
+ITEM 2. MANAGEMENT'S DISCUSSION AND ANALYSIS OF FINANCIAL CONDITION AND
+RESULTS OF OPERATIONS
+Due to rounding, numbers presented may not add up precisely to the totals indicated.
+20
+Table of Contents
+consumer preferences including willingness and ability to pay for reduced emission products; the results of research programs
+and the ability to bring new technologies to commercial scale on a cost-competitive basis; and other factors discussed under
+21
+Table of Contents
+Overview
+During the third quarter of 2026, global supply disruptions continued to affect commodity and product markets. Lower global
+22
+Table of Contents
+Cash Capital Expenditures (Non-GAAP)
+Cash capital expenditures (Cash Capex) is the sum of "Additions to property, plant and equipment," "Additional investments
+Additional investments and advances | 868 | 501 | 1,579 | 973
+Other investing activities including collection of advances | (697) | (610) | (1,431) | (949)
+Inflows from noncontrolling interests for major projects | — | (23) | — | (68)
+Less: Advances and collections not related to capital expenditures or equity investments | (347) | — | (347) | 270
+Total Cash Capex (Non-GAAP) | 7,002 | 8,595 | 19,976 | 21,134
+Upstream | 5,981 | 7,614 | 16,645 | 18,276
+Chemical Products | 247 | 275 | 736 | 845
+Specialty Products | 155 | 109 | 221 | 316
+Other | 138 | 155 | 368 | 445
+Total Cash Capex (Non-GAAP) | 7,002 | 8,595 | 19,976 | 21,134
+23
+Table of Contents
+Structural Cost Savings (Non-GAAP)
+Structural Cost Savings describes decreases in cash opex excluding energy and production taxes as a result of operational
+24
+Table of Contents
+REVIEW OF THIRD QUARTER 2026 RESULTS
+ExxonMobil’s third quarter 2026 earnings were $15.4 billion, compared to $7.5 billion a year earlier. Global market conditions
+25
+Table of Contents
+Upstream Year-to-Date Earnings Driver Analysis (millions of dollars)
+Volume / Mix
+26
+Table of Contents
+Upstream Operational Results | Three Months Ended September 30, | Nine Months Ended September 30,
+2026 | 2025 | 2026 | 2025
+Canada/Other Americas | 804 | 863 | 887 | 807
+Europe | 4 | 3 | 4 | 3
+Africa | 134 | 145 | 131 | 140
+Asia | 683 | 830 | 647 | 809
+Australia/Oceania | 27 | 27 | 25 | 25
+Worldwide | 3,279 | 3,380 | 3,316 | 3,261
+Net natural gas production available for sale (millions of cubic feet daily)
+Canada/Other Americas | 28 | 23 | 27 | 30
+Europe | 235 | 265 | 274 | 302
+Africa | 112 | 118 | 114 | 114
+Asia | 1,689 | 3,157 | 1,818 | 3,272
+Australia/Oceania | 1,371 | 1,332 | 1,309 | 1,282
+27
+Table of Contents
+Upstream Additional Information (thousands of barrels daily) | Three Months Ended September 30, | Nine Months Ended September 30,
+Volumes reconciliation (Oil-equivalent production) (1)
+28
+Table of Contents
+ENERGY PRODUCTS
+Energy Products Financial Results | Three Months Ended September 30, | Nine Months Ended September 30,
+29
+Table of Contents
+Energy Products Year-to-Date Earnings Driver Analysis (millions of dollars)
+Volume / Mix
+Canada | 381 | 425 | 365 | 400
+Europe | 754 | 1,055 | 767 | 1,003
+Asia Pacific | 460 | 471 | 388 | 453
+Other | 199 | 191 | 195 | 187
+Worldwide | 3,735 | 4,106 | 3,598 | 3,952
+Energy Products sales (1)
+Aviation fuels | 390 | 395 | 407 | 382
+Heavy fuels | 171 | 241 | 176 | 215
+Other energy products | 1,256 | 934 | 1,209 | 887
+Worldwide | 5,753 | 5,692 | 5,694 | 5,522
+(1) Data reported net of purchases/sales contracts with the same counterparty.
+30
+Table of Contents
+CHEMICAL PRODUCTS
+Chemical Products Financial Results | Three Months Ended September 30, | Nine Months Ended September 30,
+United States | 472 | 329 | 1,390 | 839
+Non-U.S. | 263 | 186 | 586 | 242
+Total | 735 | 515 | 1,976 | 1,081
+Chemical Products Third Quarter Earnings Driver Analysis (millions of dollars)
+31
+Table of Contents
+Chemical Products Year-to-Date Earnings Driver Analysis (millions of dollars)
+Volume / Mix
+32
+Table of Contents
+SPECIALTY PRODUCTS
+Specialty Products Financial Results | Three Months Ended September 30, | Nine Months Ended September 30,
+United States | 386 | 354 | 947 | 967
+Non-U.S. | 899 | 386 | 1,945 | 1,208
+Total | 1,285 | 740 | 2,892 | 2,175
+33
+Table of Contents
+Specialty Products Year-to-Date Earnings Driver Analysis (millions of dollars)
+Volume / Mix
+34
+Table of Contents
+LIQUIDITY AND CAPITAL RESOURCES
+(millions of dollars) | Three Months Ended September 30, | Nine Months Ended September 30,
+Effect of exchange rate changes | (221) | 532
+Increase/(decrease) in cash and cash equivalents | 1,472 | (9,318)
+Cash and cash equivalents (at end of period) | 12,153 | 13,869
+35
+Table of Contents
+The Corporation, as part of its ongoing asset management program, continues to evaluate its mix of assets for potential upgrade.
+Because of the ongoing nature of this program, dispositions will continue to be made from time to time which will result in
+ITEM 3. QUANTITATIVE AND QUALITATIVE DISCLOSURES ABOUT MARKET RISK
+Information about market risks for the nine months ended September 30, 2026, does not differ materially from that discussed
+under Item 7A of the registrant's Annual Report on Form 10-K for 2025.
+ITEM 4. CONTROLS AND PROCEDURES
+As indicated in the certifications in Exhibit 31 of this report, the Corporation’s Chief Executive Officer, Chief Financial Officer,
+and Principal Accounting Officer have evaluated the Corporation’s disclosure controls and procedures as of September 30,
+36
+Table of Contents
+PART II. OTHER INFORMATION
+ITEM 1. LEGAL PROCEEDINGS
+ExxonMobil has elected to use a $1 million threshold for disclosing environmental proceedings.
+Refer to the relevant portions of Note 7 of this Quarterly Report on Form 10-Q for further information on legal proceedings.
+ITEM 2. UNREGISTERED SALES OF EQUITY SECURITIES AND USE OF PROCEEDS
+Issuer Purchases of Equity Securities for Quarter Ended September 30, 2026
+Total Number of Shares Purchased (1) | Average Price Paid per Share (2) | Total Number of Shares Purchased as Part of Publicly Announced Plans or Programs (3) | Approximate Dollar Value of Shares ...
+ITEM 5. OTHER INFORMATION
+During the three months ended September 30, 2026, none of the Corporation’s directors or officers adopted or terminated a
+“Rule 10b5-1 trading arrangement” or “non-Rule 10b5-1 trading arrangement,” as each term is defined in Item 408(a) of
+37
+Table of Contents
+ITEM 6. EXHIBITS
+Exhibit | Description
+10.7 ** | Extended Provisions for Restricted Stock Agreements.*
+38
+SIGNATURE
+Pursuant to the requirements of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on

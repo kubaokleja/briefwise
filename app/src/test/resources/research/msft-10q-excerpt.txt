@@ -1,0 +1,501 @@
+UNITED STATES
+SECURITIES AND EXCHANGE COMMISSION
+Washington, D.C. 20549
+FORM 10-Q
+☒ | QUARTERLY REPORT PURSUANT TO SECTION 13 OR 15(d) OF THE SECURITIES EXCHANGE ACT OF 1934
+For the Quarterly Period Ended September 30, 2026
+OR
+☐ | TRANSITION REPORT PURSUANT TO SECTION 13 OR 15(d) OF THE SECURITIES EXCHANGE ACT OF 1934
+For the Transition Period From to
+Commission File Number 001-37845
+MICROSOFT CORPORATION
+Washington | 91-1144442
+(STATE OF INCORPORATION) | (I.R.S. ID)
+ONE MICROSOFT WAY, REDMOND, Washington 98052-6399
+(425) 882-8080
+www.microsoft.com/investor
+Securities registered pursuant to Section 12(b) of the Act:
+Title of each class | Trading Symbol | Name of exchange on which registered
+Common stock, $0.00000625 par value per share | MSFT | Nasdaq
+3.125% Notes due 2028 | MSFT | Nasdaq
+2.625% Notes due 2033 | MSFT | Nasdaq
+Indicate by check mark whether the registrant (1) has filed all reports required to be filed by Section 13 or 15(d) of the Securities Exchange Act of 1934 during the preceding 12 months (or for such ...
+Indicate by check mark whether the registrant has submitted electronically every Interactive Data File required to be submitted pursuant to Rule 405 of Regulation S-T (§232.405 of this chapter) ...
+Indicate by check mark whether the registrant is a large accelerated filer, an accelerated filer, a non-accelerated filer, a smaller reporting company, or an emerging growth company. See the ...
+Large Accelerated Filer ☒ | Accelerated Filer ☐
+Non-accelerated Filer ☐ | Smaller Reporting Company ☐
+Emerging Growth Company ☐
+If an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition period for complying with any new or revised financial accounting standards ...
+Indicate by check mark whether the registrant is a shell company (as defined in Rule 12b-2 of the Exchange Act). Yes ☐ No ☒
+Indicate the number of shares outstanding of each of the issuer’s classes of common stock, as of the latest practicable date.
+Class | Outstanding as of October 22, 2026
+Common Stock, $0.00000625 par value per share | 7,426,194,552 shares
+MICROSOFT CORPORATION
+FORM 10-Q
+For the Quarter Ended September 30, 2026
+INDEX
+Page
+PART I. | FINANCIAL INFORMATION
+Item 1. | Financial Statements
+a) | Income Statements for the Three Months Ended September 30, 2026 and 2025 | 3
+b) | Comprehensive Income Statements for the Three Months Ended September 30, 2026 and 2025 | 4
+c) | Balance Sheets as of September 30, 2026 and June 30, 2026 | 5
+d) | Cash Flows Statements for the Three Months Ended September 30, 2026 and 2025 | 6
+e) | Stockholders’ Equity Statements for the Three Months Ended September 30, 2026 and 2025 | 7
+f) | Notes to Financial Statements | 8
+g) | Report of Independent Registered Public Accounting Firm | 27
+Item 2. | Management’s Discussion and Analysis of Financial Condition and Results of Operations | 28
+Item 3. | Quantitative and Qualitative Disclosures About Market Risk | 42
+Item 4. | Controls and Procedures | 42
+PART II. | OTHER INFORMATION
+Item 1. | Legal Proceedings | 43
+Item 1A. | Risk Factors | 43
+Item 2. | Unregistered Sales of Equity Securities and Use of Proceeds | 58
+Item 5. | Other Information | 59
+Item 6. | Exhibits | 60
+SIGNATURE | 61
+2
+PART I
+Item 1
+PART I. FINANCIAL INFORMATION
+ITEM 1. FINANCIAL STATEMENTS
+INCOME STATEMENTS
+(In millions, except per share amounts) (Unaudited)
+Three Months Ended September 30, | 2026 | 2025
+Revenue:
+Product | $ | 14,631 | $ | 15,922
+Service and other | 77,648 | 61,751
+Total revenue | 92,279 | 77,673
+Cost of revenue:
+Product | 2,471 | 2,922
+Service and other | 27,249 | 21,121
+Total cost of revenue | 29,720 | 24,043
+Gross margin | 62,559 | 53,630
+Research and development | 9,047 | 8,146
+Sales and marketing | 5,716 | 5,717
+General and administrative | 1,881 | 1,806
+Operating income | 45,915 | 37,961
+Other income (expense), net | 38 | (3,660 | )
+Income before income taxes | 45,953 | 34,301
+Provision for income taxes | 9,324 | 6,554
+Net income | $ | 36,629 | $ | 27,747
+Earnings per share:
+Basic | $ | 4.93 | $ | 3.73
+Diluted | $ | 4.92 | $ | 3.72
+Weighted average shares outstanding:
+Basic | 7,426 | 7,433
+Diluted | 7,446 | 7,466
+Refer to accompanying notes.
+3
+PART I
+Item 1
+COMPREHENSIVE INCOME STATEMENTS
+(In millions) (Unaudited)
+Net change related to investments | (559 | ) | 687
+Translation adjustments and other | (17 | ) | (98 | )
+Other comprehensive income (loss) | (573 | ) | 586
+Comprehensive income | $ | 36,056 | $ | 28,333
+Refer to accompanying notes.
+4
+PART I
+Item 1
+BALANCE SHEETS
+(In millions) (Unaudited)
+5
+PART I
+Item 1
+CASH FLOWS STATEMENTS
+(In millions) (Unaudited)
+Repayments of debt | (4,850 | ) | 0
+Common stock issued | 598 | 689
+Common stock repurchased | (4,379 | ) | (5,650 | )
+Common stock cash dividends paid | (6,757 | ) | (6,169 | )
+6
+PART I
+Item 1
+STOCKHOLDERS’ EQUITY STATEMENTS
+(In millions, except per share amounts) (Unaudited)
+Common stock issued | 598 | 689
+Common stock repurchased | (1,566 | ) | (1,801 | )
+Stock-based compensation expense | 3,134 | 2,983
+Other comprehensive income (loss) | (573 | ) | 586
+Balance, end of period | (3,857 | ) | (2,761 | )
+Total stockholders’ equity | $ | 470,509 | $ | 363,076
+7
+PART I
+Item 1
+NOTES TO FINANCIAL STATEMENTS
+(Unaudited)
+8
+PART I
+Item 1
+Debt investments are classified as available-for-sale and realized gains and losses are recorded using the specific identification method. Changes in fair value, excluding credit losses and ...
+Equity investments with readily determinable fair values are generally measured at fair value. Equity investments that are not recorded at fair value are measured using the equity method of ...
+9
+PART I
+Item 1
+For derivative instruments that are not designated as hedges, gains and losses from changes in fair values are primarily recognized in other income (expense), net.
+Fair Value Measurements
+10
+PART I
+Item 1
+Recent Accounting Guidance
+Income Statement – Disaggregation of Income Statement Expenses
+Dilutive effect of stock-based awards | 20 | 33
+Common stock and common stock equivalents (C) | 7,446 | 7,466
+Earnings Per Share
+Interest and dividends income | $ | 744 | $ | 976
+Interest expense | (870 | ) | (698 | )
+Net recognized losses on investments | (46 | ) | (572 | )
+11
+PART I
+Item 1
+Net Recognized Gains (Losses) on Investments
+Net recognized gains (losses) on debt investments were as follows:
+Realized gains from sales of available-for-sale securities | $ | 12 | $ | 16
+Realized losses from sales of available-for-sale securities | (18 | ) | (10 | )
+Impairments and allowance for credit losses | (35 | ) | 4
+Total | $ | (41 | ) | $ | 10
+Net recognized gains (losses) on equity investments were as follows:
+(In millions)
+Net realized gains on investments sold | $ | 74 | $ | 71
+Net unrealized losses on investments still held | (60 | ) | (635 | )
+Impairments of investments | (19 | ) | (18 | )
+12
+PART I
+Item 1
+NOTE 4 — INVESTMENTS
+Investment Components
+Commercial paper | Level 2 | $ | 1,184 | $ | 0 | $ | 0 | $ | 1,184 | $ | 1,182 | $ | 2 | $ | 0
+Certificates of deposit | Level 2 | 1,844 | 0 | 0 | 1,844 | 1,800 | 44 | 0
+U.S. government securities | Level 1 | 42,694 | 0 | (1,587 | ) | 41,107 | 1,072 | 31,427 | 8,608
+U.S. agency securities | Level 2 | 608 | 0 | 0 | 608 | 599 | 9 | 0
+Foreign government bonds | Level 2 | 203 | 7 | (10 | ) | 200 | 0 | 200 | 0
+Mortgage- and asset-backed securities | Level 2 | 1,500 | 3 | (43 | ) | 1,460 | 0 | 1,460 | 0
+Corporate notes and bonds | Level 2 | 10,799 | 11 | (267 | ) | 10,543 | 0 | 10,543 | 0
+Corporate notes and bonds | Level 3 | 1,602 | 120 | 0 | 1,722 | 0 | 102 | 1,620
+Municipal securities | Level 2 | 148 | 0 | (11 | ) | 137 | 0 | 137 | 0
+Municipal securities | Level 3 | 105 | 0 | (16 | ) | 89 | 0 | 89 | 0
+Total debt investments | $ | 60,687 | $ | 141 | $ | (1,934 | ) | $ | 58,894 | $ | 4,653 | $ | 44,013 | $ | 10,228
+Changes in Fair Value Recorded in Net Income
+Cash | $ | 14,030 | $ | 14,030 | $ | 0 | $ | 0
+Derivatives, net (a) | 215 | 0 | 215 | 0
+Total | $ | 102,317 | $ | 20,281 | $ | 44,228 | $ | 37,808
+13
+PART I
+Item 1
+(In millions) | Fair Value Level | Adjusted Cost Basis | Unrealized Gains | Unrealized Losses | Recorded Basis | Cash and Cash Equivalents | Short-term Investments | Equity and Other Investments
+June 30, 2026
+Commercial paper | Level 2 | $ | 2,987 | $ | 0 | $ | 0 | $ | 2,987 | $ | 2,373 | $ | 614 | $ | 0
+Certificates of deposit | Level 2 | 1,745 | 0 | 0 | 1,745 | 1,701 | 44 | 0
+U.S. government securities | Level 1 | 49,714 | 2 | (1,154 | ) | 48,562 | 399 | 40,675 | 7,488
+U.S. agency securities | Level 2 | 3,133 | 0 | 0 | 3,133 | 1,787 | 1,346 | 0
+Foreign government bonds | Level 2 | 221 | 12 | (7 | ) | 226 | 0 | 226 | 0
+Mortgage- and asset-backed securities | Level 2 | 1,813 | 5 | (23 | ) | 1,795 | 0 | 1,795 | 0
+Corporate notes and bonds | Level 2 | 10,682 | 49 | (71 | ) | 10,660 | 0 | 10,660 | 0
+Corporate notes and bonds | Level 3 | 1,618 | 120 | 0 | 1,738 | 0 | 118 | 1,620
+Municipal securities | Level 2 | 152 | 0 | (5 | ) | 147 | 0 | 147 | 0
+Municipal securities | Level 3 | 105 | 0 | (14 | ) | 91 | 0 | 91 | 0
+Total debt investments | $ | 72,170 | $ | 188 | $ | (1,274 | ) | $ | 71,084 | $ | 6,260 | $ | 55,716 | $ | 9,108
+Changes in Fair Value Recorded in Net Income
+Cash | $ | 13,059 | $ | 13,059 | $ | 0 | $ | 0
+Derivatives, net (a) | 192 | 0 | 192 | 0
+Total | $ | 113,191 | $ | 20,935 | $ | 55,908 | $ | 36,348
+(a)
+14
+PART I
+Item 1
+Unrealized Losses on Debt Investments
+Debt investments with continuous unrealized losses for less than 12 months and 12 months or greater and their related fair values were as follows:
+15
+PART I
+Item 1
+Foreign currency risks related to certain Euro-denominated debt are hedged using foreign exchange forward contracts that are designated as cash flow hedging instruments.
+Certain options and forwards not designated as hedging instruments are also used to manage the variability in foreign exchange rates on certain balance sheet amounts and to manage other foreign ...
+Other contracts sold | 711 | 630
+16
+PART I
+Item 1
+Fair Values of Derivative Instruments
+The following table presents our derivative instruments:
+Interest rate contracts | 5 | 0 | 11 | 0
+Not Designated as Hedging Instruments
+Foreign exchange contracts | 331 | (379 | ) | 1,742 | (1,175 | )
+Short-term investments | $ | 215 | $ | 0 | $ | 192 | $ | 0
+Other current assets | 134 | 0 | 681 | 0
+Equity and other investments | 0 | 0 | 0 | 0
+Other long-term assets | 3 | 0 | 3 | 0
+Other current liabilities | 0 | (245 | ) | 0 | (379 | )
+Other long-term liabilities | 0 | (132 | ) | 0 | (116 | )
+Derivative assets | $ | 0 | $ | 705 | $ | 5 | $ | 710
+Derivative liabilities | 0 | (594 | ) | 0 | (594 | )
+June 30, 2026
+17
+PART I
+Item 1
+Gains (losses) on derivative instruments recognized in other income (expense), net were as follows:
+(In millions)
+Foreign exchange contracts | 262 | 381
+Equity contracts | 5 | 1,579
+Other contracts | (47 | ) | 0
+Gains (losses), net of tax, on derivative instruments recognized in our consolidated comprehensive income statements were as follows:
+(In millions)
+18
+PART I
+Item 1
+We have recast certain prior period amounts to conform to the way we internally manage and monitor our business. Refer to Note 1 – Accounting Policies for further information.
+The measurement periods for the valuation of assets acquired and liabilities assumed end as soon as information on the facts and circumstances that existed as of the acquisition dates becomes ...
+Contract-based | 663 | (158 | ) | 505 | 623 | (124 | ) | 499
+Total | $ | 44,212 | $ | (26,461 | ) | $ | 17,751 | $ | 44,079 | $ | (25,470 | ) | $ | 18,609
+Intangible assets amortization expense was $1.0 billion and $1.5 billion for the three months ended September 30, 2026 and 2025, respectively.
+19
+PART I
+Item 1
+NOTE 9 — DEBT
+The components of long-term debt were as follows:
+2009 issuance of $3.8 billion | 2039 | 5.20% | 5.24% | $ | 520 | $ | 520
+2010 issuance of $4.8 billion | 2040 | 4.50% | 4.57% | 486 | 486
+2011 issuance of $2.3 billion | 2041 | 5.30% | 5.36% | 718 | 718
+2012 issuance of $2.3 billion | 2042 | 3.50% | 3.57% | 454 | 454
+2013 issuance of $5.2 billion | 2043 | 3.75% | – | 4.88% | 3.83% | – | 4.92% | 314 | 314
+2013 issuance of €4.1 billion | 2028 | – | 2033 | 2.63% | – | 3.13% | 2.69% | – | 3.22% | 2,612 | 2,630
+2015 issuance of $23.8 billion | 2035 | – | 2055 | 3.50% | – | 4.75% | 3.60% | – | 4.78% | 4,555 | 4,555
+2023 issuance of $0.1 billion | 2027 | – | 2050 | 1.35% | – | 4.50% | 5.16% | – | 5.49% | 20 | 56
+2024 issuance of $3.3 billion | 2027 | – | 2050 | 1.35% | – | 4.50% | 5.16% | – | 5.49% | 2,618 | 3,344
+Total face value | 41,269 | 46,136
+20
+PART I
+Item 1
+Our effective tax rate was lower than the U.S. federal statutory rate for the three months ended September 30, 2026, primarily due to earnings taxed at lower rates in foreign jurisdictions resulting ...
+Uncertain Tax Positions
+Interest on lease liabilities | 769 | 546
+Total finance lease cost | $ | 2,471 | $ | 1,719
+21
+PART I
+Item 1
+Supplemental cash flow information related to leases was as follows:
+(In millions)
+Operating cash flows from finance leases | 769 | 546
+Financing cash flows from finance leases | 1,000 | 639
+Right-of-use assets obtained in exchange for lease obligations:
+Operating leases | 6,523 | 1,417
+22
+PART I
+Item 1
+NOTE 13 — CONTINGENCIES
+Irish Data Protection Commission Matter
+23
+PART I
+Item 1
+NOTE 15 — ACCUMULATED OTHER COMPREHENSIVE INCOME (LOSS)
+The following table summarizes the changes in accumulated other comprehensive income (loss) by component:
+Reclassification adjustments for losses included in other income (expense), net | 16 | 5
+Tax benefit included in provision for income taxes | (3 | ) | (1 | )
+Amounts reclassified from accumulated other comprehensive loss | 13 | 4
+Net change related to derivatives, net of tax of $0 and $(1) | 3 | (3 | )
+Balance, end of period | $ | 3 | $ | (11 | )
+Unrealized gains (losses), net of tax of $(157) and $185 | (591 | ) | 695
+Reclassification adjustments for (gains) losses included in other income (expense), net | 41 | (10 | )
+Tax expense (benefit) included in provision for income taxes | (9 | ) | 2
+Amounts reclassified from accumulated other comprehensive loss | 32 | (8 | )
+Net change related to investments, net of tax of $(148) and $183 | (559 | ) | 687
+Balance, end of period | $ | (1,395 | ) | $ | (364 | )
+Translation Adjustments and Other
+24
+PART I
+Item 1
+Our reportable segments are described below.
+Agents and Infra
+25
+PART I
+Item 1
+Segment revenue, cost of revenue, operating expenses, and operating income were as follows during the periods presented:
+(In millions)
+26
+PART I
+Item 1
+REPORT OF INDEPENDENT REGISTERED PUBLIC ACCOUNTING FIRM
+To the Stockholders and the Board of Directors of Microsoft Corporation
+27
+PART I
+Item 2
+ITEM 2. MANAGEMENT’S DISCUSSION AND ANALYSIS OF FINANCIAL CONDITION AND RESULTS OF OPERATIONS
+Note About Forward-Looking Statements
+This report includes estimates, projections, statements relating to our business plans, objectives, and expected operating results that are “forward-looking statements” within the meaning of the ...
+28
+PART I
+Item 2
+Industry Trends and Opportunities
+Our industry is dynamic and highly competitive, with frequent changes in both technologies and business models. Each industry shift is an opportunity to conceive new products, new technologies, or ...
+29
+PART I
+Item 2
+Reportable Segments
+We report our financial performance based on the following two segments: Agents and Infra, and Devices and Consumer. The segment amounts included in MD&A are presented on a basis consistent with our ...
+30
+PART I
+Item 2
+Agents and Infra
+Metrics related to our Agents and Infra segment assess the performance of our core businesses within this segment. The metrics primarily reflect growth across our commercial and cloud services.
+31
+PART I
+Item 2
+SUMMARY RESULTS OF OPERATIONS
+(In millions, except percentages and per share amounts) | Three Months Ended September 30, | Percentage Change
+32
+PART I
+Item 2
+SEGMENT RESULTS OF OPERATIONS
+(In millions, except percentages) | Three Months Ended September 30, | Percentage Change
+33
+PART I
+Item 2
+•
+Operating expenses increased $1.1 billion or 10% driven by continued investments in research and development compute capacity and talent.
+34
+PART I
+Item 2
+Three Months Ended September 30, 2026 Compared with Three Months Ended September 30, 2025
+Sales and marketing expenses were relatively unchanged.
+Interest and dividends income | $ | 744 | $ | 976
+Interest expense | (870 | ) | (698 | )
+Net recognized losses on investments | (46 | ) | (572 | )
+35
+PART I
+Item 2
+INCOME TAXES
+Effective Tax Rate
+36
+PART I
+Item 2
+LIQUIDITY AND CAPITAL RESOURCES
+We expect existing cash, cash equivalents, short-term investments, cash flows from operations, and access to capital markets to continue to be sufficient to fund our operating activities and cash ...
+37
+PART I
+Item 2
+Debt Proceeds
+We issue debt to take advantage of favorable pricing and liquidity in the debt markets, reflecting our credit rating. The proceeds of these issuances were or will be used for general corporate ...
+38
+PART I
+Item 2
+RECENT ACCOUNTING GUIDANCE
+Refer to Note 1 – Accounting Policies of the Notes to Financial Statements (Part I, Item 1 of this Form 10-Q).
+39
+PART I
+Item 2
+Measurement and Impairment of Investment Securities
+Investments purchased by Microsoft are typically accounted for as available-for-sale debt securities, equity investments with readily determinable fair values, or equity investments without readily ...
+40
+PART I
+Item 2
+Research and Development Costs
+Costs incurred internally in researching and developing a software product to be marketed or sold to external users are charged to expense until technological feasibility has been established for the ...
+41
+PART I
+Item 3, 4
+ITEM 3. QUANTITATIVE AND QUALITATIVE DISCLOSURES ABOUT MARKET RISK
+RISKS
+We are exposed to economic risk from foreign exchange rates, interest rates, credit risk, and equity prices. We use derivatives instruments to manage these risks, however, they may still impact our ...
+ITEM 4. CONTROLS AND PROCEDURES
+Under the supervision and with the participation of our management, including the Chief Executive Officer and Chief Financial Officer, we have evaluated the effectiveness of our disclosure controls ...
+42
+PART II
+Item 1, 1A
+PART II. OTHER INFORMATION
+ITEM 1. LEGAL PROCEEDINGS
+Refer to Note 13 – Contingencies of the Notes to Financial Statements (Part I, Item 1 of this Form 10-Q) for information regarding legal proceedings in which we are involved.
+ITEM 1A. RISK FACTORS
+Our operations and financial results are subject to various risks and uncertainties, including those described below, that could adversely affect our business, operations, financial condition, ...
+STRATEGIC AND COMPETITIVE RISKS
+43
+PART II
+Item 1A
+applications have high quality, security, customer appeal, and value. Efforts to compete with competitors’ content and application marketplaces may increase our cost of revenue and lower our ...
+For all of these reasons, we may not be able to compete successfully against our current and future competitors, which could adversely affect our business, operations, financial condition, and ...
+44
+PART II
+Item 1A
+Demand for cloud-based and AI products and services is evolving and difficult to forecast. Overestimation of demand or misalignment of capacity investments may result in underutilization of ...
+The cost structure for AI products and services is subject to significant uncertainty, including with respect to model training and inference costs, the availability and pricing of components, and ...
+45
+PART II
+Item 1A
+Our cloud-based and AI products and services may be misused by customers, users, or malicious actors for unintended, fraudulent, abusive, or unlawful purposes. Our efforts to detect, prevent, and ...
+RISKS RELATING TO THE EVOLUTION OF OUR BUSINESS
+46
+PART II
+Item 1A
+employees, users, partners, suppliers, or customers to disclose sensitive information, such as passwords, or take other actions to gain access to our data or our users’ or customers’ data; or acting ...
+Cyberthreats are constantly evolving and becoming increasingly sophisticated and complex, increasing the difficulty of preventing, detecting and successfully defending against them. Threat actors ...
+47
+PART II
+Item 1A
+controlled, facilitate unauthorized access, disclosure, alteration, or destruction of data or disruption of critical operations. Malicious actors have and may continue to exploit the supply chain to ...
+Security of our products, services, devices, and customers’ data
+48
+PART II
+Item 1A
+Development and deployment of defensive measures
+To defend against security threats to our internal infrastructure, our cloud-based services, and our customers’ systems, we must take a complex and multifaceted approach. This includes continuously ...
+49
+PART II
+Item 1A
+other things, changes in the law, interpretations of law, or increasing use of agentic AI, could adversely affect our business, financial condition, and results of operations.
+Abuse of our platforms may harm our reputation or user engagement.
+50
+PART II
+Item 1A
+systems could result in legal liability, regulatory action, litigation, brand, reputational, or competitive harm, or other adverse impacts. These risks may stem from issues related to AI model and ...
+OPERATIONAL RISKS
+51
+PART II
+Item 1A
+components. Expanding manufacturing or supply capacity for certain components may require significant investments and multi-year lead times. As components are delayed or become unavailable or more ...
+In addition to infrastructure, other products such as XBOX consoles, Surface devices, and other hardware are similarly subject to supply chain challenges and disruptions, resulting in shortages which ...
+52
+PART II
+Item 1A
+LEGAL, REGULATORY, AND LITIGATION RISKS
+We are subject to a variety of new, existing, and evolving legal and regulatory requirements that could adversely affect our results of operations. We are subject to a wide range of laws, ...
+53
+PART II
+Item 1A
+countries, has and may continue to increase operational costs, create uncertainty in the continuity of our products, and accelerate sovereignty initiatives among international partners and customers. ...
+•
+54
+PART II
+Item 1A
+We have claims and lawsuits against us that may result in adverse outcomes. We are subject to a variety of claims and lawsuits. These claims may arise from a wide variety of business practices and ...
+Our business with government customers may present additional uncertainties. We derive substantial revenue from government contracts. Government contracts and regulatory requirements can present ...
+55
+PART II
+Item 1A
+Source code, the detailed program commands for our software programs, is critical to our business. Unauthorized access to or disclosure of source code or other intellectual property may negatively ...
+Third parties may claim that we infringe their intellectual property. From time to time, others claim we infringe their intellectual property rights, including current copyright infringement and ...
+56
+PART II
+Item 1A
+Abrupt political change, terrorist activity, and armed conflict pose economic and other risks, which may negatively impact our ability to sell to and collect from customers, increase our operating ...
+Regional epidemics or a global pandemic could adversely affect our business, operations, financial condition, and results of operations, depending on their duration and scope, responsive actions by ...
+57
+PART II
+Item 2
+ITEM 2. UNREGISTERED SALES OF EQUITY SECURITIES AND USE OF PROCEEDS
+SHARE REPURCHASES AND DIVIDENDS
+Following are our monthly share repurchases for the first quarter of fiscal year 2027:
+58
+PART II
+Item 5
+ITEM 5. OTHER INFORMATION
+Insider Trading Arrangements
+None of our officers or directors, as defined in Rule 16a-1(f) of the Securities Exchange Act of 1934, adopted, modified, or terminated a “Rule 10b5-1 trading arrangement” or a “non-Rule 10b5-1 ...
+59
+PART II
+Item 6
+ITEM 6. EXHIBITS
+Incorporated by Reference
+Exhibit Number | Exhibit Description | Filed Herewith | Form | Period Ending | Exhibit | Filing Date
+60
+SIGNATURE
+Pursuant to the requirements of the Securities Exchange Act of 1934, the registrant has duly caused this report to be signed on its behalf by the undersigned; thereunto duly authorized.
+61
