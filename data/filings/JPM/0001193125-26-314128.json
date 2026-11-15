@@ -1,0 +1,24 @@
+{
+  "formatVersion" : 1,
+  "ticker" : "JPM",
+  "accessionNo" : "0001193125-26-314128",
+  "cik" : "0000019617",
+  "form" : "8-K",
+  "filedAt" : "2026-07-23",
+  "reportDate" : "2026-07-23",
+  "primaryDocument" : "d103985d8k.htm",
+  "items" : [
+    "8.01",
+    "9.01"
+  ],
+  "sourceUrl" : "https://www.sec.gov/Archives/edgar/data/19617/000119312526314128/d103985d8k.htm",
+  "extractorVersion" : "html-2/sections-2",
+  "contentSha256" : "fd2a41b5613e7cf50c918852593a6304693305d1bed8749f6829bd4bc3f7f2ef",
+  "sections" : [
+    {
+      "itemId" : "8.01",
+      "title" : "Other Events.",
+      "text" : "On July 23, 2026, JPMorgan Chase & Co. closed public offerings of (i) $500,000,000 aggregate principal amount of Floating Rate Notes due 2030 (the “Floating Rate Notes”), (ii) $2,500,000,000 aggregate principal amount of Fixed-to-Floating Rate Notes due 2030 (the “2030 Fixed-to-Floating Rate Notes”), (iii) $3,000,000,000 aggregate principal amount of Fixed-to-Floating Rate Notes due 2032 (together with the Floating Rate Notes and the 2030 Fixed-to-Floating Rate Notes, the “Senior Notes”) and (iv) $3,000,000,000 aggregate principal amount of Fixed-Rate Reset Subordinated Notes due 2041 (the “Subordinated Notes” and, together with the Senior Notes, the “Notes”).\nThe offerings of the Notes were registered under the Securities Act of 1933, as amended, pursuant to a registration statement on Form S-3 (File No. 333-285537), as amended. In connection with these offerings, the legal opinion as to the legality of the Senior Notes is being filed as Exhibit 5.1 to this report and the legal opinion as to the legality of the Subordinated Notes is being filed as Exhibit 5.2 to this report."
+    }
+  ]
+}

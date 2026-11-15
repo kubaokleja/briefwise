@@ -1,0 +1,24 @@
+{
+  "formatVersion" : 1,
+  "ticker" : "XOM",
+  "accessionNo" : "0001193125-26-402986",
+  "cik" : "0002115436",
+  "form" : "8-K",
+  "filedAt" : "2026-09-25",
+  "reportDate" : "2026-09-25",
+  "primaryDocument" : "d15072d8k.htm",
+  "items" : [
+    "8.01",
+    "9.01"
+  ],
+  "sourceUrl" : "https://www.sec.gov/Archives/edgar/data/2115436/000119312526402986/d15072d8k.htm",
+  "extractorVersion" : "html-2/sections-2",
+  "contentSha256" : "93db467717addc467b5a4df06f307bee08af3d83d374731029fd36d1bba29401",
+  "sections" : [
+    {
+      "itemId" : "8.01",
+      "title" : "Other Events",
+      "text" : "On September 23, 2026, ExxonMobil Holdings Corporation, a Texas corporation (the “Company”), and Exxon Mobil Corporation, a New Jersey corporation and a subsidiary of the Company (“Exxon Mobil”), entered into an underwriting agreement (the “Underwriting Agreement”) with RBC Capital Markets, LLC, Deutsche Bank Securities Inc., J.P. Morgan Securities LLC, Morgan Stanley & Co. LLC and UBS Securities LLC, as managers of the several underwriters named therein, for the issuance and sale by Exxon Mobil of $185,883,000 aggregate principal amount of its Floating Rate Notes due 2076 (the “Notes”), which are to be fully and unconditionally guaranteed by the Company.\nThe Notes were issued pursuant to an indenture entered into by Exxon Mobil on March 20, 2014 with Deutsche Bank Trust Company Americas, as trustee (the “Trustee”), as supplemented and amended by a first supplemental indenture dated as of June 26, 2020 between Exxon Mobil and the Trustee, as further supplemented and amended by a second supplemental indenture dated as of July 1, 2026 among the Company, Exxon Mobil and the Trustee and as further supplemented by an officer’s certificate dated as of September 25, 2026 establishing the terms and forms of the Notes (the “Officer’s Certificate”).\nThe Notes were offered pursuant to Exxon Mobil’s Registration Statement on Form S-3 filed with the Securities and Exchange Commission (the “Commission”) on February 18, 2026 (Reg. No. 333-293558), as amended by Post-Effective Amendment No. 1 thereto filed with the Commission on July 1, 2026 (together, the “Registration Statement”).\nThe Form of Underwriting Agreement – Standard Provisions (Debt Securities), the Underwriting Agreement and the Officer’s Certificate (including the forms of the Notes) are filed as Exhibits 1.1, 1.2 and 4.4, respectively, to this current report on Form 8-K and are incorporated by reference into the Registration Statement. The opinions of Davis Polk & Wardwell LLP and Timothy Kim, Esq., Counsel—Corporate of Exxon Mobil Corporation and ExxonMobil Holdings Corporation, are filed as Exhibits 5.1 and 5.2, respectively, to this current report on Form 8-K and are incorporated by reference into the Registration Statement."
+    }
+  ]
+}

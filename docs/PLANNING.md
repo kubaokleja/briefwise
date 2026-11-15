@@ -341,8 +341,13 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   filings and listings failed or on a thrown error, no deadline (like news ingest, ADR 0021);
   `briefwise.jobs.filing-ingest.enabled`. `JobServiceTest` (+3), `JobModelTest` (+2 asserts), `AdminJobControllerIT`
   (+1, test snapshot); `docs/api.http` entry (404 / 400 cases shared with the other jobs)
-- [ ] First local ingest from live EDGAR (held stocks): snapshot committed; filings, sections, size, time, screening
-  hits in PROGRESS (may move to the start of slice 3 if the session runs long)
+- [x] First local ingest from live EDGAR (2026-11-15, `local` DB, job runner with `source=edgar`): 9 companies (AGG,
+  SPY skipped), 110 filings (8 10-K, 18 10-Q, 84 8-K), 204 sections, 3.97 M characters, 0 suspected, 0 failed;
+  `data/filings/` 3.9 MB in 110 files committed, tables 2.3 MB; about 2 min live, 9 s from the snapshot (all
+  `UNCHANGED`). Found and fixed: filing-agent 8-Ks write `Item&#8201;8.01` (thin space), 10 had 0 sections ->
+  `HtmlText` v2 (every `\p{Zs}` a plain space, 23 filings `REPLACED`); same hash from a newer extractor now records
+  the new `extractor_version` / source URL (`updateProvenance`, decided 2026-11-15, ADR 0026 update). Checked, as
+  designed: JNJ / XOM 10-Qs have no Part II Item 1A (1 section each); XOM has no 10-K under its new CIK yet
 
 ### Slice 3 — Chunking, embeddings, vector store
 - [ ] Decide C1 chunking: by section + size limit (DESIGN 8 proposal) vs fixed size; chunk size and overlap in

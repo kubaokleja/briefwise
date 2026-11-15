@@ -1,0 +1,24 @@
+{
+  "formatVersion" : 1,
+  "ticker" : "PG",
+  "accessionNo" : "0001628280-26-068909",
+  "cik" : "0000080424",
+  "form" : "8-K",
+  "filedAt" : "2026-11-02",
+  "reportDate" : "2026-11-02",
+  "primaryDocument" : "pg-20261102.htm",
+  "items" : [
+    "8.01",
+    "9.01"
+  ],
+  "sourceUrl" : "https://www.sec.gov/Archives/edgar/data/80424/000162828026068909/pg-20261102.htm",
+  "extractorVersion" : "html-2/sections-2",
+  "contentSha256" : "020899bb2766773267be34b68f52fa37d0e196765b90037058741667b7249d24",
+  "sections" : [
+    {
+      "itemId" : "8.01",
+      "title" : "Other Events.",
+      "text" : "On November 2, 2026, The Procter & Gamble Company (the “Company”) closed an underwritten public\noffering of $352,231,000 aggregate principal amount of Floating Rate Notes due November 2, 2076 under the\nCompany’s Registration Statement on Form S-3 (Registration No. 333-299472). Legal opinions related to these\nnotes are attached hereto as Exhibits (5)(a) and (5)(b) and are incorporated herein by reference."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "formatVersion" : 1,
+  "ticker" : "JPM",
+  "accessionNo" : "0001628280-26-069523",
+  "cik" : "0000019617",
+  "form" : "10-Q",
+  "filedAt" : "2026-11-03",
+  "reportDate" : "2026-09-30",
+  "primaryDocument" : "jpm-20260930.htm",
+  "items" : [ ],
+  "sourceUrl" : "https://www.sec.gov/Archives/edgar/data/19617/000162828026069523/jpm-20260930.htm",
+  "extractorVersion" : "html-2/sections-2",
+  "contentSha256" : "bb3a926b402221f10338b19b343a48f3433a22f49c581d78e463f9d189e0e9e8",
+  "sections" : [
+    {
+      "itemId" : "I-2",
+      "title" : "Management’s Discussion and Analysis of Financial Condition and Results of Operations.",
+      "text" : "Consolidated Financial Highlights | 3\nIntroduction | 4\nExecutive Overview | 5\nConsolidated Results of Operations | 9\nConsolidated Balance Sheets and Cash Flows Analysis | 15\nExplanation and Reconciliation of the Firm’s Use of Non-GAAP Financial Measures | 19\nBusiness Segment & Corporate Results | 21\nFirmwide Risk Management | 44\nCapital Risk Management | 45\nLiquidity Risk Management | 53\nConsumer Credit Portfolio | 62\nWholesale Credit Portfolio | 66\nAllowance for Credit Losses | 75\nInvestment Portfolio Risk Management | 78\nMarket Risk Management | 79\nCountry Risk Management | 85\nCritical Accounting Estimates Used by the Firm | 86\nAccounting and Reporting Developments | 89\nForward-Looking Statements | 91"
+    },
+    {
+      "itemId" : "II-1A",
+      "title" : "Risk Factors.",
+      "text" : "Refer to Part I, Item 1A: Risk Factors on pages 9–31 of JPMorganChase’s 2025 Form 10-K and Forward-Looking Statements on page 91 of this Form 10-Q for a discussion of certain risk factors affecting the Firm.\nSupervision and regulation\nRefer to the Supervision and regulation section on pages 2-6 of JPMorganChase’s 2025 Form 10-K for information on Supervision and Regulation."
+    }
+  ]
+}

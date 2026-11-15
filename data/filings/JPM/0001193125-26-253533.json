@@ -1,0 +1,24 @@
+{
+  "formatVersion" : 1,
+  "ticker" : "JPM",
+  "accessionNo" : "0001193125-26-253533",
+  "cik" : "0000019617",
+  "form" : "8-K",
+  "filedAt" : "2026-06-02",
+  "reportDate" : "2026-06-02",
+  "primaryDocument" : "d113536d8k.htm",
+  "items" : [
+    "8.01",
+    "9.01"
+  ],
+  "sourceUrl" : "https://www.sec.gov/Archives/edgar/data/19617/000119312526253533/d113536d8k.htm",
+  "extractorVersion" : "html-2/sections-2",
+  "contentSha256" : "9d17e977ded542c0d45677b6bf859fddc51ac57e7eaf5c6ac05a70fc524e6731",
+  "sections" : [
+    {
+      "itemId" : "8.01",
+      "title" : "Other Events.",
+      "text" : "On June 2, 2026, JPMorgan Chase & Co. closed a public offering of $500,000,000 aggregate principal amount of Fixed-to-Floating Rate Notes due 2030 (the “Notes”). The Notes are an additional issuance of, and constitute a single series with, the $2,750,000,000 aggregate principal amount of Fixed-to-Floating Rate Notes due 2030 issued by JPMorgan Chase & Co. on April 23, 2026.\nThe offering of the Notes was registered under the Securities Act of 1933, as amended, pursuant to a registration statement on Form S-3 (File No. 333-285537), as amended. In connection with these offerings, the legal opinion as to the legality of the Notes is being filed as Exhibit 5.1 to this report."
+    }
+  ]
+}

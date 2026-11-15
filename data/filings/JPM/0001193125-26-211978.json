@@ -1,0 +1,26 @@
+{
+  "formatVersion" : 1,
+  "ticker" : "JPM",
+  "accessionNo" : "0001193125-26-211978",
+  "cik" : "0000019617",
+  "form" : "8-K",
+  "filedAt" : "2026-05-07",
+  "reportDate" : "2026-05-06",
+  "primaryDocument" : "d903351d8k.htm",
+  "items" : [
+    "3.03",
+    "5.03",
+    "8.01",
+    "9.01"
+  ],
+  "sourceUrl" : "https://www.sec.gov/Archives/edgar/data/19617/000119312526211978/d903351d8k.htm",
+  "extractorVersion" : "html-2/sections-2",
+  "contentSha256" : "2406d3b4ed3322748fb80b24d94d3d03e90e055e7b3668c5c0db979f085a2218",
+  "sections" : [
+    {
+      "itemId" : "8.01",
+      "title" : "Other Events.",
+      "text" : "On May 7, 2026, the Company completed the issuance and sale of 300,000 Shares, which Shares were deposited against delivery of Depositary Receipts evidencing 3,000,000 Depositary Shares, pursuant to an Underwriting Agreement, dated April 30, 2026, among the Company, J.P. Morgan Securities LLC and the other several underwriters named therein. The sale of the Depositary Shares was made pursuant to the Company’s Registration Statement on Form S-3 (File No. 333-285537), as amended. In connection with this offering, the legal opinion as to the legality of the Depositary Shares and the Series PP Preferred Stock is being filed as Exhibit 5.1 to this Current Report on Form 8-K."
+    }
+  ]
+}

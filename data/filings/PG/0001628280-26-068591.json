@@ -1,0 +1,24 @@
+{
+  "formatVersion" : 1,
+  "ticker" : "PG",
+  "accessionNo" : "0001628280-26-068591",
+  "cik" : "0000080424",
+  "form" : "8-K",
+  "filedAt" : "2026-10-30",
+  "reportDate" : "2026-10-30",
+  "primaryDocument" : "pg-20261030.htm",
+  "items" : [
+    "8.01",
+    "9.01"
+  ],
+  "sourceUrl" : "https://www.sec.gov/Archives/edgar/data/80424/000162828026068591/pg-20261030.htm",
+  "extractorVersion" : "html-2/sections-2",
+  "contentSha256" : "04860893f7245815a7c765ef593794f95c529ab07ccabebdcd2b819aa823a7df",
+  "sections" : [
+    {
+      "itemId" : "8.01",
+      "title" : "Other Events.",
+      "text" : "On October 30, 2026, The Procter & Gamble Company (the “Company”) closed an underwritten public\noffering of $750,000,000 aggregate principal amount of 5.125% Notes due October 30, 2031, $750,000,000\naggregate principal amount of 5.300% Notes due October 30, 2033, $1,250,000,000 aggregate principal amount of\n5.450% Notes due October 30, 2036 and $1,250,000,000 aggregate principal amount of 5.900% Notes due October\n30, 2056 under the Company’s Registration Statement on Form S-3 (Registration No. 333-299472). Legal opinions\nrelated to these notes are attached hereto as Exhibits (5)(a) and (5)(b) and are incorporated herein by reference."
+    }
+  ]
+}
