@@ -369,6 +369,8 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   Ollama embed API (valid, wrong dimension, timeout)
 - [ ] Flyway V19 `research_chunks` (filing, section, ordinal, text, token count, `embedding vector(N)`,
   `embedding_model`), HNSW index; `FlywayBaselineIT`
+- [ ] Sections with `injection_suspected` are neither chunked nor embedded, so retrieval can never return them
+  (ADR 0013; found missing 2026-11-15); a test with the suspected test-snapshot 8-K
 - [ ] `ingestFiling` chunks + embeds (embedding usage recorded in `ai_generation_log`? decide in V1: cost 0 locally,
   but latency and volume are useful); repository IT (insert, HNSW used per `EXPLAIN`)
 - [ ] First local ingest of the G1 corpus: filings, sections, chunks, DB size, ingest time (in PROGRESS); load into
@@ -586,6 +588,7 @@ Doubts about the domain model. Add new ones at session end; resolve them in an A
 | 2026-11-07 | "Run news now" (admin trigger) has no drain step, so `summarize` runs while the listener is still classifying the items just ingested. Today's summary is built without them, and the gate reopens it only for a HIGH item, so new MEDIUM news never reaches today's summary. Drain for the admin trigger too, skip `summarize` for admin runs, or accept? | Decided (2026-11-07): admin runs skip `summarize`; summaries come from the runner / scheduler |
 | 2026-11-07 | `briefwise.job-runner.max-duration` (15m) bounds only publish and drain. A slow ingest, sweep (up to 200 sequential LLM calls) or summary can run until the workflow's 25-min timeout kills it, with no exit 1 from the app and no "leftovers for the next run" message. Give every step the deadline (stop between items), or treat max-duration as a wait limit only and document it? | Decided: deadline for sweep and summaries between items, ingest unbounded ([ADR 0021](decisions/0021-job-run-limits-status-and-lock.md)) |
 | 2026-11-14 | A news item fetched for one ticker can be about a related company with another ticker (eval: an item under `KO` about Coca-Cola Consolidated, `COKE`). The model then names no ticker but rates it `MEDIUM`, which ADR 0023 rejects as invalid. Is "listed under a ticker" the same as "about the company"? Map related issuers (bottlers, subsidiaries, share classes) to the held instrument, let the model answer `LOW` for them, or accept as unclassified? | Open (prompt v3 / watch the live unusable rate) |
+| 2026-11-15 | An unchanged filing keeps its stored screening, so a new injection pattern (ADR 0013 list) does not re-screen stored sections. Re-screen all sections when the pattern list changes (screening version per section)? | Open (decide with M2 slice 3 chunking, which skips suspected sections) |
 
 ## Open questions from DESIGN
 
