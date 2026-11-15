@@ -128,6 +128,22 @@ class FilingIngestServiceTest {
         verify(screen, never()).screen(any(), anyString());
         verify(repository, never()).insert(any());
         verify(repository, never()).replace(any());
+        verify(repository, never()).updateProvenance(any(), anyString(), anyString());
+    }
+
+    @Test
+    void same_text_from_a_newer_extractor_only_updates_the_provenance() {
+        FetchedFiling fetched = fetched(TEN_K, "Text of " + TEN_K);   // extractor html-1/sections-2
+        Filing stored = new Filing(UUID.randomUUID(), AAPL, TEN_K, fetched.sourceUrl(), "html-1/sections-1",
+                fetched.contentSha256(), stored(fetched, Screening.CLEAN).sections());
+        when(repository.findByAccession(TEN_K.accessionNo())).thenReturn(Optional.of(stored));
+
+        IngestedFiling result = service.ingestFiling(AAPL, TEN_K.accessionNo());
+
+        assertThat(result.outcome()).isEqualTo(IngestOutcome.UNCHANGED);
+        verify(repository).updateProvenance(TEN_K.accessionNo(), fetched.sourceUrl(), "html-1/sections-2");
+        verify(screen, never()).screen(any(), anyString());
+        verify(repository, never()).replace(any());
     }
 
     @Test

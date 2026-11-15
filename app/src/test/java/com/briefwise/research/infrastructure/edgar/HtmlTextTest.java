@@ -23,6 +23,13 @@ class HtmlTextTest {
     }
 
     @Test
+    void every_unicode_space_becomes_a_plain_space() {   // seen 2026-11-15 in filing-agent 8-Ks: Item&#8201;8.01
+        String html = "<body><p>Item&#8201;8.01.&#8194;Other&#8239;Events</p><p>a&#160;&#160;b</p></body>";
+
+        assertThat(text(html)).isEqualTo("Item 8.01. Other Events\na b");
+    }
+
+    @Test
     void table_rows_become_cell_rows_without_empty_cells() {
         String html = """
                 <body><p>Before</p><table>

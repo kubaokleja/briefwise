@@ -17,6 +17,14 @@ public interface FilingRepository {
     void insert(Filing filing);
 
     /**
+     * Updates only where the stored filing came from and which extractor produced it, for a re-ingest whose content
+     * hash is unchanged; sections and screening stay as they are.
+     *
+     * @throws IllegalStateException if no filing with this accession is stored
+     */
+    void updateProvenance(AccessionNo accessionNo, String sourceUrl, String extractorVersion);
+
+    /**
      * Replaces the stored filing with the same accession (metadata, hash, all sections) in one transaction; the
      * stored filing id is kept.
      */
