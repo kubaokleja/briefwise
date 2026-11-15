@@ -141,6 +141,18 @@ briefwise:
       read-timeout: 10s
       max-retries: 2         # on 429, 5xx, I/O errors (ADR 0005); delay doubles
       retry-delay: 1s
+  research:
+    filings:
+      source: snapshot       # ADR 0026: snapshot everywhere; edgar only for a deliberate local refresh
+    edgar:                   # SEC fair access: max 10 req/s, declared User-Agent, no key (checked 2026-11-15)
+      data-base-url: https://data.sec.gov       # submissions JSON
+      archive-base-url: https://www.sec.gov     # filing documents and -index.htm pages
+      user-agent: ${SEC_USER_AGENT:}             # "Name contact@email"; blank fails before any request
+      connect-timeout: 5s
+      read-timeout: 30s      # a 10-K primary document is 1-2 MB
+      max-retries: 2         # on 429, 5xx, I/O errors (ADR 0005); delay doubles; 403 is not retried
+      retry-delay: 1s
+      min-request-gap: 150ms # about 6-7 req/s, below the SEC limit (ADR 0026)
   aiops:
     # USD per 1M tokens, Anthropic first-party rates (checked 2026-10-21; re-check before relying on them).
     # Haiku 5.5 rates apply to prompts up to 100K tokens. Every model the app calls needs an entry (ADR 0008).

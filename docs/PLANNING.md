@@ -278,8 +278,12 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   snapshot `data/filings/{TICKER}/{accession}.json` (`briefwise.research.filings.source: edgar|snapshot`), `cik` column
   on `instruments` via `MarketFacade` (V17), local ingest (Neon in slice 3), in-adapter throttle (150 ms gap), re-ingest
   by accession + content SHA-256
-- [ ] Check current SEC EDGAR fair-access rules (requests per second, `User-Agent` with contact), submissions API
-  and archive URLs; `SEC_USER_AGENT` in `.env.example`
+- [x] Check current SEC EDGAR fair-access rules (2026-11-15; sec.gov pages last reviewed 2025-04): max 10 req/s,
+  declared `User-Agent` ("Name contact@email"), no key, excess -> IP block (no status documented, 403 in practice);
+  `data.sec.gov/submissions/CIK##########.json`, `filings.recent` columns confirmed on AAPL (`accessionNumber`,
+  `filingDate`, `reportDate`, `form`, `primaryDocument`, `items` comma-separated), at least 1 year / 1,000 rows (older
+  pages in `filings.files`, not read); documents under `/Archives/edgar/data/{cik}/{accession no dashes}/`, the
+  EX-99.1 named in the Type column of `{accession}-index.htm`; `SEC_USER_AGENT` in `.env.example`
 - [x] Dependency: `org.jsoup:jsoup:1.24.1` (approved 2026-11-15, latest in Maven Central `maven-metadata.xml`;
   no transitive deps), used only in `research/infrastructure/edgar/`. Rejected: Spring AI `JsoupDocumentReader`
   (wraps jsoup, its `Document` does not help with sections), Tika (heavy), hand-rolled (fragile on inline XBRL)
@@ -297,10 +301,18 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   `injection_suspected`, `matched_rules`; one per item; cascade on delete); JDBC `FilingRepositoryAdapter`
   (`findContentSha256`, `findByAccession`, `insert`, `replace` keeping the filing id); `FilingRepositoryAdapterIT`
   (4), `FlywayBaselineIT` (18 migrations)
-- [ ] EDGAR adapter (`RestClient`, `User-Agent`, rate limit, `RetryTemplate` on 429/5xx/timeout per ADR 0005);
-  WireMock tests with saved submissions JSON + one trimmed 10-K / 10-Q / 8-K (+ EX-99.1) HTML each
+- [x] EDGAR adapter `research/infrastructure/edgar/`: `EdgarFilingSource` (`RestClient`, `User-Agent` from
+  `SEC_USER_AGENT`, blank fails before any request; `RetryTemplate` on 429/5xx/I/O per ADR 0005; 403 = config error,
+  not retried; 404 -> `FilingNotFoundException`; active with `briefwise.research.filings.source=edgar`, default
+  `snapshot`), `EdgarThrottle` (150 ms gap before every attempt), `HtmlText` (jsoup: block per line, `cell | cell`
+  rows, `ix:header` / `display:none` / script dropped, SGML `<DOCUMENT>` wrapper of archive exhibits skipped),
+  `EdgarProperties`; `extractorVersion` = `html-1/sections-1`. Real AAPL fixtures (2026-11-15, trimmed by script to
+  ~230 KB: 10-K, 10-Q, earnings 8-K + index + EX-99.1, 8.01 8-K without EX-99.1 + index, 8-row submissions).
+  `EdgarFilingSourceTest` (15), `HtmlTextTest` (6), `EdgarThrottleTest` (4). Seen on the full filings: page footers
+  (`Apple Inc. | 2026 Form 10-K | 12`) stay inside section text -> next step
 - [ ] Section extraction (10-K Items 1, 1A, 7, 7A; 10-Q Part I Item 2, Part II Item 1A; 8-K Items 2.02, 7.01, 8.01
-  + EX-99.1): table of contents skipped, tables as `cell | cell` rows (ADR 0025); `SectionExtractorTest` on the fixtures
+  + EX-99.1): table of contents skipped, tables as `cell | cell` rows (ADR 0025); page footer / page-number lines
+  dropped (seen on AAPL: `Apple Inc. | 2026 Form 10-K | 12`); `SectionExtractorTest` on the fixtures
 - [ ] Snapshot (ADR 0026): `SnapshotFilingSource` + `JsonFilingSnapshotWriter` (`data/filings/`); round-trip test
 - [ ] First local ingest from live EDGAR (held stocks): snapshot committed; filings, sections, size, time, screening
   hits in PROGRESS (may move to the start of slice 3 if the session runs long)

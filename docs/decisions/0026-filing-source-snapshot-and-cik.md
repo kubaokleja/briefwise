@@ -12,6 +12,9 @@ sec.gov "Accessing EDGAR Data":
 - a `User-Agent` naming the requester and a contact email;
 - no API key.
 
+Re-checked on 2026-11-15 while building the adapter: unchanged. The 8-K exhibit EX-99.1 is found through the Type
+column of the filing's `{accession}-index.htm` page (the folder `index.json` lists file names only).
+
 EDGAR identifies companies by CIK, not by ticker. CI, the `demo` profile and the RAG golden-set anchors (slice 4)
 must work offline and reproducibly ([ADR 0003](0003-runtime-github-actions-and-neon.md)), the same reason prices
 use a snapshot ([ADR 0004](0004-market-price-source-yfinance-snapshot.md)). Filing ingest runs on demand, locally,
