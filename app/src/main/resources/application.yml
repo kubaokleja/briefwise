@@ -77,6 +77,8 @@ briefwise:
       enabled: true
     news-classification-eval:  # never scheduled: evals.yml (job runner) or "run now"; disabled would exit 0 = green
       enabled: true
+    filing-ingest:             # never scheduled, not in the morning pipeline: admin endpoint or job runner (ADR 0026)
+      enabled: true
     risk-alerts:
       enabled: true
     brief:

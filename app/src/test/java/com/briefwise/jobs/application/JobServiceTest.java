@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.briefwise.jobs.domain.model.EvalResult;
@@ -18,6 +19,7 @@ import com.briefwise.jobs.domain.model.JobStep;
 import com.briefwise.jobs.domain.model.JobTrigger;
 import com.briefwise.jobs.domain.model.PublishResult;
 import com.briefwise.jobs.domain.model.RunPolicy;
+import com.briefwise.jobs.domain.port.FilingPipeline;
 import com.briefwise.jobs.domain.port.JobLock;
 import com.briefwise.jobs.domain.port.NewsPipeline;
 import com.briefwise.shared.domain.exception.UsageLimitExceededException;
@@ -39,8 +41,9 @@ class JobServiceTest {
 
     private final MutableClock clock = new MutableClock(Instant.parse("2026-10-28T04:30:00Z"));
     private final NewsPipeline news = mock(NewsPipeline.class);
+    private final FilingPipeline filings = mock(FilingPipeline.class);
     private final FakeLock lock = new FakeLock();
-    private final JobService service = new JobService(news, lock, new RunPolicy(MAX, Duration.ZERO), clock);
+    private final JobService service = new JobService(news, filings, lock, new RunPolicy(MAX, Duration.ZERO), clock);
 
     @BeforeEach
     void happyPipeline() {
@@ -298,6 +301,40 @@ class JobServiceTest {
         JobRun run = service.run(JobName.NEWS_CLASSIFICATION_EVAL, JobTrigger.RUNNER);
 
         assertThat(run.status()).isEqualTo(JobStatus.FAILED);
+    }
+
+    @Test
+    void filing_ingest_is_one_step_and_isolated_failures_keep_it_green() {
+        when(filings.ingestHeld()).thenReturn(Map.of("attempted", 40, "inserted", 39, "failed", 1));
+
+        JobRun run = service.run(JobName.FILING_INGEST, JobTrigger.RUNNER);
+
+        assertThat(run.status()).isEqualTo(JobStatus.SUCCEEDED);
+        assertThat(run.steps()).extracting(JobStep::name).containsExactly("ingest-filings");
+        assertThat(step(run, "ingest-filings").result()).containsEntry("inserted", 39);
+        verifyNoInteractions(news);
+    }
+
+    @Test
+    void filing_ingest_fails_when_half_the_filings_failed() {
+        when(filings.ingestHeld()).thenReturn(Map.of("attempted", 4, "failed", 2));
+
+        JobRun run = service.run(JobName.FILING_INGEST, JobTrigger.ADMIN);
+
+        assertThat(run.status()).isEqualTo(JobStatus.FAILED);
+        assertThat(step(run, "ingest-filings").message())
+                .hasValueSatisfying(m -> assertThat(m).contains("2 of 4 filings and listings failed"));
+    }
+
+    @Test
+    void a_misconfigured_filing_source_fails_the_run() {
+        when(filings.ingestHeld()).thenThrow(new IllegalStateException("EDGAR answered 403"));
+
+        JobRun run = service.run(JobName.FILING_INGEST, JobTrigger.RUNNER);
+
+        assertThat(run.status()).isEqualTo(JobStatus.FAILED);
+        assertThat(step(run, "ingest-filings").message())
+                .hasValueSatisfying(m -> assertThat(m).contains("EDGAR answered 403"));
     }
 
     /** One lock for every job: {@code taken} simulates another run holding it. */

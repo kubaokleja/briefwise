@@ -335,8 +335,12 @@ embeddings), not part of the morning pipeline ([7.3](DESIGN.md#73-qa-with-citati
   `extractor_version` `VARCHAR(16)` too short for `html-1/sections-2` -> 64 (V18 edited in place, never merged;
   decided 2026-11-15). `FilingIngestServiceTest` (10), `ResearchFacadeIT` (3, synthetic AAPL 10-K + 8-K with an
   injection phrase in `test/resources/research/snapshot/`), `FilingRepositoryAdapterIT` on real version strings
-- [ ] Job `filing-ingest` in `JobName` (own lock group; admin endpoint + runner, not in the morning pipeline) ->
-  `ResearchFacade.ingestHeld`; `docs/api.http` (happy path, 404 unknown job, 400)
+- [x] Job `filing-ingest` in `JobName` (own lock group `filing-ingest`; admin endpoint + runner, no cron, not in the
+  morning pipeline): port `FilingPipeline`, `FacadeFilingPipeline` -> `ResearchFacade.ingestHeld`; one step
+  `ingest-filings` (counts, `attempted`, `failed`, `failedFilings`), `FAILED` when at least half of the attempted
+  filings and listings failed or on a thrown error, no deadline (like news ingest, ADR 0021);
+  `briefwise.jobs.filing-ingest.enabled`. `JobServiceTest` (+3), `JobModelTest` (+2 asserts), `AdminJobControllerIT`
+  (+1, test snapshot); `docs/api.http` entry (404 / 400 cases shared with the other jobs)
 - [ ] First local ingest from live EDGAR (held stocks): snapshot committed; filings, sections, size, time, screening
   hits in PROGRESS (may move to the start of slice 3 if the session runs long)
 

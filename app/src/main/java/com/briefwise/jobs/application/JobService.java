@@ -8,6 +8,7 @@ import com.briefwise.jobs.domain.model.JobStep;
 import com.briefwise.jobs.domain.model.JobTrigger;
 import com.briefwise.jobs.domain.model.PublishResult;
 import com.briefwise.jobs.domain.model.RunPolicy;
+import com.briefwise.jobs.domain.port.FilingPipeline;
 import com.briefwise.jobs.domain.port.JobLock;
 import com.briefwise.jobs.domain.port.Jobs;
 import com.briefwise.jobs.domain.port.NewsPipeline;
@@ -46,12 +47,14 @@ class JobService implements Jobs {
     private static final Logger log = LoggerFactory.getLogger(JobService.class);
 
     private final NewsPipeline news;
+    private final FilingPipeline filings;
     private final JobLock locks;
     private final RunPolicy policy;
     private final Clock clock;
 
-    JobService(NewsPipeline news, JobLock locks, RunPolicy policy, Clock clock) {
+    JobService(NewsPipeline news, FilingPipeline filings, JobLock locks, RunPolicy policy, Clock clock) {
         this.news = news;
+        this.filings = filings;
         this.locks = locks;
         this.policy = policy;
         this.clock = clock;
@@ -78,6 +81,7 @@ class JobService implements Jobs {
             case NEWS_INGEST -> newsIngest(trigger, deadline);
             case NEWS_CLASSIFY -> List.of(sweep(deadline));
             case NEWS_CLASSIFICATION_EVAL -> List.of(evaluate());
+            case FILING_INGEST -> List.of(ingestFilings());
         };
         JobRun run = new JobRun(job, trigger, steps, startedAt, clock.instant());
         log.info("Job {} {} in {} ms: {}", job.id(), run.status(),
@@ -139,6 +143,25 @@ class JobService implements Jobs {
         if (flag(step, "stoppedOnDeferral")) {
             return new JobStep("sweep", JobStatus.SKIPPED, step.result(),
                     Optional.of("classification deferred (budget used up); the rest waits for the next run"));
+        }
+        return step;
+    }
+
+    /**
+     * Filing ingest of the held companies (ADR 0025, 0026). Like the sweep: {@code FAILED} when at least half of the
+     * attempted filings and listings failed (a systematic fault); isolated failures are listed in the result and the
+     * next run retries them. No deadline, like news ingest (ADR 0021): about 40 filings take a few minutes.
+     */
+    private JobStep ingestFilings() {
+        JobStep step = step("ingest-filings", filings::ingestHeld);
+        if (step.status() != JobStatus.SUCCEEDED) {
+            return step;
+        }
+        int attempted = count(step, "attempted");
+        int failed = count(step, "failed");
+        if (failed > 0 && 2 * failed >= attempted) {
+            return new JobStep("ingest-filings", JobStatus.FAILED, step.result(),
+                    Optional.of(failed + " of " + attempted + " filings and listings failed; see failedFilings"));
         }
         return step;
     }

@@ -20,6 +20,8 @@ class JobModelTest {
     void job_ids_resolve_to_names() {
         assertThat(JobName.fromId("news-ingest")).isEqualTo(JobName.NEWS_INGEST);
         assertThat(JobName.fromId("news-classify")).isEqualTo(JobName.NEWS_CLASSIFY);
+        assertThat(JobName.fromId("filing-ingest")).isEqualTo(JobName.FILING_INGEST);
+        assertThat(JobName.FILING_INGEST.lockGroup()).isNotEqualTo(JobName.NEWS_INGEST.lockGroup());
     }
 
     @Test

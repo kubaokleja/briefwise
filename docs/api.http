@@ -65,6 +65,11 @@ POST {{host}}/api/admin/jobs/news-ingest/run
 ### golden set, ANTHROPIC_API_KEY and spring.ai.model.chat=anthropic; otherwise the step reports REFUSED / FAILED
 POST {{host}}/api/admin/jobs/news-classification-eval/run
 
+### Filing ingest of the held companies - 200 (ADR 0025, 0026). Default source: the committed snapshot
+### (data/filings, no network). Live EDGAR only with briefwise.research.filings.source=edgar and SEC_USER_AGENT set;
+### that also rewrites the snapshot. Safe to repeat: unchanged filings are counted, not stored again
+POST {{host}}/api/admin/jobs/filing-ingest/run
+
 ### Unknown job - 404
 POST {{host}}/api/admin/jobs/risk-alerts/run
 

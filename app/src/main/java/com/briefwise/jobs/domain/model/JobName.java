@@ -8,11 +8,13 @@ import java.util.regex.Pattern;
  * {@code briefwise.jobs.<id>} and the value of {@code --briefwise.job}. {@code news-ingest}: ingest, publish, (runner:
  * wait until consumed), sweep, portfolio summaries. {@code news-classify}: the sweep alone.
  * {@code news-classification-eval}: the classification eval against the golden set (ADR 0018); never scheduled.
+ * {@code filing-ingest}: SEC filings of the held companies (ADR 0025, 0026); admin endpoint and runner only.
  */
 public enum JobName {
     NEWS_INGEST("news-ingest", "news-pipeline"),
     NEWS_CLASSIFY("news-classify", "news-pipeline"),
-    NEWS_CLASSIFICATION_EVAL("news-classification-eval", "news-classification-eval");
+    NEWS_CLASSIFICATION_EVAL("news-classification-eval", "news-classification-eval"),
+    FILING_INGEST("filing-ingest", "filing-ingest");
 
     private static final Pattern ID = Pattern.compile("[a-z][a-z0-9-]{0,63}");
 
